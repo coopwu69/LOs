@@ -2,7 +2,7 @@
 _extracted.json
 _parsed.json
 _appdata.json
-index.html
+# index.html is now tracked for Vercel static deployment
 
 # Supabase local
 supabase/.temp/
@@ -36,3 +36,7 @@ Thumbs.db
 # Env
 .env
 .env.local
+
+# Local DB helper scripts (contain credentials)
+_check_neon.py
+_apply_neon_schema.py
