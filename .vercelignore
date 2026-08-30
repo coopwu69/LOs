@@ -1,0 +1,36 @@
+# Exclude source document directories (long Thai filenames break Linux build)
+1.*/
+2.*/
+3.*/
+4.*/
+5.*/
+6.*/
+7.*/
+8.*/
+9.*/
+10.*/
+11.*/
+12.*/
+13.*/
+*.docx
+*.pdf
+*.xlsx
+
+# Exclude derived data artifacts
+_extracted.json
+_parsed.json
+_appdata.json
+
+# Exclude Python build scripts (not needed for static deployment)
+*.py
+__pycache__/
+
+# Exclude supabase local config
+supabase/
+
+# Exclude docs
+docs/
+
+# Exclude local DB helper scripts
+_check_neon.py
+_apply_neon_schema.py
