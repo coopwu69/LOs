@@ -21,7 +21,10 @@ _extracted.json
 _parsed.json
 _appdata.json
 
-# Exclude Python build scripts (not needed for static deployment)
+# Build the Next.js app from web/ instead of the legacy static app
+index.html
+
+# Exclude Python build scripts (not needed for deployment)
 *.py
 __pycache__/
 
