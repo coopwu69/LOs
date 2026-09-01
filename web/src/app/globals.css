@@ -1,0 +1,404 @@
+@import "tailwindcss";
+
+/* ============================================
+   Design Tokens — 3-Tier Hierarchy (DTCG)
+   Warm Academic Workspace — friendly, trustworthy, efficient
+   ============================================ */
+
+:root {
+  color-scheme: light;
+  /* --- Primitive Tokens (never reference directly) --- */
+  /* Indigo — warm trustworthy primary (replaces cold blue) */
+  --indigo-50: #eef2ff;
+  --indigo-100: #e0e7ff;
+  --indigo-200: #c7d2fe;
+  --indigo-300: #a5b4fc;
+  --indigo-400: #818cf8;
+  --indigo-500: #6366f1;
+  --indigo-600: #4f46e5;
+  --indigo-700: #4338ca;
+  --indigo-800: #3730a3;
+  --indigo-900: #312e81;
+  --indigo-950: #1e1b4b;
+
+  /* Stone — warm neutral (replaces cold gray) */
+  --stone-50: #fafaf9;
+  --stone-100: #f5f5f4;
+  --stone-200: #e7e5e4;
+  --stone-300: #d6d3d1;
+  --stone-400: #a8a29e;
+  --stone-500: #78716c;
+  --stone-600: #57534e;
+  --stone-700: #44403c;
+  --stone-800: #292524;
+  --stone-900: #1c1917;
+  --stone-950: #0c0a09;
+
+  --emerald-50: #ecfdf5;
+  --emerald-100: #d1fae5;
+  --emerald-500: #10b981;
+  --emerald-600: #059669;
+  --emerald-700: #047857;
+
+  --amber-50: #fffbeb;
+  --amber-100: #fef3c7;
+  --amber-500: #f59e0b;
+  --amber-600: #d97706;
+  --amber-700: #b45309;
+
+  --red-50: #fef2f2;
+  --red-100: #fee2e2;
+  --red-500: #ef4444;
+  --red-600: #dc2626;
+  --red-700: #b91c1c;
+
+  /* --- Semantic Tokens (light mode) --- */
+  --surface-page: #f8f7f4;
+  --surface-raised: #fffefb;
+  --surface-sunken: #f3f1ed;
+  --surface-overlay: rgba(255, 254, 251, 0.85);
+  --surface-hover: #f5f3ef;
+  --surface-table-stripe: #faf9f7;
+  --surface-table-hover: #f5f3ef;
+
+  --text-primary: var(--stone-900);
+  --text-secondary: var(--stone-600);
+  --text-tertiary: var(--stone-500);
+  --text-inverse: #fffefb;
+  --text-link: var(--indigo-600);
+
+  --border-default: var(--stone-200);
+  --border-strong: var(--stone-300);
+  --border-focus: var(--indigo-500);
+
+  --action-primary: var(--indigo-600);
+  --action-primary-hover: var(--indigo-700);
+  --action-primary-active: var(--indigo-800);
+
+  --feedback-success-bg: var(--emerald-50);
+  --feedback-success-text: var(--emerald-700);
+  --feedback-success-border: var(--emerald-100);
+  --feedback-warning-bg: var(--amber-50);
+  --feedback-warning-text: var(--amber-700);
+  --feedback-warning-border: var(--amber-100);
+  --feedback-error-bg: var(--red-50);
+  --feedback-error-text: var(--red-700);
+  --feedback-error-border: var(--red-100);
+  --feedback-info-bg: var(--indigo-50);
+  --feedback-info-text: var(--indigo-700);
+  --feedback-info-border: var(--indigo-100);
+
+  /* Domain colors for assessment sections */
+  --domain-knowledge: var(--indigo-600);
+  --domain-knowledge-bg: var(--indigo-50);
+  --domain-skills: var(--emerald-600);
+  --domain-skills-bg: var(--emerald-50);
+  --domain-ethics: var(--amber-600);
+  --domain-ethics-bg: var(--amber-50);
+  --domain-character: #8b5cf6;
+  --domain-character-bg: #f5f3ff;
+  --domain-general: var(--stone-600);
+  --domain-general-bg: var(--stone-100);
+
+  /* Spacing — 4px base */
+  --space-0: 0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Radii */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Shadows — 5-level elevation (warm-tinted) */
+  --shadow-xs: 0 1px 2px 0 rgb(28 25 23 / 0.06);
+  --shadow-sm: 0 1px 3px 0 rgb(28 25 23 / 0.08), 0 1px 2px -1px rgb(28 25 23 / 0.08);
+  --shadow-md: 0 4px 6px -1px rgb(28 25 23 / 0.08), 0 2px 4px -2px rgb(28 25 23 / 0.06);
+  --shadow-lg: 0 10px 15px -3px rgb(28 25 23 / 0.08), 0 4px 6px -4px rgb(28 25 23 / 0.05);
+  --shadow-xl: 0 20px 25px -5px rgb(28 25 23 / 0.1), 0 8px 10px -6px rgb(28 25 23 / 0.05);
+  --shadow-focus-ring: 0 0 0 2px var(--surface-page), 0 0 0 4px var(--border-focus);
+}
+
+[data-theme="dark"] {
+  --surface-page: var(--stone-950);
+  --surface-raised: var(--stone-900);
+  --surface-sunken: var(--stone-900);
+  --surface-overlay: rgba(28, 25, 23, 0.85);
+  --surface-hover: var(--stone-800);
+  --surface-table-stripe: rgba(255, 254, 251, 0.02);
+  --surface-table-hover: var(--stone-800);
+
+  --text-primary: #fafaf9;
+  --text-secondary: var(--stone-400);
+  --text-tertiary: var(--stone-500);
+  --text-inverse: var(--stone-900);
+  --text-link: var(--indigo-400);
+
+  --border-default: var(--stone-800);
+  --border-strong: var(--stone-700);
+  --border-focus: var(--indigo-400);
+
+  --action-primary: var(--indigo-500);
+  --action-primary-hover: var(--indigo-600);
+  --action-primary-active: var(--indigo-700);
+
+  --feedback-success-bg: rgba(16, 185, 129, 0.12);
+  --feedback-success-text: var(--emerald-500);
+  --feedback-success-border: rgba(16, 185, 129, 0.25);
+  --feedback-warning-bg: rgba(245, 158, 11, 0.12);
+  --feedback-warning-text: var(--amber-500);
+  --feedback-warning-border: rgba(245, 158, 11, 0.25);
+  --feedback-error-bg: rgba(239, 68, 68, 0.12);
+  --feedback-error-text: var(--red-500);
+  --feedback-error-border: rgba(239, 68, 68, 0.25);
+  --feedback-info-bg: rgba(99, 102, 241, 0.12);
+  --feedback-info-text: var(--indigo-400);
+  --feedback-info-border: rgba(99, 102, 241, 0.25);
+
+  --domain-knowledge: var(--indigo-400);
+  --domain-knowledge-bg: rgba(99, 102, 241, 0.12);
+  --domain-skills: var(--emerald-500);
+  --domain-skills-bg: rgba(16, 185, 129, 0.12);
+  --domain-ethics: var(--amber-500);
+  --domain-ethics-bg: rgba(245, 158, 11, 0.12);
+  --domain-character: #a78bfa;
+  --domain-character-bg: rgba(139, 92, 246, 0.12);
+  --domain-general: var(--stone-400);
+  --domain-general-bg: var(--stone-800);
+
+  --shadow-focus-ring: 0 0 0 2px var(--surface-page), 0 0 0 4px var(--border-focus);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface-page: var(--stone-950);
+    --surface-raised: var(--stone-900);
+    --surface-sunken: var(--stone-900);
+    --surface-overlay: rgba(28, 25, 23, 0.85);
+    --surface-hover: var(--stone-800);
+    --surface-table-stripe: rgba(255, 254, 251, 0.02);
+    --surface-table-hover: var(--stone-800);
+
+    --text-primary: #fafaf9;
+    --text-secondary: var(--stone-400);
+    --text-tertiary: var(--stone-500);
+    --text-inverse: var(--stone-900);
+    --text-link: var(--indigo-400);
+
+    --border-default: var(--stone-800);
+    --border-strong: var(--stone-700);
+    --border-focus: var(--indigo-400);
+
+    --action-primary: var(--indigo-500);
+    --action-primary-hover: var(--indigo-600);
+    --action-primary-active: var(--indigo-700);
+
+    --feedback-success-bg: rgba(16, 185, 129, 0.12);
+    --feedback-success-text: var(--emerald-500);
+    --feedback-success-border: rgba(16, 185, 129, 0.25);
+    --feedback-warning-bg: rgba(245, 158, 11, 0.12);
+    --feedback-warning-text: var(--amber-500);
+    --feedback-warning-border: rgba(245, 158, 11, 0.25);
+    --feedback-error-bg: rgba(239, 68, 68, 0.12);
+    --feedback-error-text: var(--red-500);
+    --feedback-error-border: rgba(239, 68, 68, 0.25);
+    --feedback-info-bg: rgba(99, 102, 241, 0.12);
+    --feedback-info-text: var(--indigo-400);
+    --feedback-info-border: rgba(99, 102, 241, 0.25);
+
+    --domain-knowledge: var(--indigo-400);
+    --domain-knowledge-bg: rgba(99, 102, 241, 0.12);
+    --domain-skills: var(--emerald-500);
+    --domain-skills-bg: rgba(16, 185, 129, 0.12);
+    --domain-ethics: var(--amber-500);
+    --domain-ethics-bg: rgba(245, 158, 11, 0.12);
+    --domain-character: #a78bfa;
+    --domain-character-bg: rgba(139, 92, 246, 0.12);
+    --domain-general: var(--stone-400);
+    --domain-general-bg: var(--stone-800);
+
+    --shadow-focus-ring: 0 0 0 2px var(--surface-page), 0 0 0 4px var(--border-focus);
+  }
+}
+
+/* Map semantic tokens to Tailwind theme */
+@theme inline {
+  --color-page: var(--surface-page);
+  --color-raised: var(--surface-raised);
+  --color-sunken: var(--surface-sunken);
+  --color-hover: var(--surface-hover);
+  --color-overlay: var(--surface-overlay);
+
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-tertiary: var(--text-tertiary);
+  --color-inverse: var(--text-inverse);
+  --color-link: var(--text-link);
+
+  --color-border-default: var(--border-default);
+  --color-border-strong: var(--border-strong);
+  --color-border-focus: var(--border-focus);
+
+  --color-action: var(--action-primary);
+  --color-action-hover: var(--action-primary-hover);
+  --color-action-active: var(--action-primary-active);
+
+  --color-success-bg: var(--feedback-success-bg);
+  --color-success-text: var(--feedback-success-text);
+  --color-success-border: var(--feedback-success-border);
+  --color-warning-bg: var(--feedback-warning-bg);
+  --color-warning-text: var(--feedback-warning-text);
+  --color-warning-border: var(--feedback-warning-border);
+  --color-error-bg: var(--feedback-error-bg);
+  --color-error-text: var(--feedback-error-text);
+  --color-error-border: var(--feedback-error-border);
+  --color-info-bg: var(--feedback-info-bg);
+  --color-info-text: var(--feedback-info-text);
+  --color-info-border: var(--feedback-info-border);
+
+  --font-sans: var(--font-plex-thai), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+}
+
+/* Base styles */
+* {
+  border-color: var(--border-default);
+}
+
+body {
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.65; /* Thai: 1.6–1.75 for readable glyphs */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Thai text wrapping — no forced single-line for long questions */
+p, li {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Focus visible — WCAG 2.4.11 + 3:1 contrast */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Domain badge utility classes */
+.domain-knowledge { background: var(--domain-knowledge-bg); color: var(--domain-knowledge); }
+.domain-skills { background: var(--domain-skills-bg); color: var(--domain-skills); }
+.domain-ethics { background: var(--domain-ethics-bg); color: var(--domain-ethics); }
+.domain-character { background: var(--domain-character-bg); color: var(--domain-character); }
+.domain-general { background: var(--domain-general-bg); color: var(--domain-general); }
+
+/* Print helpers (screen-inert, active only when printing) */
+.print-break-avoid { break-inside: avoid; }
+.print-break-before-page { break-before: page; }
+
+/* ============================================
+   Print — A4, black & white, hide chrome
+   ============================================ */
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide navigation, buttons, breadcrumbs, toolbars */
+  nav,
+  [aria-label="breadcrumb"],
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Force <details> open when printing (PLOs) */
+  .print-open,
+  details {
+    display: block !important;
+  }
+  .print-open > summary,
+  details > summary {
+    list-style: none !important;
+  }
+  .print-open > summary::-webkit-details-marker,
+  details > summary::-webkit-details-marker {
+    display: none !important;
+  }
+
+  /* Dashed lines stay crisp in B/W */
+  .border-dashed {
+    border-style: dashed !important;
+    border-color: #000 !important;
+  }
+
+  /* Avoid splitting individual form controls and LO questions across pages */
+  fieldset,
+  .print-break-avoid {
+    break-inside: avoid;
+  }
+
+  /* Each major form step starts on a new page */
+  .print-break-before-page {
+    break-before: page;
+  }
+
+  /* Remove decorative shadows that waste ink */
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg,
+  .shadow-xl {
+    box-shadow: none !important;
+  }
+
+  /* Keep Thai font legible; ensure no orphan lines */
+  p, li {
+    orphans: 3;
+    widows: 3;
+  }
+}
