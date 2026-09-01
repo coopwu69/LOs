@@ -10,6 +10,7 @@ type StepperProps = {
   stepCompletion: boolean[];
   onSelect: (step: number) => void;
   locale: Locale;
+  allowUnrestrictedNavigation?: boolean;
 };
 
 // Step progress indicator with visible completion state.
@@ -27,7 +28,7 @@ type StepperProps = {
 // - Completed steps include a visually-hidden "complete" status.
 // - The mobile progress bar is decorative (aria-hidden) because the
 //   text label already conveys the same information.
-export function Stepper({ currentStep, maxVisited, stepCompletion, onSelect, locale }: StepperProps) {
+export function Stepper({ currentStep, maxVisited, stepCompletion, onSelect, locale, allowUnrestrictedNavigation = false }: StepperProps) {
   const copy = COPY[locale];
   const navRef = useRef<HTMLElement>(null);
   const total = copy.steps.length;
@@ -55,7 +56,7 @@ export function Stepper({ currentStep, maxVisited, stepCompletion, onSelect, loc
           const current = index === currentStep;
           const complete = stepCompletion[index];
           const visited = index <= maxVisited;
-          const enabled = visited || current;
+          const enabled = allowUnrestrictedNavigation || visited || current;
           return (
             <li key={step[0]} className="relative min-w-0 flex-1">
               {index < total - 1 && (

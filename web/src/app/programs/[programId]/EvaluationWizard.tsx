@@ -249,23 +249,13 @@ export function EvaluationWizard({ program, template, sections, questions, local
     });
   }, [copy.steps.length, currentStep, primaryQuestions, secondaryQuestions, validateStep]);
 
-  // --- Navigate to a step with validation ---
+  // --- Navigate to a step ---
+  // Browsing between steps is unrestricted — required fields are only
+  // enforced at final submit (see handleSubmit) so reviewers can flip
+  // through every page without needing to fill anything in first.
   const goToStep = useCallback(
     (next: number) => {
       if (!formRef.current) return;
-      const data = formDataToRecord(formRef.current);
-      // Validate the current step before leaving (only if moving forward).
-      if (next > currentStep) {
-        const errors = validateStep(currentStep, data);
-        if (Object.keys(errors).length > 0) {
-          setFieldErrors((prev) => ({ ...prev, ...errors }));
-          // Focus the first error field.
-          const firstErrorField = Object.keys(errors)[0];
-          if (firstErrorField && formRef.current) namedControl(formRef.current, firstErrorField)?.focus();
-          return;
-        }
-      }
-      // Clear errors for the step we're leaving.
       setFieldErrors({});
       setCurrentStep(next);
       setMaxVisited((visited) => Math.max(visited, next));
@@ -276,7 +266,7 @@ export function EvaluationWizard({ program, template, sections, questions, local
         stepHeadingRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 50);
     },
-    [currentStep, persistDraft, validateStep],
+    [persistDraft],
   );
 
   // --- Handle Next button ---
@@ -397,6 +387,7 @@ export function EvaluationWizard({ program, template, sections, questions, local
         stepCompletion={stepCompletion}
         onSelect={goToStep}
         locale={locale}
+        allowUnrestrictedNavigation
       />
 
       <div className="mt-8 rounded-xl border border-border-default bg-raised shadow-sm sm:mt-10">

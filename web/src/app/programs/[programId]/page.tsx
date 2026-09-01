@@ -14,6 +14,7 @@ import { isInternationalContext, resolveLocale, schoolDisplayName, type Locale, 
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { PageHeader } from "@/components/PageHeader";
 import { PrintButton } from "@/components/PrintButton";
+import { ViewEditToggle } from "@/components/ViewEditToggle";
 import { EvaluationWizard } from "./EvaluationWizard";
 
 export const dynamic = "force-dynamic";
@@ -23,11 +24,17 @@ type QuestionWithOptions = Question & { options: Option[] };
 function Toolbar({ programKey, hasTemplate, locale }: { programKey: string; hasTemplate: boolean; locale: Locale }) {
   const copy = uiCopy[locale];
   const secondary = "inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg border border-border-strong bg-raised px-4 text-sm font-medium text-primary transition-colors hover:border-border-focus hover:bg-hover";
-  const primary = "inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg bg-action px-5 text-sm font-medium text-inverse transition-colors hover:bg-action-hover active:bg-action-active";
 
   return (
     <nav aria-label={copy.tools} className="flex w-full gap-2 overflow-x-auto pb-1 print:hidden sm:w-auto">
-      <Link href={hasTemplate ? withLocale(`/programs/${programKey}/edit`, locale) : "#main-content"} className={primary}>{copy.edit}</Link>
+      <ViewEditToggle
+        active="view"
+        viewHref={withLocale(`/programs/${programKey}`, locale)}
+        editHref={hasTemplate ? withLocale(`/programs/${programKey}/edit`, locale) : "#main-content"}
+        viewLabel={copy.view}
+        editLabel={copy.edit}
+        groupLabel={copy.tools}
+      />
       {hasTemplate && <>
         <PrintButton className={secondary} label={copy.print} previewHref={withLocale(`/programs/${programKey}/print`, locale)} />
         <Link href={withLocale(`/programs/${programKey}/export/docx`, locale)} className={secondary}>{copy.downloadWord}</Link>

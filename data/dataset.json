@@ -46,7 +46,7 @@
       "sequence": 11
     },
     {
-      "name_th": "ความร่วมมือต่างประเทศ",
+      "name_th": "วิทยาลัยนานาชาติ",
       "sequence": 12
     },
     {
@@ -12102,7 +12102,7 @@
       "code": "INTL",
       "name_th": "บริหารธุรกิจ (นานาชาติ)",
       "name_en": null,
-      "school_name_th": "ความร่วมมือต่างประเทศ",
+      "school_name_th": "วิทยาลัยนานาชาติ",
       "slug": "intl",
       "revision_label": "หลักสูตรปรับปรุง ปีการศึกษา 2565",
       "form_status": "submitted",

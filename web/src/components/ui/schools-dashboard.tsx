@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Badge, StatusDot } from "./badge";
 import { Input } from "./input";
@@ -96,6 +97,7 @@ function ScaleBadges({ school, c }: { school: SchoolSummary; c: typeof COPY.th }
 
 export function SchoolsDashboard({ schools, locale }: { schools: SchoolSummary[]; locale: Locale }) {
   const c = COPY[locale];
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<FilterKey>("all");
 
@@ -162,11 +164,26 @@ export function SchoolsDashboard({ schools, locale }: { schools: SchoolSummary[]
               {filtered.map((school) => {
                 const statusVariant = school.pending_count > 0 ? "warning" : "success";
                 return (
-                  <TableRow key={school.name} className="relative cursor-pointer">
+                  <TableRow
+                    key={school.name}
+                    className="relative cursor-pointer focus-visible:outline-none focus-visible:shadow-[var(--shadow-focus-ring)]"
+                    role="link"
+                    tabIndex={0}
+                    aria-label={school.displayName}
+                    onClick={(event) => {
+                      if ((event.target as HTMLElement).closest("a, button")) return;
+                      router.push(school.href);
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key !== "Enter" && event.key !== " ") return;
+                      event.preventDefault();
+                      router.push(school.href);
+                    }}
+                  >
                     <TableCell className="font-medium">
                       <Link
                         href={school.href}
-                        className="text-primary underline-offset-4 transition-colors before:absolute before:inset-0 before:content-[''] hover:text-link hover:underline focus-visible:outline-none focus-visible:before:shadow-[var(--shadow-focus-ring)]"
+                        className="text-primary underline-offset-4 transition-colors hover:text-link hover:underline"
                       >
                         {school.displayName}
                       </Link>

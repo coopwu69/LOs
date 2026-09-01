@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Badge, StatusDot } from "./badge";
 import { Input } from "./input";
@@ -72,6 +73,7 @@ function FilterTab({ active, onClick, children, count }: { active: boolean; onCl
 
 export function ProgramsList({ programs, locale }: { programs: ProgramSummary[]; locale: Locale }) {
   const c = COPY[locale];
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<FilterKey>("all");
 
@@ -135,10 +137,28 @@ export function ProgramsList({ programs, locale }: { programs: ProgramSummary[];
               {filtered.map((program) => {
                 const isAvailable = program.form_status === "submitted";
                 return (
-                  <TableRow key={program.id}>
+                  <TableRow
+                    key={program.id}
+                    className="relative cursor-pointer focus-visible:outline-none focus-visible:shadow-[var(--shadow-focus-ring)]"
+                    role="link"
+                    tabIndex={0}
+                    aria-label={program.name}
+                    onClick={(event) => {
+                      if ((event.target as HTMLElement).closest("a, button")) return;
+                      router.push(program.href);
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key !== "Enter" && event.key !== " ") return;
+                      event.preventDefault();
+                      router.push(program.href);
+                    }}
+                  >
                     <TableCell className="font-mono text-xs text-secondary whitespace-nowrap">{program.code}</TableCell>
                     <TableCell className="font-medium">
-                      <Link href={program.href} className="text-primary underline-offset-4 transition-colors hover:text-link hover:underline">
+                      <Link
+                        href={program.href}
+                        className="text-primary underline-offset-4 transition-colors hover:text-link hover:underline"
+                      >
                         {program.name}
                       </Link>
                     </TableCell>

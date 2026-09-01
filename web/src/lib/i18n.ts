@@ -17,8 +17,12 @@ export function withLocale(path: string, locale: Locale): string {
   return `${path}${separator}lang=${locale}`;
 }
 
+const SCHOOL_NAME_ALIASES: Record<string, string> = {
+  "ความร่วมมือต่างประเทศ": "วิทยาลัยนานาชาติ",
+};
+
 const SCHOOL_NAMES_EN: Record<string, string> = {
-  "ความร่วมมือต่างประเทศ": "International Cooperation",
+  "วิทยาลัยนานาชาติ": "International College",
   "สำนักวิชาการจัดการ": "School of Management",
   "สำนักวิชาวิศวกรรมศาสตร์": "School of Engineering",
   "สำนักวิชาเทคโนโลยีสารสนเทศ": "School of Information Technology",
@@ -31,7 +35,8 @@ const SCHOOL_NAMES_EN: Record<string, string> = {
 };
 
 export function schoolDisplayName(name: string, locale: Locale): string {
-  return locale === "en" ? SCHOOL_NAMES_EN[name] ?? name : name;
+  const canonicalName = SCHOOL_NAME_ALIASES[name] ?? name;
+  return locale === "en" ? SCHOOL_NAMES_EN[canonicalName] ?? canonicalName : canonicalName;
 }
 
 export const uiCopy = {
@@ -56,7 +61,8 @@ export const uiCopy = {
     loadError: "เกิดข้อผิดพลาดในการโหลดข้อมูล",
     loadErrorHelp: "กรุณาลองใหม่อีกครั้ง หากยังพบปัญหาโปรดติดต่อผู้ดูแลระบบ",
     footer: "ระบบแบบประเมิน LOs รายวิชาสหกิจศึกษา — COOP69",
-    edit: "แก้ไขแบบประเมิน",
+    view: "ดู",
+    edit: "แก้ไข",
     print: "พิมพ์ / บันทึก PDF",
     downloadWord: "ดาวน์โหลด Word",
     history: "ประวัติการแก้ไข",
@@ -84,7 +90,8 @@ export const uiCopy = {
     loadError: "Unable to load information",
     loadErrorHelp: "Please try again. If the problem persists, contact the system administrator.",
     footer: "Cooperative Education LO Evaluation System — COOP69",
-    edit: "Edit evaluation",
+    view: "View",
+    edit: "Edit",
     print: "Print / Save PDF",
     downloadWord: "Download Word",
     history: "Edit history",

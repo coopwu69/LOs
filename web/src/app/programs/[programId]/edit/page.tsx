@@ -8,6 +8,7 @@ import {
 import type { TemplateDoc } from "@/lib/types";
 import { PageHeader } from "@/components/PageHeader";
 import { ScaleBadge } from "@/components/ScaleBadge";
+import { ViewEditToggle } from "@/components/ViewEditToggle";
 import { TemplateEditor } from "./TemplateEditor";
 
 export const dynamic = "force-dynamic";
@@ -50,7 +51,11 @@ export default async function EditPage({
             { label: program.name_th, href: programPath },
             { label: "แก้ไข" },
           ]}
-        />
+        >
+          <div className="mt-4">
+            <ViewEditToggle active="edit" viewHref={programPath} editHref={`${programPath}/edit`} viewLabel="ดู" editLabel="แก้ไข" groupLabel="เครื่องมือแบบประเมิน" />
+          </div>
+        </PageHeader>
         <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
           <div className="rounded-xl border border-warning-text/30 bg-warning-bg p-6">
             <h2 className="text-lg font-semibold text-warning-text">
@@ -86,7 +91,11 @@ export default async function EditPage({
             { label: program.name_th, href: programPath },
             { label: "แก้ไข" },
           ]}
-        />
+        >
+          <div className="mt-4">
+            <ViewEditToggle active="edit" viewHref={programPath} editHref={`${programPath}/edit`} viewLabel="ดู" editLabel="แก้ไข" groupLabel="เครื่องมือแบบประเมิน" />
+          </div>
+        </PageHeader>
         <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
           <div className="rounded-xl border border-warning-text/30 bg-warning-bg p-6">
             <h2 className="text-lg font-semibold text-warning-text">ยังไม่สามารถบันทึกการแก้ไขได้</h2>
@@ -112,7 +121,11 @@ export default async function EditPage({
             { label: program.name_th, href: programPath },
             { label: "แก้ไข" },
           ]}
-        />
+        >
+          <div className="mt-4">
+            <ViewEditToggle active="edit" viewHref={programPath} editHref={`${programPath}/edit`} viewLabel="ดู" editLabel="แก้ไข" groupLabel="เครื่องมือแบบประเมิน" />
+          </div>
+        </PageHeader>
         <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
           <div className="rounded-xl border border-border-default bg-sunken p-8 text-center">
             <h2 className="text-xl font-semibold text-primary">ยังไม่มีแบบประเมินในระบบ</h2>
@@ -140,6 +153,7 @@ export default async function EditPage({
         ]}
       >
         <div className="mt-4 flex flex-wrap items-center gap-3">
+          <ViewEditToggle active="edit" viewHref={programPath} editHref={`${programPath}/edit`} viewLabel="ดู" editLabel="แก้ไข" groupLabel="เครื่องมือแบบประเมิน" />
           <span className="inline-flex items-center rounded-md bg-white/15 px-2 py-1 text-xs font-mono font-medium text-white">
             {program.code}
           </span>
