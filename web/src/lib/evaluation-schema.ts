@@ -9,7 +9,9 @@ import { z } from "zod";
 // and scoring keys — do not rename without updating actions.ts and the
 // draft restore logic.
 
-export const SEMESTER_PATTERN = /^[1-3]\/(256[0-9]|257[0-9])$/;
+export const SEMESTER_PATTERN = /^[1-2]$/;
+// Buddhist-era academic year, currently offered from 2569 onward.
+export const ACADEMIC_YEAR_PATTERN = /^25(6[9]|[7-9][0-9])$/;
 export const STUDENT_CODE_PATTERN = /^\d{8}$/;
 export const PHONE_PATTERN = /^[0-9+()\-\s]{8,20}$/;
 export const UUID_PATTERN =
@@ -23,6 +25,7 @@ export const generalStepSchema = z.object({
     .email("email")
     .max(254, "email"),
   semester: z.string().min(1, "required").regex(SEMESTER_PATTERN, "semester"),
+  academic_year: z.string().min(1, "required").regex(ACADEMIC_YEAR_PATTERN, "academic_year"),
   company: z.string().min(1, "required").max(200, "length"),
   evaluator_name: z.string().min(1, "required").max(120, "length"),
   position: z.string().min(1, "required").max(120, "length"),
@@ -53,8 +56,8 @@ export const feedbackStepSchema = z.object({
     .refine((v) => Number.isInteger(Number(v)) && Number(v) >= 0, "non_negative"),
 });
 
-// --- Report step (step 3) — two fixed items, scores 1–5 ---
-export const REPORT_ITEM_COUNT = 2;
+// --- Report step (step 3) — five fixed items, scores 1–5 (25 points total) ---
+export const REPORT_ITEM_COUNT = 5;
 export const reportItemSchema = z
   .string()
   .min(1, "required")
@@ -66,6 +69,9 @@ export const reportItemSchema = z
 export const reportStepSchema = z.object({
   "c-0": reportItemSchema,
   "c-1": reportItemSchema,
+  "c-2": reportItemSchema,
+  "c-3": reportItemSchema,
+  "c-4": reportItemSchema,
 });
 
 // --- Competency questions (steps 1 & 2) ---
@@ -114,6 +120,7 @@ export type ErrorKey =
   | "required"
   | "email"
   | "semester"
+  | "academic_year"
   | "phone"
   | "student_code"
   | "uuid"
@@ -126,6 +133,7 @@ export const ERROR_MESSAGES: Record<"th" | "en", Record<ErrorKey, string>> = {
     required: "กรุณากรอกข้อมูลในช่องนี้",
     email: "รูปแบบอีเมลไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง",
     semester: "กรุณาเลือกภาคการศึกษา",
+    academic_year: "กรุณาเลือกปีการศึกษา",
     phone: "เบอร์โทรศัพท์ไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง",
     student_code: "รหัสนักศึกษาต้องเป็นตัวเลข 8 หลัก",
     uuid: "ไม่พบหลักสูตรหรือแบบประเมิน กรุณาเปิดแบบประเมินใหม่อีกครั้ง",
@@ -137,6 +145,7 @@ export const ERROR_MESSAGES: Record<"th" | "en", Record<ErrorKey, string>> = {
     required: "This field is required.",
     email: "Enter a valid email address and try again.",
     semester: "Please select a semester.",
+    academic_year: "Please select an academic year.",
     phone: "The phone number is invalid. Please check and try again.",
     student_code: "The student ID must contain exactly 8 digits.",
     uuid: "The program or evaluation could not be found. Please reopen the evaluation.",

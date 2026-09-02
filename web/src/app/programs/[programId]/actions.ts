@@ -7,6 +7,7 @@ import {
   generalStepSchema,
   feedbackStepSchema,
   reportStepSchema,
+  REPORT_ITEM_COUNT,
   flattenZodToKeys,
   localizeFieldErrors,
   localizeError,
@@ -100,6 +101,7 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
   const generalResult = generalStepSchema.safeParse({
     evaluator_email: raw.evaluator_email,
     semester: raw.semester,
+    academic_year: raw.academic_year,
     company: raw.company,
     evaluator_name: raw.evaluator_name,
     position: raw.position,
@@ -137,12 +139,18 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
   }
 
   // --- Step 3: Report validation ---
-  const reportResult = reportStepSchema.safeParse({ "c-0": raw["c-0"], "c-1": raw["c-1"] });
+  const reportResult = reportStepSchema.safeParse({
+    "c-0": raw["c-0"],
+    "c-1": raw["c-1"],
+    "c-2": raw["c-2"],
+    "c-3": raw["c-3"],
+    "c-4": raw["c-4"],
+  });
   if (!reportResult.success) {
     const fieldErrors = localizeFieldErrors(flattenZodToKeys(reportResult.error), locale);
     return {
       success: false,
-      error: message("กรุณาประเมินรายงานหรือโครงงานให้ครบทั้ง 2 ข้อ", "Please complete both report or project questions."),
+      error: message("กรุณาประเมินรายงานหรือโครงงานให้ครบทั้ง 5 ข้อ", "Please complete all five report or project questions."),
       fieldErrors,
     };
   }
@@ -242,10 +250,10 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
       };
     }
 
-    if (cCount !== 2)
+    if (cCount !== REPORT_ITEM_COUNT)
       return {
         success: false,
-        error: message("กรุณาประเมินรายงานหรือโครงงานให้ครบทั้ง 2 ข้อ", "Please complete both report or project questions."),
+        error: message("กรุณาประเมินรายงานหรือโครงงานให้ครบทั้ง 5 ข้อ", "Please complete all five report or project questions."),
       };
 
     // --- Persist submission (preserved from original) ---

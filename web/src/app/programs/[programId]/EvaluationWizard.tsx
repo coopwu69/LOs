@@ -24,6 +24,7 @@ import {
   validateReportStep,
   validateFeedbackStep,
   localizeFieldErrors,
+  REPORT_ITEM_COUNT,
   type FieldErrors,
   type SubmitResult,
 } from "@/lib/evaluation-schema";
@@ -75,7 +76,8 @@ function hasStepData(
     const required = stepQuestions.filter((q) => q.is_required);
     return required.every((q) => data[`lo-${q.id}`]);
   }
-  if (step === 3) return Boolean(data["c-0"] && data["c-1"]);
+  if (step === 3)
+    return Array.from({ length: REPORT_ITEM_COUNT }, (_, i) => data[`c-${i}`]).every(Boolean);
   if (step === 4)
     return Boolean(
       data.strengths &&

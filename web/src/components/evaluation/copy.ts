@@ -10,6 +10,8 @@ export type WizardCopy = {
   email: string;
   semester: string;
   selectSemester: string;
+  academicYear: string;
+  selectAcademicYear: string;
   company: string;
   evaluatorName: string;
   position: string;
@@ -98,6 +100,8 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     email: "อีเมล",
     semester: "ภาคการศึกษา",
     selectSemester: "เลือกภาคการศึกษา",
+    academicYear: "ปีการศึกษา",
+    selectAcademicYear: "เลือกปีการศึกษา",
     company: "ชื่อสถานประกอบการ",
     evaluatorName: "ชื่อ–นามสกุลผู้ประเมิน",
     position: "ตำแหน่ง",
@@ -116,8 +120,11 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     question: "ข้อ",
     rubric: "ดูเกณฑ์การให้คะแนน",
     reportItems: [
-      "รายงานหรือโครงงานเป็นไปตามวัตถุประสงค์และความต้องการของหน่วยงาน",
-      "นักศึกษาขอคำปรึกษาและรายงานความก้าวหน้าอย่างสม่ำเสมอ",
+      "รายงาน/โครงงานเป็นไปตามวัตถุประสงค์และความต้องการของหน่วยงาน",
+      "ความต่อเนื่องสม่ำเสมอในการขอรับคำปรึกษาและรายงานความก้าวหน้าในการจัดทำรายงาน/โครงงาน",
+      "เนื้อหารายงาน/โครงงานเป็นไปตามหลักวิชาการ",
+      "ความถูกต้องในเชิงเนื้อหาและการจัดเก็บข้อมูล",
+      "ประโยชน์ของรายงาน/โครงงาน ต่อหน่วยงานและนำไปใช้ได้จริง",
     ],
     rating: ["น้อยที่สุด", "น้อย", "ปานกลาง", "มาก", "มากที่สุด"],
     strengths: "จุดเด่นของนักศึกษา",
@@ -185,6 +192,8 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     email: "Email",
     semester: "Semester",
     selectSemester: "Select a semester",
+    academicYear: "Academic year",
+    selectAcademicYear: "Select an academic year",
     company: "Organization",
     evaluatorName: "Evaluator's full name",
     position: "Position",
@@ -204,7 +213,10 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     rubric: "View scoring criteria",
     reportItems: [
       "The report or project meets the organization's objectives and requirements.",
-      "The student regularly seeks advice and reports progress.",
+      "Consistency and regularity in seeking advice and reporting progress on the report or project.",
+      "The report or project content follows academic standards.",
+      "Accuracy of content and data collection.",
+      "The report or project is beneficial to the organization and practically applicable.",
     ],
     rating: ["Lowest", "Low", "Moderate", "High", "Highest"],
     strengths: "Student strengths",

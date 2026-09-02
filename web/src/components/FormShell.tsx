@@ -105,6 +105,7 @@ export function FormShell({
             <div className="mt-5 grid grid-cols-2 gap-x-6 gap-y-5">
               <BlankLine label={copy.email} />
               <BlankLine label={copy.semester} />
+              <BlankLine label={copy.academicYear} />
               <div className="col-span-2"><BlankLine label={copy.company} /></div>
               <BlankLine label={copy.evaluatorName} />
               <BlankLine label={copy.position} />

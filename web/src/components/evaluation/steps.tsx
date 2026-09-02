@@ -27,12 +27,14 @@ export function GeneralStep({
   errors?: FieldErrors;
 }) {
   const copy = COPY[locale];
-  const semesters = [1, 2, 3].flatMap((semester) =>
-    [2568, 2569].map((year) => ({
-      value: `${semester}/${year}`,
-      label: locale === "en" ? `Semester ${semester}/${year - 543}` : `ภาคการศึกษาที่ ${semester}/${year}`,
-    })),
-  ).slice(0, 5);
+  const semesterOptions = [1, 2].map((semester) => ({
+    value: String(semester),
+    label: locale === "en" ? `Semester ${semester}` : `ภาคการศึกษาที่ ${semester}`,
+  }));
+  const academicYearOptions = [2569, 2570].map((year) => ({
+    value: String(year),
+    label: locale === "en" ? String(year - 543) : String(year),
+  }));
   const programName =
     locale === "en"
       ? program.name_en || (program.code === "INTL" ? "International Program (WUIC)" : program.name_th)
@@ -44,7 +46,10 @@ export function GeneralStep({
         <legend className="text-lg font-semibold text-primary">{copy.evaluatorInfo}</legend>
         <div className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
           <Field label={copy.email} name="evaluator_email" type="email" placeholder="name@company.com" inputMode="email" autoComplete="email" spellCheck={false} required locale={locale} error={errors?.evaluator_email} />
-          <SelectField label={copy.semester} name="semester" options={semesters} placeholder={copy.selectSemester} required error={errors?.semester} />
+          <div className="grid grid-cols-2 gap-3">
+            <SelectField label={copy.semester} name="semester" options={semesterOptions} placeholder={copy.selectSemester} required error={errors?.semester} />
+            <SelectField label={copy.academicYear} name="academic_year" options={academicYearOptions} placeholder={copy.selectAcademicYear} required error={errors?.academic_year} />
+          </div>
           <div className="sm:col-span-2">
             <Field label={copy.company} name="company" autoComplete="organization" required locale={locale} error={errors?.company} />
           </div>

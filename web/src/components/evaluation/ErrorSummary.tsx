@@ -28,6 +28,7 @@ export function ErrorSummary({ fieldErrors, locale, onFieldFocus }: ErrorSummary
   const labels: Record<string, string> = {
     evaluator_email: copy.email,
     semester: copy.semester,
+    academic_year: copy.academicYear,
     company: copy.company,
     evaluator_name: copy.evaluatorName,
     position: copy.position,
