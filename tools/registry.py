@@ -1,6 +1,6 @@
-"""Registry of 36 programs (33 submitted + 3 pending).
+"""Registry of 37 programs (33 submitted + 4 pending).
 
-Built from _appdata.json (13 faculties, 33 curricula) + 3 pending programs.
+Built from _appdata.json (13 faculties, 33 curricula) + 4 pending programs.
 Each entry maps a source document to a program code, layout hint, and overrides.
 """
 
@@ -39,7 +39,7 @@ CODE_MAP = [
     ("แพทย", "วิทย์กีฬา", "SSE", "วิทยาศาสตร์การกีฬาและการออกกำลังกาย", "rubric4"),
     # 3. สารสนเทศ (5)
     ("สารสนเทศ", "นิเทศศาสตร์", "DCA", "นิเทศศาสตร์ดิจิทัล", "rubric4"),
-    ("สารสนเทศ", "ดิจิทัลทางการแพทย์", "DMI", "เทคโนโลยีดิจิทัลทางการแพทย์", "rubric4"),
+    ("สารสนเทศ", "ดิจิทัลทางการแพทย์", "DTM", "เทคโนโลยีดิจิทัลทางการแพทย์", "rubric4"),
     ("สารสนเทศ", "สารสนเทศอัจฉริยะ", "IIT", "เทคโนโลยีสารสนเทศอัจฉริยะ", "rubric4"),
     ("สารสนเทศ", "ดิจิทัลคอนเทนต์", "DCM", "ดิจิทัลคอนเทนต์และสื่อ", "rubric4"),
     ("สารสนเทศ", "MTA", "IMAG", "อินเทอร์แอคทีฟมัลติมีเดียแอนิเมชันและเกม", "rubric4"),
@@ -78,7 +78,7 @@ CODE_MAP = [
     ("เกษตร", "เกษตรศาสตร์และนวัตกรร", "ANSCI", "เกษตรศาสตร์และนวัตกรรม", "rubric4"),
 ]
 
-# ─── 3 pending programs (no source document, no template) ───
+# ─── 4 pending programs (no source document, no template) ───
 PENDING_PROGRAMS = [
     {
         "code": "OHS",
@@ -104,6 +104,14 @@ PENDING_PROGRAMS = [
         "layout": None,
         "form_status": "pending",
         "note": "ใช้แบบประเมินร่วมกับ IR",
+    },
+    {
+        "code": "SRV",
+        "name_th": "อุตสาหกรรมการบริการ",
+        "school_name_th": "สำนักวิชาการจัดการ",
+        "source_file": None,
+        "layout": None,
+        "form_status": "pending",
     },
 ]
 

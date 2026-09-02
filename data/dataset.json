@@ -1558,11 +1558,11 @@
       }
     },
     {
-      "code": "DMI",
+      "code": "DTM",
       "name_th": "เทคโนโลยีดิจิทัลทางการแพทย์",
       "name_en": null,
       "school_name_th": "สำนักวิชาสารสนเทศศาสตร์",
-      "slug": "dmi",
+      "slug": "dtm",
       "revision_label": "หลักสูตรปรับปรุง ปีการศึกษา 2567",
       "form_status": "submitted",
       "source_file": "3. สำนักวิชาสารสนเทศศาสตร์ 5 หลักสูตร\\2.ผลลัพธ์การเรียนรู้ของวิชาสหกิจศึกษา หลักสูตรเทคโนโลยีดิจิทัลทางการแพทย์ พ.ศ.67.docx",
@@ -13675,6 +13675,19 @@
       "name_en": null,
       "school_name_th": "สำนักวิชารัฐศาสตร์และรัฐประศาสนศาสตร์",
       "slug": "asean",
+      "revision_label": null,
+      "form_status": "pending",
+      "source_file": null,
+      "source_layout": null,
+      "plos": [],
+      "template": null
+    },
+    {
+      "code": "SRV",
+      "name_th": "อุตสาหกรรมการบริการ",
+      "name_en": null,
+      "school_name_th": "สำนักวิชาการจัดการ",
+      "slug": "srv",
       "revision_label": null,
       "form_status": "pending",
       "source_file": null,
