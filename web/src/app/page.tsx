@@ -1,6 +1,7 @@
 import { getSchoolsWithProgress, type SchoolWithProgress } from "@/lib/db";
 import { isFixtureMode, getFixtureSchoolsWithProgress } from "@/lib/fixtures";
 import { resolveLocale, schoolDisplayName, uiCopy, withLocale } from "@/lib/i18n";
+import { getSchoolSlug } from "@/lib/schools";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { PageHeader } from "@/components/PageHeader";
 import { SchoolsDashboard, type SchoolSummary } from "@/components/ui/schools-dashboard";
@@ -38,7 +39,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
   // Serialize for client component
   const summaries: SchoolSummary[] = schools.map((school) => {
-    const path = `/schools/${encodeURIComponent(school.name)}`;
+    const path = `/schools/${getSchoolSlug(school.name)}`;
     const href = requestedLanguage === "th" || requestedLanguage === "en" ? withLocale(path, locale) : path;
     return {
       name: school.name,

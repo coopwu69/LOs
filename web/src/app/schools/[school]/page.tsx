@@ -1,5 +1,6 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { getProgramRouteKey, getProgramsBySchool, getSchoolsWithProgress } from "@/lib/db";
+import { getSchoolNameBySlug, getSchoolSlug } from "@/lib/schools";
 import { isFixtureMode, getFixtureProgramsBySchool, getFixtureSchoolsWithProgress } from "@/lib/fixtures";
 import { isInternationalContext, resolveLocale, schoolDisplayName, uiCopy, withLocale } from "@/lib/i18n";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
@@ -11,14 +12,19 @@ export const dynamic = "force-dynamic";
 export default async function SchoolPage({ params, searchParams }: PageProps<"/schools/[school]">) {
   const { school: rawSchool } = await params;
   const requestedLanguage = (await searchParams).lang;
-  const schoolName = rawSchool.includes("%") ? decodeURIComponent(rawSchool) : rawSchool;
+  const schoolName = getSchoolNameBySlug(rawSchool);
+  if (!schoolName) notFound();
   const locale = resolveLocale(requestedLanguage, isInternationalContext(schoolName));
+  const canonicalSlug = getSchoolSlug(schoolName);
+  if (canonicalSlug !== rawSchool) {
+    permanentRedirect(withLocale(`/schools/${canonicalSlug}`, locale));
+  }
   const copy = uiCopy[locale];
   const displaySchool = schoolDisplayName(schoolName, locale);
   const allSchools = isFixtureMode() ? getFixtureSchoolsWithProgress() : await getSchoolsWithProgress();
   if (!allSchools.some((school) => school.name === schoolName)) notFound();
   const programs = isFixtureMode() ? getFixtureProgramsBySchool(schoolName) : await getProgramsBySchool(schoolName);
-  const path = `/schools/${encodeURIComponent(schoolName)}`;
+  const path = `/schools/${canonicalSlug}`;
 
   // Serialize for client component
   const summaries: ProgramSummary[] = programs.map((program) => {

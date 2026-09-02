@@ -11,6 +11,7 @@ import {
   type Option,
 } from "@/lib/db";
 import { isInternationalContext, resolveLocale, schoolDisplayName, type Locale, uiCopy, withLocale } from "@/lib/i18n";
+import { getSchoolSlug } from "@/lib/schools";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { PageHeader } from "@/components/PageHeader";
 import { PrintButton } from "@/components/PrintButton";
@@ -107,7 +108,7 @@ export default async function ProgramPage({
           { label: copy.home, href: withLocale("/", locale) },
           {
             label: schoolName,
-            href: withLocale(`/schools/${encodeURIComponent(program.school ?? "")}`, locale),
+            href: withLocale(`/schools/${getSchoolSlug(program.school)}`, locale),
           },
           { label: programName },
         ]}

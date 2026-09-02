@@ -6,6 +6,7 @@ import {
   getFixtureTemplateDoc,
 } from "@/lib/fixtures";
 import type { TemplateDoc } from "@/lib/types";
+import { getSchoolSlug } from "@/lib/schools";
 import { PageHeader } from "@/components/PageHeader";
 import { ScaleBadge } from "@/components/ScaleBadge";
 import { ViewEditToggle } from "@/components/ViewEditToggle";
@@ -46,7 +47,7 @@ export default async function EditPage({
           breadcrumbs={[
             { label: "หน้าแรก", href: "/" },
             program.school
-              ? { label: program.school, href: `/schools/${encodeURIComponent(program.school)}` }
+              ? { label: program.school, href: `/schools/${getSchoolSlug(program.school)}` }
               : { label: "สำนักวิชา" },
             { label: program.name_th, href: programPath },
             { label: "แก้ไข" },
@@ -116,7 +117,7 @@ export default async function EditPage({
           breadcrumbs={[
             { label: "หน้าแรก", href: "/" },
             program.school
-              ? { label: program.school, href: `/schools/${encodeURIComponent(program.school)}` }
+              ? { label: program.school, href: `/schools/${getSchoolSlug(program.school)}` }
               : { label: "สำนักวิชา" },
             { label: program.name_th, href: programPath },
             { label: "แก้ไข" },
@@ -146,7 +147,7 @@ export default async function EditPage({
         breadcrumbs={[
           { label: "หน้าแรก", href: "/" },
           program.school
-            ? { label: program.school, href: `/schools/${encodeURIComponent(program.school)}` }
+            ? { label: program.school, href: `/schools/${getSchoolSlug(program.school)}` }
             : { label: "สำนักวิชา" },
           { label: program.name_th, href: programPath },
           { label: "แก้ไข" },

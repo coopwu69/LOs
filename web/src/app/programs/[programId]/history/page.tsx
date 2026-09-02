@@ -8,6 +8,7 @@ import {
   getFixtureTemplateDoc,
 } from "@/lib/fixtures";
 import type { RevisionRow } from "@/lib/types";
+import { getSchoolSlug } from "@/lib/schools";
 import { PageHeader } from "@/components/PageHeader";
 import { RestoreButton } from "./RestoreButton";
 
@@ -69,7 +70,7 @@ export default async function HistoryPage({
         breadcrumbs={[
           { label: "หน้าแรก", href: "/" },
           program.school
-            ? { label: program.school, href: `/schools/${encodeURIComponent(program.school)}` }
+            ? { label: program.school, href: `/schools/${getSchoolSlug(program.school)}` }
             : { label: "สำนักวิชา" },
           { label: program.name_th, href: programPath },
           { label: "ประวัติ" },
