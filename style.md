@@ -144,3 +144,73 @@
 - รักษาโทนสีน้ำเงินเข้ม/ฟ้าอ่อนและพื้นหลังสีขาว-เทาอ่อนเหมือนเดิม
 - ฟอนต์หลักของ `web/` คือ `IBM Plex Sans Thai Looped` (subset `thai,latin`, weights 300–700)
 - ข้อความภาษาไทยใช้ `line-height: 1.6–1.75` และเปิด `overflow-wrap: break-word` เพื่อรองรับคำยาว
+
+---
+
+## 6. StepProgressBar — ตัวบอกขั้นตอนแบบ progress bar
+
+> ใช้ใน EvaluationWizard (`web/src/components/evaluation/StepProgressBar.tsx`)
+> แทน Stepper แบบเดิมที่ใช้เส้นเชื่อมระหว่างวงกลมเป็นสีเขียว
+
+### โครงสร้าง
+
+แบ่งเป็น 2 แถวแยกกัน:
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  ①      ②      ③      ④      ⑤      ⑥    ← แถววงกลม + label │
+│ ส่วน 1  ส่วน 2  ส่วน 3  ส่วน 4  ส่วน 5  ส่วน 6                │
+├──────────────────────────────────────────────────────────────┤
+│ ████████████░░░░░░░░░░░░░░░░░░░░░░░░░░  ← แถว track bar       │
+└──────────────────────────────────────────────────────────────┘
+```
+
+- **แถวบน:** วงกลม (number/check icon) + label แต่ละส่วน วางใน grid เท่ากัน (`grid-cols-N`)
+- **แถวล่าง:** progress track เส้นเดียวยาวเต็มความกว้าง แยกจากวงกลม (ไม่ใช่เส้นเชื่อมระหว่างวงกลม)
+
+### พฤติกรรมสี (ใช้ design tokens)
+
+| สถานะ | วงกลม | ตัวอย่างเมื่ออยู่ส่วน 3/6 |
+|---|---|---|
+| completed (index < current) | `border-action bg-action text-inverse` + เครื่องหมาย ✓ | วงกลม 1, 2 เป็นสีน้ำเงิน indigo พร้อม check icon |
+| active (index === current) | `border-action bg-action text-inverse` + เลข | วงกลม 3 เป็นสีน้ำเงิน indigo แสดงเลข 3 |
+| upcoming (index > current) | `border-border-default bg-sunken text-tertiary` + เลข | วงกลม 4, 5, 6 เป็นสีเทา |
+
+- **Track bar ล่าง:** พื้นหลัง `bg-sunken` ตลอดทั้งแถบ, ส่วนที่เติม `bg-action` ความกว้าง `((currentStep + 1) / total) × 100%`
+- เมื่ออยู่ส่วน 3 ของ 6 → bar เติม 50% ครอบคลุมตำแหน่งส่วน 1 ถึง 3
+- Animation: `transition-all duration-300 ease-out`
+
+### คำศัพท์
+
+ใช้คำว่า **"ส่วน"** (th) / **"Section"** (en) แทน "ขั้น" / "Step" ทั่วทั้ง wizard:
+- `copy.step` = "ส่วน" / "Section"
+- `copy.stepsLabel` = "ส่วนของแบบประเมิน" / "Evaluation sections"
+- `copy.firstStep` = "กลับไปดูส่วนแรก" / "Return to first section"
+- แสดงผล: "ส่วน 3 จาก 6"
+
+### Navigation policy
+
+ตามกฎใน `web/CLAUDE.md` — ห้ามบล็อกการเปลี่ยนหน้าด้วย validation:
+- `allowUnrestrictedNavigation` อนุญาตให้คลิกส่วนใดก็ได้โดยอิสระ
+- `stepCompletion` ใช้แค่เป็น soft indicator (checkmark ใน `aria-label`) ไม่ใช่ตัวบล็อก
+- validation ทำที่ `handleSubmit` ตอนส่งจริงเท่านั้น
+
+### Props
+
+```ts
+interface StepProgressBarProps {
+  currentStep: number;                    // 0-indexed
+  stepCompletion: boolean[];              // soft checkmarks (non-blocking)
+  onSelect: (step: number) => void;
+  locale: Locale;
+  allowUnrestrictedNavigation?: boolean;  // default false
+}
+```
+
+### Accessibility
+
+- `<nav aria-label={copy.stepsLabel}>` ครอบทั้ง component
+- ปุ่มแต่ละส่วนมี `aria-current="step"` เมื่อเป็นส่วนปัจจุบัน
+- `aria-label` ระบุชื่อส่วนและสถานะ complete เช่น "ส่วน 3: จริยธรรมและบุคลิก"
+- Track bar มี `role="progressbar"` พร้อม `aria-valuenow/min/max`
+- Focus ring ใช้ `--shadow-focus-ring` (3:1 contrast)

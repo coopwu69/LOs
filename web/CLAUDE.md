@@ -9,3 +9,50 @@
 **Why:** this form's steps are viewed by reviewers/staff who need to page through the entire questionnaire to check its layout/wording without entering real data — locking Next behind per-step validation makes that impossible. Confirmed 2026-09-02 after this exact behavior regressed (or was about to) and had to be fixed again.
 
 **How to apply:** if you touch `goToStep`, `handleNext`, or add a new wizard step, do not reintroduce a `validateStep()` call that blocks navigation. Keep native HTML `required` attributes on fields if useful for the final `type="submit"` button's browser-level check, but never call `.reportValidity()`/`.checkValidity()` or custom validators from the Next/step-click handlers.
+
+## Design System — Color Tokens
+
+### Two distinct "primary" colors (do not conflate)
+
+| Token | CSS Variable | Value | Purpose | Changes in dark? |
+|---|---|---|---|---|
+| **Primary** (brand) | `--primary` | `#071C31` (navy) | Selected state in RatingCard, solid fills, brand accents | No — always navy |
+| **Action** (interactive) | `--action-primary` | `#4F46E5` (indigo-600) | Buttons, links, LO code labels, step indicators | Yes — indigo-500 in dark |
+| **Text primary** | `--text-primary` | `var(--primary)` in light, `#fafaf9` in dark | Body text, headings | Yes — cream in dark |
+
+### Why two colors?
+
+- **Navy `#071C31`** = "this is selected/active" — used in `bg-primary` for RatingCard selected state. Conveys state, not action.
+- **Indigo `#4F46E5`** = "click me to do something" — used in `bg-action` for buttons, `text-action` for LO codes. Conveys interactivity.
+
+Mixing them would make selected rating cards look like buttons, or buttons look like selected cards. Keep them separate.
+
+### Token architecture in `globals.css`
+
+```
+--primary: #071c31                    (brand navy, never changes)
+--primary-foreground: #fffefb         (warm white on navy, never changes)
+--text-primary: var(--primary)        (light mode — navy text)
+--text-primary: #fafaf9               (dark mode — cream text)
+--action-primary: var(--indigo-600)   (light mode — indigo buttons)
+--action-primary: var(--indigo-500)   (dark mode — lighter indigo)
+```
+
+### Custom utility class overrides
+
+`bg-primary`, `border-primary`, `bg-secondary`, `bg-border`, and `text-primary-foreground` are defined as **custom CSS classes** in `globals.css` (after `@theme inline`) to ensure they always resolve to `var(--primary)` (navy) regardless of light/dark mode. Tailwind's generated `bg-primary` utility would otherwise use `var(--text-primary)` which changes to cream in dark mode — wrong for a background.
+
+**Do not remove these custom classes.** If you need a new primary-based utility (e.g., `ring-primary`), add it in the same block.
+
+### RatingCard component
+
+`RatingCard.tsx` is a controlled radio group (segmented control) used for:
+- **CompetencyStep** (Steps 1-2): 4 levels with descriptions (rubric shown in-card)
+- **ReportStep** (Step 3): 5 levels without descriptions
+
+Selected state: `bg-primary text-primary-foreground` (navy fill, warm white text).
+Unselected state: `bg-raised text-primary hover:bg-hover`.
+
+The wizard uses uncontrolled form submission (hidden radio inputs with `name`), but RatingCard is controlled (`value`/`onChange`). State is synced from DOM to React via `useEffect` on `formVersion` — this bridges the gap after `restoreForm` sets radio.checked directly on the DOM.
+
+**Do not replace RatingCard with RatingScale** for LOs or report items. RatingScale (the older uncontrolled radio grid) is kept only for backward compatibility but is no longer used in the wizard.

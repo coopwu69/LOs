@@ -1,6 +1,8 @@
 export { Stepper } from "./Stepper";
 export { StepProgressBar } from "./StepProgressBar";
 export { RatingScale } from "./RatingScale";
+export { RatingCard } from "./RatingCard";
+export type { RatingLevel, RatingCardProps } from "./RatingCard";
 export { ChoiceGroup } from "./ChoiceGroup";
 export { ErrorSummary } from "./ErrorSummary";
 export { AutosaveStatus } from "./AutosaveStatus";

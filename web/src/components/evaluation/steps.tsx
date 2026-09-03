@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Option, Program, Question, Section } from "@/lib/db";
 import type { Locale } from "@/lib/i18n";
 import {
@@ -11,6 +11,7 @@ import {
 } from "./copy";
 import { Field, SelectField, TextAreaField, Required } from "./fields";
 import { RatingScale } from "./RatingScale";
+import { RatingCard, type RatingLevel } from "./RatingCard";
 import { ChoiceGroup } from "./ChoiceGroup";
 
 type QuestionWithOptions = Question & { options: Option[] };
@@ -82,13 +83,42 @@ export function CompetencyStep({
   questions,
   locale,
   errors,
+  formVersion,
 }: {
   sections: Section[];
   questions: QuestionWithOptions[];
   locale: Locale;
   errors?: FieldErrors;
+  formVersion: number;
 }) {
   const copy = COPY[locale];
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [ratings, setRatings] = useState<Record<string, number | undefined>>({});
+
+  // RatingCard is controlled, but the wizard restores drafts by setting
+  // radio.checked directly on the DOM (restoreForm). This effect bridges
+  // that gap by reading DOM radio state into React whenever formVersion
+  // changes (fires on restore and on every form change).
+  useEffect(() => {
+    const form = containerRef.current?.closest("form");
+    if (!form) return;
+    const next: Record<string, number | undefined> = {};
+    for (const q of questions) {
+      const group = form.elements.namedItem(`lo-${q.id}`);
+      if (group instanceof RadioNodeList) {
+        for (const radio of group) {
+          if (radio instanceof HTMLInputElement && radio.checked) {
+            next[q.id] = Number(radio.value);
+            break;
+          }
+        }
+      } else if (group instanceof HTMLInputElement && group.checked) {
+        next[q.id] = Number(group.value);
+      }
+    }
+    setRatings(next);
+  }, [formVersion, questions]);
+
   const grouped = useMemo(() => {
     const map = new Map<string, QuestionWithOptions[]>();
     for (const question of questions)
@@ -104,7 +134,7 @@ export function CompetencyStep({
     );
 
   return (
-    <div className="space-y-10">
+    <div ref={containerRef} className="space-y-10">
       {sections.map((section) => {
         const items = grouped.get(section.id) ?? [];
         if (!items.length) return null;
@@ -127,13 +157,22 @@ export function CompetencyStep({
             </div>
             <div className="divide-y divide-border-default">
               {items.map((question, index) => {
-                const descriptionsAvailable = question.options.some((option) =>
-                  locale === "en" ? option.description_en : option.description_th,
-                );
-                const ratingOptions =
+                const levels: RatingLevel[] =
                   question.options.length > 0
-                    ? question.options
-                    : copy.rating.map((label, ratingIndex) => ({ value: String(ratingIndex + 1), label }));
+                    ? [...question.options]
+                        .sort((a, b) => b.score - a.score)
+                        .map((option) => ({
+                          value: option.score,
+                          label:
+                            locale === "en"
+                              ? option.label_en || ENGLISH_SCORE_LABELS[option.score] || option.label_th
+                              : option.label_th,
+                          description: (locale === "en" ? option.description_en : option.description_th) || undefined,
+                        }))
+                    : copy.rating.map((label, i) => ({
+                        value: copy.rating.length - i,
+                        label,
+                      }));
                 const fieldName = `lo-${question.id}`;
                 return (
                   <fieldset key={question.id} className="py-7 first:pt-6 last:pb-0">
@@ -145,35 +184,16 @@ export function CompetencyStep({
                       {question.is_required && <Required />}
                     </legend>
                     <div className="mt-4">
-                      <RatingScale
+                      <RatingCard
+                        levels={levels}
+                        value={ratings[question.id]}
+                        onChange={(v) => setRatings((prev) => ({ ...prev, [question.id]: v }))}
                         name={fieldName}
-                        options={ratingOptions}
                         required={question.is_required}
-                        locale={locale}
                         error={errors?.[fieldName]}
+                        aria-label={question.lo_code ?? `${copy.question} ${index + 1}`}
                       />
                     </div>
-                    {descriptionsAvailable && (
-                      <details className="mt-4 rounded-lg bg-sunken px-4 py-3 text-sm text-secondary">
-                        <summary className="cursor-pointer font-medium text-primary">{copy.rubric}</summary>
-                        <ul className="mt-3 space-y-3">
-                          {question.options.map((option) => {
-                            const description = locale === "en" ? option.description_en : option.description_th;
-                            const label =
-                              locale === "en"
-                                ? option.label_en || ENGLISH_SCORE_LABELS[option.score] || option.label_th
-                                : option.label_th;
-                            return (
-                              description && (
-                                <li key={option.id}>
-                                  <strong className="text-primary">{option.score} {label}:</strong> {description}
-                                </li>
-                              )
-                            );
-                          })}
-                        </ul>
-                      </details>
-                    )}
                   </fieldset>
                 );
               })}
@@ -186,11 +206,49 @@ export function CompetencyStep({
 }
 
 // --- Step 3: Report / project ---
-export function ReportStep({ locale, errors }: { locale: Locale; errors?: FieldErrors }) {
+export function ReportStep({
+  locale,
+  errors,
+  formVersion,
+}: {
+  locale: Locale;
+  errors?: FieldErrors;
+  formVersion: number;
+}) {
   const copy = COPY[locale];
-  const options = copy.rating.map((label, index) => ({ value: String(index + 1), label }));
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [ratings, setRatings] = useState<Record<number, number | undefined>>({});
+
+  // 5 levels displayed high → low. copy.rating is [Lowest..Highest] (index 0→4),
+  // and the form schema maps value = index + 1 (1=Lowest, 5=Highest).
+  // Reverse so the highest score renders first (leftmost).
+  const levels: RatingLevel[] = copy.rating
+    .map((label, i) => ({ value: i + 1, label }))
+    .reverse();
+
+  // Sync from DOM after draft restore (same pattern as CompetencyStep)
+  useEffect(() => {
+    const form = containerRef.current?.closest("form");
+    if (!form) return;
+    const next: Record<number, number | undefined> = {};
+    for (let i = 0; i < copy.reportItems.length; i++) {
+      const group = form.elements.namedItem(`c-${i}`);
+      if (group instanceof RadioNodeList) {
+        for (const radio of group) {
+          if (radio instanceof HTMLInputElement && radio.checked) {
+            next[i] = Number(radio.value);
+            break;
+          }
+        }
+      } else if (group instanceof HTMLInputElement && group.checked) {
+        next[i] = Number(group.value);
+      }
+    }
+    setRatings(next);
+  }, [formVersion, copy.reportItems.length]);
+
   return (
-    <div className="space-y-8">
+    <div ref={containerRef} className="space-y-8">
       {copy.reportItems.map((item, index) => {
         const fieldName = `c-${index}`;
         return (
@@ -200,7 +258,15 @@ export function ReportStep({ locale, errors }: { locale: Locale; errors?: FieldE
               <Required />
             </legend>
             <div className="mt-4">
-              <RatingScale name={fieldName} options={options} locale={locale} error={errors?.[fieldName]} />
+              <RatingCard
+                levels={levels}
+                value={ratings[index]}
+                onChange={(v) => setRatings((prev) => ({ ...prev, [index]: v }))}
+                name={fieldName}
+                required
+                error={errors?.[fieldName]}
+                aria-label={`${index + 1}. ${item}`}
+              />
             </div>
           </fieldset>
         );

@@ -53,6 +53,11 @@
   --red-700: #b91c1c;
 
   /* --- Semantic Tokens (light mode) --- */
+  --primary: #071c31;
+  --primary-foreground: #fffefb;
+  --secondary: #f3f1ed;
+  --border: var(--stone-200);
+
   --surface-page: #f8f7f4;
   --surface-raised: #fffefb;
   --surface-sunken: #f3f1ed;
@@ -61,7 +66,7 @@
   --surface-table-stripe: #faf9f7;
   --surface-table-hover: #f5f3ef;
 
-  --text-primary: var(--stone-900);
+  --text-primary: var(--primary);
   --text-secondary: var(--stone-600);
   --text-tertiary: var(--stone-500);
   --text-inverse: #fffefb;
@@ -133,6 +138,11 @@
 }
 
 [data-theme="dark"] {
+  /* Brand colors stay the same in dark mode */
+  --primary: #071c31;
+  --primary-foreground: #fffefb;
+  --secondary: var(--stone-800);
+
   --surface-page: var(--stone-950);
   --surface-raised: var(--stone-900);
   --surface-sunken: var(--stone-900);
@@ -184,6 +194,11 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
+    /* Brand colors stay the same in dark mode */
+    --primary: #071c31;
+    --primary-foreground: #fffefb;
+    --secondary: var(--stone-800);
+
     --surface-page: var(--stone-950);
     --surface-raised: var(--stone-900);
     --surface-sunken: var(--stone-900);
@@ -242,12 +257,17 @@
   --color-hover: var(--surface-hover);
   --color-overlay: var(--surface-overlay);
 
+  /* text-primary changes per mode (navy in light, cream in dark).
+     bg-primary is overridden by the custom .bg-primary class below
+     to always use --primary (navy #071c31) regardless of mode. */
   --color-primary: var(--text-primary);
+  --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--text-secondary);
   --color-tertiary: var(--text-tertiary);
   --color-inverse: var(--text-inverse);
   --color-link: var(--text-link);
 
+  --color-border: var(--border);
   --color-border-default: var(--border-default);
   --color-border-strong: var(--border-strong);
   --color-border-focus: var(--border-focus);
@@ -287,6 +307,35 @@
 /* Base styles */
 * {
   border-color: var(--border-default);
+}
+
+/* Custom utility overrides — these take precedence over Tailwind's
+   generated utilities (defined later in the cascade). They ensure
+   bg-primary and border-primary always use the navy brand color
+   (#071c31) regardless of light/dark mode, while text-primary
+   (from @theme inline → --text-primary) changes per mode. */
+.border-primary {
+  border-color: var(--primary);
+}
+
+.border-border {
+  border-color: var(--border);
+}
+
+.bg-primary {
+  background-color: var(--primary);
+}
+
+.bg-secondary {
+  background-color: var(--secondary);
+}
+
+.bg-border {
+  background-color: var(--border);
+}
+
+.text-primary-foreground {
+  color: var(--primary-foreground);
 }
 
 body {

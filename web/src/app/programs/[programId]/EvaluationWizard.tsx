@@ -412,13 +412,13 @@ export function EvaluationWizard({ program, template, sections, questions, local
             <GeneralStep program={program} locale={locale} errors={effectiveFieldErrors} />
           </div>
           <div hidden={currentStep !== 1}>
-            <CompetencyStep sections={primarySections} questions={primaryQuestions} locale={locale} errors={effectiveFieldErrors} />
+            <CompetencyStep sections={primarySections} questions={primaryQuestions} locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
           </div>
           <div hidden={currentStep !== 2}>
-            <CompetencyStep sections={secondarySections} questions={secondaryQuestions} locale={locale} errors={effectiveFieldErrors} />
+            <CompetencyStep sections={secondarySections} questions={secondaryQuestions} locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
           </div>
           <div hidden={currentStep !== 3}>
-            <ReportStep locale={locale} errors={effectiveFieldErrors} />
+            <ReportStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
           </div>
           <div hidden={currentStep !== 4}>
             <FeedbackStep locale={locale} errors={effectiveFieldErrors} />
