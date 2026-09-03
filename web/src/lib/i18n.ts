@@ -24,14 +24,20 @@ const SCHOOL_NAME_ALIASES: Record<string, string> = {
 const SCHOOL_NAMES_EN: Record<string, string> = {
   "วิทยาลัยนานาชาติ": "International College",
   "สำนักวิชาการจัดการ": "School of Management",
+  "สำนักวิชาการบัญชีและการเงิน": "School of Accountancy and Finance",
+  "สำนักวิชาวิศวกรรมศาสตร์และเทคโนโลยี": "School of Engineering and Technology",
   "สำนักวิชาวิศวกรรมศาสตร์": "School of Engineering",
   "สำนักวิชาเทคโนโลยีสารสนเทศ": "School of Information Technology",
+  "สำนักวิชาสารสนเทศศาสตร์": "School of Informatics",
   "สำนักวิชาพยาบาลศาสตร์": "School of Nursing",
   "สำนักวิชานิติศาสตร์": "School of Law",
   "สำนักวิชาสาธารณสุขศาสตร์": "School of Public Health",
   "สำนักวิชารัฐศาสตร์และรัฐประศาสนศาสตร์": "School of Political Science and Public Administration",
   "สำนักวิชาศิลปศาสตร์": "School of Liberal Arts",
   "สำนักวิชาวิทยาศาสตร์": "School of Science",
+  "สำนักวิชาสถาปัตยกรรมศาสตร์และการออกแบบ": "School of Architecture and Design",
+  "สำนักวิชาเทคโนโลยีการเกษตรและอุตสาหกรรมอาหาร": "School of Agricultural Technology and Food Industry",
+  "สำนักวิชาแพทยศาสตร์": "School of Medicine",
 };
 
 export function schoolDisplayName(name: string, locale: Locale): string {
