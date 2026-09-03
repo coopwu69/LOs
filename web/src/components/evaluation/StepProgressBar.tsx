@@ -18,12 +18,12 @@ type StepProgressBarProps = {
  * Bottom row: single full-width track bar, independent of the circles.
  *
  * Visual states per circle (matches project tokens):
- *   - completed (index < currentStep):  filled action (indigo), check icon
- *   - active    (index === currentStep): filled action (indigo), ring emphasis, number
+ *   - completed (index < currentStep):  filled action (navy), check icon
+ *   - active    (index === currentStep): filled action (navy), ring emphasis, number
  *   - upcoming  (index > currentStep):   sunken surface, number
  *
  * The track fills from 0% to ((currentStep + 1) / total) * 100%,
- * so when the user is on step 3 of 6 the indigo bar spans steps 1→3.
+ * so when the user is on step 3 of 6 the navy bar spans steps 1→3.
  *
  * Navigation policy (per CLAUDE.md): never gate page navigation on validation.
  * `allowUnrestrictedNavigation` lets the user click any step freely; soft

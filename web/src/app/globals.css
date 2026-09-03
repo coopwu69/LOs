@@ -8,18 +8,18 @@
 :root {
   color-scheme: light;
   /* --- Primitive Tokens (never reference directly) --- */
-  /* Indigo — warm trustworthy primary (replaces cold blue) */
-  --indigo-50: #eef2ff;
-  --indigo-100: #e0e7ff;
-  --indigo-200: #c7d2fe;
-  --indigo-300: #a5b4fc;
-  --indigo-400: #818cf8;
-  --indigo-500: #6366f1;
-  --indigo-600: #4f46e5;
-  --indigo-700: #4338ca;
-  --indigo-800: #3730a3;
-  --indigo-900: #312e81;
-  --indigo-950: #1e1b4b;
+  /* Navy — single brand-consistent blue (900 tier matches --primary exactly) */
+  --navy-50: #eff6fd;
+  --navy-100: #dbebfa;
+  --navy-200: #b3d4f4;
+  --navy-300: #79b2ec;
+  --navy-400: #368ce2;
+  --navy-500: #1966b3;
+  --navy-600: #12477d;
+  --navy-700: #0d3359;
+  --navy-800: #0a2845;
+  --navy-900: #071c31;
+  --navy-950: #04121f;
 
   /* Stone — warm neutral (replaces cold gray) */
   --stone-50: #fafaf9;
@@ -70,15 +70,15 @@
   --text-secondary: var(--stone-600);
   --text-tertiary: var(--stone-500);
   --text-inverse: #fffefb;
-  --text-link: var(--indigo-600);
+  --text-link: var(--navy-600);
 
   --border-default: var(--stone-200);
   --border-strong: var(--stone-300);
-  --border-focus: var(--indigo-500);
+  --border-focus: var(--navy-500);
 
-  --action-primary: var(--indigo-600);
-  --action-primary-hover: var(--indigo-700);
-  --action-primary-active: var(--indigo-800);
+  --action-primary: var(--navy-900);
+  --action-primary-hover: var(--navy-800);
+  --action-primary-active: var(--navy-950);
 
   --feedback-success-bg: var(--emerald-50);
   --feedback-success-text: var(--emerald-700);
@@ -89,13 +89,13 @@
   --feedback-error-bg: var(--red-50);
   --feedback-error-text: var(--red-700);
   --feedback-error-border: var(--red-100);
-  --feedback-info-bg: var(--indigo-50);
-  --feedback-info-text: var(--indigo-700);
-  --feedback-info-border: var(--indigo-100);
+  --feedback-info-bg: var(--navy-50);
+  --feedback-info-text: var(--navy-700);
+  --feedback-info-border: var(--navy-100);
 
   /* Domain colors for assessment sections */
-  --domain-knowledge: var(--indigo-600);
-  --domain-knowledge-bg: var(--indigo-50);
+  --domain-knowledge: var(--navy-600);
+  --domain-knowledge-bg: var(--navy-50);
   --domain-skills: var(--emerald-600);
   --domain-skills-bg: var(--emerald-50);
   --domain-ethics: var(--amber-600);
@@ -155,15 +155,15 @@
   --text-secondary: var(--stone-400);
   --text-tertiary: var(--stone-500);
   --text-inverse: var(--stone-900);
-  --text-link: var(--indigo-400);
+  --text-link: var(--navy-400);
 
   --border-default: var(--stone-800);
   --border-strong: var(--stone-700);
-  --border-focus: var(--indigo-400);
+  --border-focus: var(--navy-400);
 
-  --action-primary: var(--indigo-500);
-  --action-primary-hover: var(--indigo-600);
-  --action-primary-active: var(--indigo-700);
+  --action-primary: var(--navy-500);
+  --action-primary-hover: var(--navy-400);
+  --action-primary-active: var(--navy-600);
 
   --feedback-success-bg: rgba(16, 185, 129, 0.12);
   --feedback-success-text: var(--emerald-500);
@@ -174,12 +174,12 @@
   --feedback-error-bg: rgba(239, 68, 68, 0.12);
   --feedback-error-text: var(--red-500);
   --feedback-error-border: rgba(239, 68, 68, 0.25);
-  --feedback-info-bg: rgba(99, 102, 241, 0.12);
-  --feedback-info-text: var(--indigo-400);
-  --feedback-info-border: rgba(99, 102, 241, 0.25);
+  --feedback-info-bg: rgba(25, 102, 179, 0.12);
+  --feedback-info-text: var(--navy-400);
+  --feedback-info-border: rgba(25, 102, 179, 0.25);
 
-  --domain-knowledge: var(--indigo-400);
-  --domain-knowledge-bg: rgba(99, 102, 241, 0.12);
+  --domain-knowledge: var(--navy-400);
+  --domain-knowledge-bg: rgba(25, 102, 179, 0.12);
   --domain-skills: var(--emerald-500);
   --domain-skills-bg: rgba(16, 185, 129, 0.12);
   --domain-ethics: var(--amber-500);
@@ -211,15 +211,15 @@
     --text-secondary: var(--stone-400);
     --text-tertiary: var(--stone-500);
     --text-inverse: var(--stone-900);
-    --text-link: var(--indigo-400);
+    --text-link: var(--navy-400);
 
     --border-default: var(--stone-800);
     --border-strong: var(--stone-700);
-    --border-focus: var(--indigo-400);
+    --border-focus: var(--navy-400);
 
-    --action-primary: var(--indigo-500);
-    --action-primary-hover: var(--indigo-600);
-    --action-primary-active: var(--indigo-700);
+    --action-primary: var(--navy-500);
+    --action-primary-hover: var(--navy-400);
+    --action-primary-active: var(--navy-600);
 
     --feedback-success-bg: rgba(16, 185, 129, 0.12);
     --feedback-success-text: var(--emerald-500);
@@ -230,12 +230,12 @@
     --feedback-error-bg: rgba(239, 68, 68, 0.12);
     --feedback-error-text: var(--red-500);
     --feedback-error-border: rgba(239, 68, 68, 0.25);
-    --feedback-info-bg: rgba(99, 102, 241, 0.12);
-    --feedback-info-text: var(--indigo-400);
-    --feedback-info-border: rgba(99, 102, 241, 0.25);
+    --feedback-info-bg: rgba(25, 102, 179, 0.12);
+    --feedback-info-text: var(--navy-400);
+    --feedback-info-border: rgba(25, 102, 179, 0.25);
 
-    --domain-knowledge: var(--indigo-400);
-    --domain-knowledge-bg: rgba(99, 102, 241, 0.12);
+    --domain-knowledge: var(--navy-400);
+    --domain-knowledge-bg: rgba(25, 102, 179, 0.12);
     --domain-skills: var(--emerald-500);
     --domain-skills-bg: rgba(16, 185, 129, 0.12);
     --domain-ethics: var(--amber-500);
