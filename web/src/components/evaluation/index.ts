@@ -1,4 +1,5 @@
 export { Stepper } from "./Stepper";
+export { StepProgressBar } from "./StepProgressBar";
 export { RatingScale } from "./RatingScale";
 export { ChoiceGroup } from "./ChoiceGroup";
 export { ErrorSummary } from "./ErrorSummary";

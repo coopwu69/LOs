@@ -21,11 +21,16 @@ export function ChoiceGroup({ legend, name, options, required = true, error }: C
         {legend}
         {required && <Required />}
       </legend>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2" aria-invalid={error ? "true" : undefined} aria-describedby={errorId}>
+      <div
+        className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:[grid-template-columns:repeat(var(--option-count),minmax(0,1fr))]"
+        style={{ "--option-count": options.length } as React.CSSProperties}
+        aria-invalid={error ? "true" : undefined}
+        aria-describedby={errorId}
+      >
         {options.map((option, index) => (
           <label
             key={option.value}
-            className="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border border-border-strong bg-raised px-4 py-3 text-sm text-primary transition-colors hover:border-border-focus hover:bg-hover focus-within:shadow-[var(--shadow-focus-ring)] has-[:checked]:border-action has-[:checked]:bg-info-bg"
+            className="flex min-h-12 min-w-0 cursor-pointer items-center gap-3 rounded-lg border border-border-strong bg-raised px-4 py-3 text-sm text-primary transition-colors hover:border-border-focus hover:bg-hover focus-within:shadow-[var(--shadow-focus-ring)] has-[:checked]:border-action has-[:checked]:bg-info-bg"
           >
             <input
               type="radio"

@@ -39,7 +39,10 @@ function QuestionView({ question, index, locale }: { question: QuestionRow; inde
         <span className="mr-2 text-sm font-semibold text-action">{question.lo_code ?? `${copy.question} ${index + 1}`}</span>
         {locale === "en" ? englishQuestionFallback(question.text, question.text_en) : question.text}
       </legend>
-      <div className="mt-4 grid grid-cols-5 gap-2">
+      <div
+        className="mt-4 grid gap-2 [grid-template-columns:repeat(var(--option-count),minmax(0,1fr))]"
+        style={{ "--option-count": options.length } as React.CSSProperties}
+      >
         {options.map((option) => (
           <div key={option.key} className="flex min-h-16 flex-col items-center justify-center gap-1 rounded-lg border border-border-strong bg-raised px-2 py-2 text-center">
             <span className="h-4 w-4 rounded-full border-2 border-border-strong" aria-hidden="true" />

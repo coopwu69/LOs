@@ -26,7 +26,10 @@ export function RatingScale({ name, options, required = true, locale, error }: R
   const errorId = error ? `${name}-error` : undefined;
   return (
     <div aria-invalid={error ? "true" : undefined} aria-describedby={errorId}>
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-5">
+      <div
+        className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:[grid-template-columns:repeat(var(--option-count),minmax(0,1fr))]"
+        style={{ "--option-count": options.length } as React.CSSProperties}
+      >
         {options.map((option, index) => {
           const value = "score" in option ? String(option.score) : option.value;
           const label =
@@ -40,7 +43,7 @@ export function RatingScale({ name, options, required = true, locale, error }: R
             <label
               key={id}
               htmlFor={id}
-              className="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border border-border-strong bg-raised px-3 py-2.5 transition-colors hover:border-border-focus hover:bg-hover focus-within:shadow-[var(--shadow-focus-ring)] has-[:checked]:border-action has-[:checked]:bg-info-bg sm:flex-col sm:justify-center sm:gap-1 sm:text-center"
+              className="flex min-h-12 min-w-0 cursor-pointer items-center gap-3 rounded-lg border border-border-strong bg-raised px-3 py-2.5 transition-colors hover:border-border-focus hover:bg-hover focus-within:shadow-[var(--shadow-focus-ring)] has-[:checked]:border-action has-[:checked]:bg-info-bg sm:flex-col sm:justify-center sm:gap-1 sm:text-center"
             >
               <input
                 id={id}

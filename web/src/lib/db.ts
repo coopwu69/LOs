@@ -119,8 +119,13 @@ function asStringArray(value: unknown): string[] | null {
 
 // ---------- Template doc (single round-trip via json_agg) ----------
 
-export async function getTemplateDoc(programRef: string): Promise<TemplateDoc | null> {
-  const program = await getProgram(programRef);
+// `resolvedProgram` lets callers that already hold the program skip a redundant
+// lookup round-trip; without it the ref is resolved here as before.
+export async function getTemplateDoc(
+  programRef: string,
+  resolvedProgram?: ProgramRow
+): Promise<TemplateDoc | null> {
+  const program = resolvedProgram ?? (await getProgram(programRef));
   if (!program) return null;
   const templateResult = await getPool().query(
     `SELECT id::text, COALESCE(title, name) AS title
@@ -387,6 +392,116 @@ export async function getSchoolsWithProgress(): Promise<SchoolWithProgress[]> {
       form_status: p.form_status === "submitted" ? "submitted" : "pending",
     })),
   }));
+}
+
+// Everything the program page needs, in one round-trip. Replaces the
+// program -> templates -> sections/questions -> options request chain, whose
+// four sequential waits dominated page latency on a cold Neon compute.
+export async function getProgramPageData(programRef: string): Promise<{
+  program: ProgramRow;
+  template: Template | null;
+  sections: Section[];
+  questions: (Question & { options: Option[] })[];
+} | null> {
+  const { rows } = await getPool().query<{
+    program: ProgramRow | null;
+    template: Template | null;
+    sections: Section[] | null;
+    questions: (Question & { options: Option[] })[] | null;
+  }>(
+    `
+    WITH program AS (
+      SELECT id, id::text AS id_text, code, name_th, name_en, school, slug
+      FROM programs
+      WHERE id::text = $1 OR LOWER(code) = LOWER($1) OR LOWER(slug) = LOWER($1)
+      LIMIT 1
+    ),
+    template AS (
+      SELECT t.*
+      FROM evaluation_templates t
+      JOIN program p ON p.id = t.program_id
+      ORDER BY t.created_at DESC
+      LIMIT 1
+    ),
+    sections AS (
+      SELECT COALESCE(
+        json_agg(
+          json_build_object(
+            'id', s.id::text,
+            'template_id', s.template_id::text,
+            'title_th', s.title_th,
+            'title_en', s.title_en,
+            'domain_type', s.domain_type::text,
+            'sequence', s.sequence
+          ) ORDER BY s.sequence
+        ) FILTER (WHERE s.id IS NOT NULL),
+        '[]'::json
+      ) AS arr
+      FROM assessment_sections s
+      JOIN template t ON t.id = s.template_id
+    ),
+    questions AS (
+      SELECT COALESCE(
+        json_agg(
+          json_build_object(
+            'id', q.id::text,
+            'template_id', q.template_id::text,
+            'section_id', q.section_id::text,
+            'text', q.text,
+            'text_en', q.text_en,
+            'lo_code', q.lo_code,
+            'question_type', q.question_type,
+            'is_required', q.is_required,
+            'sequence', q.sequence,
+            'options', COALESCE((
+              SELECT json_agg(
+                json_build_object(
+                  'id', o.id::text,
+                  'question_id', o.question_id::text,
+                  'label_th', o.label_th,
+                  'label_en', o.label_en,
+                  'description_th', o.description_th,
+                  'description_en', o.description_en,
+                  'score', o.score,
+                  'sequence', o.sequence
+                ) ORDER BY o.sequence
+              ) FILTER (WHERE o.id IS NOT NULL)
+              FROM assessment_options o
+              WHERE o.question_id = q.id
+            ), '[]'::json)
+          ) ORDER BY q.sequence
+        ) FILTER (WHERE q.id IS NOT NULL),
+        '[]'::json
+      ) AS arr
+      FROM evaluation_questions q
+      JOIN template t ON t.id = q.template_id
+    )
+    SELECT
+      (SELECT json_build_object(
+         'id', p.id_text,
+         'code', p.code,
+         'name_th', p.name_th,
+         'name_en', p.name_en,
+         'school', p.school,
+         'slug', p.slug,
+         'revision_label', NULL,
+         'form_status', 'pending'
+       ) FROM program p) AS program,
+      (SELECT row_to_json(t) FROM template t) AS template,
+      (SELECT arr FROM sections) AS sections,
+      (SELECT arr FROM questions) AS questions
+    `,
+    [programRef]
+  );
+
+  const row = rows[0];
+  if (!row?.program) return null;
+  return {
+    program: { ...row.program, form_status: "pending" },
+    template: row.template,
+    sections: row.sections ?? [],
+    questions: row.questions ?? [],
+  };
 }
 
 export async function getProgram(programRef: string): Promise<ProgramRow | null> {

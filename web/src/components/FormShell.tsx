@@ -27,7 +27,10 @@ function ChoiceRow({ label, choices }: { label: string; choices: string[] }) {
   return (
     <div className="print-break-avoid">
       <p className="text-sm font-medium text-primary">{label}</p>
-      <div className="mt-3 grid grid-cols-2 gap-3">
+      <div
+        className="mt-3 grid gap-3 [grid-template-columns:repeat(var(--option-count),minmax(0,1fr))]"
+        style={{ "--option-count": choices.length } as React.CSSProperties}
+      >
         {choices.map((choice) => (
           <div key={choice} className="flex min-h-11 items-center gap-3 rounded-lg border border-border-strong bg-raised px-4 py-2.5 text-sm text-primary">
             <span className="h-5 w-5 shrink-0 rounded-full border-2 border-border-strong" aria-hidden="true" />
@@ -41,7 +44,10 @@ function ChoiceRow({ label, choices }: { label: string; choices: string[] }) {
 
 function PrintRating({ labels }: { labels: string[] }) {
   return (
-    <div className="mt-4 grid grid-cols-5 gap-2">
+    <div
+      className="mt-4 grid gap-2 [grid-template-columns:repeat(var(--option-count),minmax(0,1fr))]"
+      style={{ "--option-count": labels.length } as React.CSSProperties}
+    >
       {labels.map((label, index) => (
         <div key={label} className="flex min-h-16 flex-col items-center justify-center gap-1 rounded-lg border border-border-strong bg-raised px-2 py-2 text-center">
           <span className="h-4 w-4 rounded-full border-2 border-border-strong" aria-hidden="true" />
@@ -84,14 +90,19 @@ export function FormShell({
 }) {
   const copy = COPY[locale];
   const programName = locale === "en" ? program.name_en || program.name_th : program.name_th;
+  const schoolName = program.school ?? "";
 
   return (
     <article className="space-y-8">
       <header className="text-center print-break-avoid">
         <h1 className="text-xl font-bold text-primary sm:text-2xl">
-          {title ?? (locale === "en" ? "Cooperative Education Learning Outcomes Evaluation" : "แบบประเมินผลลัพธ์การเรียนรู้ที่คาดหวังของรายวิชาสหกิจศึกษา")}
+          {locale === "en" ? "Cooperative Education Learning Outcomes Evaluation" : "แบบประเมิน LOs รายวิชาสหกิจศึกษา"}
         </h1>
-        <p className="mt-2 text-base font-medium text-primary">{programName}</p>
+        <p className="mt-2 text-base font-medium text-primary">
+          {locale === "en"
+            ? `Program: ${programName}  School: ${schoolName}`
+            : `หลักสูตร ${programName}  สำนักวิชา ${schoolName}`}
+        </p>
         {revisionLabel && <p className="mt-1 text-sm text-secondary">({revisionLabel})</p>}
         {courseCodes && courseCodes.length > 0 && (
           <p className="mt-1 text-sm text-secondary">{locale === "en" ? "Course code" : "รหัสรายวิชา"}: {courseCodes.join(", ")}</p>

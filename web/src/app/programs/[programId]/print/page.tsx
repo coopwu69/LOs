@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { AssessmentDocument } from "@/components/AssessmentDocument";
 import { PrintButton } from "@/components/PrintButton";
@@ -8,6 +9,25 @@ import { resolveLocale, uiCopy, withLocale } from "@/lib/i18n";
 import type { TemplateDoc } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+
+// PDF filename when saving from the browser print dialog derives from
+// document.title. Use a stable format: "<form title> _ หลักสูตร <program>"
+// so files sort together and identify the program without opening.
+export async function generateMetadata({
+  params,
+  searchParams,
+}: PageProps<"/programs/[programId]/print">): Promise<Metadata> {
+  const { programId } = await params;
+  const locale = resolveLocale((await searchParams).lang, false);
+  const program = isFixtureMode() ? getFixtureProgram(programId) : await getProgram(programId);
+  if (!program) return {};
+  const programName = locale === "en" ? program.name_en || program.name_th : program.name_th;
+  const formTitle = locale === "en"
+    ? "Cooperative Education Learning Outcomes Evaluation"
+    : "แบบประเมิน LOs รายวิชาสหกิจศึกษา";
+  const programLabel = locale === "en" ? "Program" : "หลักสูตร";
+  return { title: `${formTitle} _ ${programLabel} ${programName}` };
+}
 
 export default async function PrintPreviewPage({
   params,
@@ -24,7 +44,7 @@ export default async function PrintPreviewPage({
 
   let doc: TemplateDoc | null = null;
   try {
-    doc = isFixtureMode() ? getFixtureTemplateDoc(program.id) : await getTemplateDoc(program.id);
+    doc = isFixtureMode() ? getFixtureTemplateDoc(program.id) : await getTemplateDoc(program.id, program);
   } catch {
     doc = null;
   }

@@ -1,7 +1,7 @@
 import { notFound, permanentRedirect } from "next/navigation";
-import { getProgramRouteKey, getProgramsBySchool, getSchoolsWithProgress } from "@/lib/db";
+import { getProgramRouteKey, getProgramsBySchool } from "@/lib/db";
 import { getSchoolNameBySlug, getSchoolSlug } from "@/lib/schools";
-import { isFixtureMode, getFixtureProgramsBySchool, getFixtureSchoolsWithProgress } from "@/lib/fixtures";
+import { isFixtureMode, getFixtureProgramsBySchool } from "@/lib/fixtures";
 import { isInternationalContext, resolveLocale, schoolDisplayName, uiCopy, withLocale } from "@/lib/i18n";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { PageHeader } from "@/components/PageHeader";
@@ -21,9 +21,10 @@ export default async function SchoolPage({ params, searchParams }: PageProps<"/s
   }
   const copy = uiCopy[locale];
   const displaySchool = schoolDisplayName(schoolName, locale);
-  const allSchools = isFixtureMode() ? getFixtureSchoolsWithProgress() : await getSchoolsWithProgress();
-  if (!allSchools.some((school) => school.name === schoolName)) notFound();
+  // A school exists exactly when it has at least one active program, so the
+  // program list doubles as the existence check — no all-schools aggregate needed.
   const programs = isFixtureMode() ? getFixtureProgramsBySchool(schoolName) : await getProgramsBySchool(schoolName);
+  if (programs.length === 0) notFound();
   const path = `/schools/${canonicalSlug}`;
 
   // Serialize for client component

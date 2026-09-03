@@ -1,12 +1,8 @@
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import {
-  getProgram,
+  getProgramPageData,
   getProgramRouteKey,
-  getTemplatesByProgram,
-  getSectionsByTemplate,
-  getQuestionsByTemplate,
-  getOptionsByQuestion,
   type Question,
   type Option,
 } from "@/lib/db";
@@ -45,36 +41,15 @@ function Toolbar({ programKey, hasTemplate, locale }: { programKey: string; hasT
   );
 }
 
-async function getTemplateWithData(templateId: string): Promise<{
-  sections: Awaited<ReturnType<typeof getSectionsByTemplate>>;
-  questions: QuestionWithOptions[];
-}> {
-  const [sections, questions] = await Promise.all([
-    getSectionsByTemplate(templateId),
-    getQuestionsByTemplate(templateId),
-  ]);
-
-  const questionIds = questions.map((question) => question.id);
-  const options = await getOptionsByQuestion(questionIds);
-  const optionsByQuestion = new Map<string, Option[]>();
-  for (const option of options) {
-    const grouped = optionsByQuestion.get(option.question_id) ?? [];
-    grouped.push(option);
-    optionsByQuestion.set(option.question_id, grouped);
-  }
-
-  const questionsWithOptions = questions.map((question) => ({
-    ...question,
-    options: optionsByQuestion.get(question.id) ?? [],
-  }));
+// Collapse questions that repeat the same LO code, keeping the tersest wording.
+function dedupeByLoCode(questions: QuestionWithOptions[]): QuestionWithOptions[] {
   const uniqueQuestions = new Map<string, QuestionWithOptions>();
-  for (const question of questionsWithOptions) {
+  for (const question of questions) {
     const key = question.lo_code?.trim().toUpperCase() || question.id;
     const existing = uniqueQuestions.get(key);
     if (!existing || question.text.length < existing.text.length) uniqueQuestions.set(key, question);
   }
-
-  return { sections, questions: [...uniqueQuestions.values()].sort((a, b) => a.sequence - b.sequence) };
+  return [...uniqueQuestions.values()].sort((a, b) => a.sequence - b.sequence);
 }
 
 export default async function ProgramPage({
@@ -83,8 +58,9 @@ export default async function ProgramPage({
 }: PageProps<"/programs/[programId]">) {
   const { programId } = await params;
   const requestedLanguage = (await searchParams).lang;
-  const program = await getProgram(programId);
-  if (!program) notFound();
+  const pageData = await getProgramPageData(programId);
+  if (!pageData) notFound();
+  const { program, template } = pageData;
   const locale = resolveLocale(requestedLanguage, isInternationalContext(program.school) || isInternationalContext(program.name_th) || isInternationalContext(program.code));
   const copy = uiCopy[locale];
   const programKey = getProgramRouteKey(program);
@@ -93,11 +69,8 @@ export default async function ProgramPage({
   const programName = locale === "en" ? program.name_en || (program.code === "INTL" ? "International Program (WUIC)" : program.name_th) : program.name_th;
   const schoolName = schoolDisplayName(program.school ?? (locale === "en" ? "School" : "สำนักวิชา"), locale);
 
-  const templates = await getTemplatesByProgram(program.id);
-  const template = templates[0] ?? null;
-  const { sections, questions } = template
-    ? await getTemplateWithData(template.id)
-    : { sections: [], questions: [] };
+  const sections = pageData.sections;
+  const questions = dedupeByLoCode(pageData.questions);
 
   return (
     <div className="flex-1">

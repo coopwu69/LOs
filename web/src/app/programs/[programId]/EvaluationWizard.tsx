@@ -7,7 +7,7 @@ import { loadEvaluationDraft, saveEvaluationDraft, submitEvaluation } from "./ac
 import {
   WIZARD_COPY as COPY,
   PRIMARY_DOMAINS,
-  Stepper,
+  StepProgressBar,
   ErrorSummary,
   AutosaveStatus,
   CompletionScreen,
@@ -383,9 +383,8 @@ export function EvaluationWizard({ program, template, sections, questions, local
       <input type="hidden" name="draftToken" defaultValue="" />
       <input type="hidden" name="locale" value={locale} />
 
-      <Stepper
+      <StepProgressBar
         currentStep={currentStep}
-        maxVisited={maxVisited}
         stepCompletion={stepCompletion}
         onSelect={goToStep}
         locale={locale}

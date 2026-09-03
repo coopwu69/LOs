@@ -364,7 +364,7 @@ export async function GET(
     doc = getFixtureTemplateDoc(programId);
   } else {
     try {
-      doc = await getTemplateDoc(program.id);
+      doc = await getTemplateDoc(program.id, program);
     } catch {
       doc = null;
     }
