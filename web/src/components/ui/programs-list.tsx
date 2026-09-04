@@ -31,6 +31,9 @@ const COPY = {
     noResultsHelp: "ลองเปลี่ยนคำค้นหาหรือตัวกรอง",
     availableLabel: "ส่งแล้ว",
     pendingLabel: "ยังไม่ส่ง",
+    copyLink: "คัดลอกลิงก์",
+    linkCopied: "คัดลอกแล้ว",
+    linkColumn: "ลิงก์",
   },
   en: {
     searchPlaceholder: "Search by code or program name…",
@@ -44,6 +47,9 @@ const COPY = {
     noResultsHelp: "Try adjusting your search or filter",
     availableLabel: "Available",
     pendingLabel: "Not available",
+    copyLink: "Copy link",
+    linkCopied: "Copied!",
+    linkColumn: "Link",
   },
 };
 
@@ -53,6 +59,40 @@ function SearchIcon() {
 
 function ArrowRightIcon() {
   return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7" /></svg>;
+}
+
+function CopyIcon() {
+  return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>;
+}
+
+function CheckIcon() {
+  return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>;
+}
+
+function CopyLinkButton({ href, copyLabel, copiedLabel }: { href: string; copyLabel: string; copiedLabel: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const url = `${window.location.origin}${href}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }).catch(() => {});
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      aria-label={copied ? copiedLabel : copyLabel}
+      title={copied ? copiedLabel : copyLabel}
+      className={`inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-hover ${copied ? "text-success-text" : "text-tertiary hover:text-primary"}`}
+    >
+      {copied ? <CheckIcon /> : <CopyIcon />}
+    </button>
+  );
 }
 
 function FilterTab({ active, onClick, children, count }: { active: boolean; onClick: () => void; children: React.ReactNode; count: number }) {
@@ -130,6 +170,7 @@ export function ProgramsList({ programs, locale }: { programs: ProgramSummary[];
                 <TableHead className="w-40">{c.code}</TableHead>
                 <TableHead>{c.program}</TableHead>
                 <TableHead className="w-32">{c.status}</TableHead>
+                <TableHead className="w-10">{c.linkColumn}</TableHead>
                 <TableHead className="w-10" />
               </TableRow>
             </TableHeader>
@@ -168,6 +209,9 @@ export function ProgramsList({ programs, locale }: { programs: ProgramSummary[];
                         {isAvailable ? c.availableLabel : c.pendingLabel}
                       </Badge>
                     </TableCell>
+                    <TableCell>
+                      <CopyLinkButton href={program.href} copyLabel={c.copyLink} copiedLabel={c.linkCopied} />
+                    </TableCell>
                     <TableCell className="text-tertiary" aria-hidden="true"><ArrowRightIcon /></TableCell>
                   </TableRow>
                 );
@@ -190,7 +234,10 @@ export function ProgramsList({ programs, locale }: { programs: ProgramSummary[];
                       <p className="font-mono text-xs text-tertiary">{program.code}</p>
                       <h3 className="mt-0.5 text-sm font-semibold text-primary leading-snug">{program.name}</h3>
                     </div>
-                    <span className="flex-shrink-0 text-tertiary"><ArrowRightIcon /></span>
+                    <div className="flex flex-shrink-0 items-center gap-1">
+                      <CopyLinkButton href={program.href} copyLabel={c.copyLink} copiedLabel={c.linkCopied} />
+                      <span className="text-tertiary"><ArrowRightIcon /></span>
+                    </div>
                   </div>
                   <div className="mt-2">
                     <Badge variant={isAvailable ? "success" : "warning"}>

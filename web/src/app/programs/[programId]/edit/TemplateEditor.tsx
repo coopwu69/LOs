@@ -40,6 +40,7 @@ type State = {
   templateId: string;
   programId: string;
   title: string;
+  programNameTh: string;
   courseCodesText: string; // comma-separated in the UI
   scaleStatus: ScaleStatus;
   sections: SectionState[];
@@ -52,6 +53,7 @@ function docToState(doc: TemplateDoc): State {
     templateId: doc.id,
     programId: doc.program.id,
     title: doc.title ?? "",
+    programNameTh: doc.program.name_th ?? "",
     courseCodesText: (doc.course_codes ?? []).join(", "),
     scaleStatus: doc.scale_status,
     sections: doc.sections.map((s) => ({
@@ -83,6 +85,7 @@ function docToState(doc: TemplateDoc): State {
 
 type Action =
   | { type: "set_title"; value: string }
+  | { type: "set_program_name"; value: string }
   | { type: "set_course_codes"; value: string }
   | { type: "set_scale_status"; value: ScaleStatus }
   | { type: "add_section"; part: number }
@@ -107,6 +110,8 @@ function reducer(state: State, action: Action): State {
       return action.state;
     case "set_title":
       return { ...state, title: action.value };
+    case "set_program_name":
+      return { ...state, programNameTh: action.value };
     case "set_course_codes":
       return { ...state, courseCodesText: action.value };
     case "set_scale_status":
@@ -275,8 +280,9 @@ function stateToPayload(state: State): EditPayload {
     templateId: state.templateId,
     programId: state.programId,
     title: state.title.trim() || null,
+    programNameTh: state.programNameTh.trim(),
     courseCodes: parseCourseCodes(state.courseCodesText),
-    scaleStatus: state.scaleStatus,
+    scaleStatus: "standard_4",
     sections: state.sections.map((s) => ({
       id: s.id,
       titleTh: s.titleTh,
@@ -426,39 +432,19 @@ export function TemplateEditor({ doc, programKey }: { doc: TemplateDoc; programK
         <h2 className="text-lg font-semibold text-primary">ข้อมูลทั่วไปของแบบประเมิน</h2>
         <div className="mt-4 grid gap-x-6 gap-y-5 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <label htmlFor="title" className={labelClass}>ชื่อแบบประเมิน</label>
+            <label htmlFor="programNameTh" className={labelClass}>ชื่อหลักสูตร</label>
             <input
-              id="title"
+              id="programNameTh"
               type="text"
               className={inputClass}
-              value={state.title}
-              onChange={(e) => dispatch({ type: "set_title", value: e.target.value })}
-              placeholder="เช่น แบบประเมินผลลัพธ์การเรียนรู้ที่คาดหวังของรายวิชาสหกิจศึกษา"
+              value={state.programNameTh}
+              onChange={(e) => dispatch({ type: "set_program_name", value: e.target.value })}
+              placeholder="เช่น หลักสูตรภาษาไทย"
             />
           </div>
           <div className="sm:col-span-2">
-            <label htmlFor="courseCodes" className={labelClass}>รหัสรายวิชา (คั่นด้วยจุลภาค)</label>
-            <input
-              id="courseCodes"
-              type="text"
-              className={inputClass}
-              value={state.courseCodesText}
-              onChange={(e) => dispatch({ type: "set_course_codes", value: e.target.value })}
-              placeholder="เช่น 040203xxx-xxx, 040203yyy-yyy"
-            />
-          </div>
-          <div>
-            <label htmlFor="scaleStatus" className={labelClass}>ระดับคะแนนที่ใช้</label>
-            <select
-              id="scaleStatus"
-              className={inputClass}
-              value={state.scaleStatus}
-              onChange={(e) => dispatch({ type: "set_scale_status", value: e.target.value as ScaleStatus })}
-            >
-              <option value="standard_4">4 ระดับมาตรฐาน (แนะนำ)</option>
-              <option value="legacy_5">5 ระดับแบบเดิม (ต้องแปลง)</option>
-              <option value="needs_descriptions">ยังไม่มีคำอธิบายเกณฑ์</option>
-            </select>
+            <span className={labelClass}>ระดับคะแนนที่ใช้</span>
+            <p className="text-sm text-secondary">4 ระดับมาตรฐาน (บังคับใช้)</p>
           </div>
         </div>
       </section>

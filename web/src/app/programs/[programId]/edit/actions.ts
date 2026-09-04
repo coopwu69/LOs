@@ -10,6 +10,7 @@ export type EditPayload = {
   templateId: string;
   programId: string;
   title: string | null;
+  programNameTh: string;
   courseCodes: string[] | null;
   scaleStatus: ScaleStatus;
   sections: {
@@ -107,6 +108,13 @@ export async function saveTemplate(payload: EditPayload): Promise<{ ok: true } |
         payload.scaleStatus,
       ]
     );
+
+    if (payload.programNameTh.trim()) {
+      await client.query(
+        `UPDATE programs SET name_th = $2, updated_at = now() WHERE id = $1`,
+        [payload.programId, payload.programNameTh.trim()]
+      );
+    }
 
     // 3. Reconcile sections (insert/update/delete).
     const incomingSectionIds = payload.sections.filter((s) => isExistingId(s.id)).map((s) => s.id);
