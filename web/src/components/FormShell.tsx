@@ -75,6 +75,7 @@ function StepSection({ step, title, description, children, locale, newPage = fal
 
 export function FormShell({
   program,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept in the public prop shape; callers still pass it
   title: _title,
   revisionLabel,
   courseCodes,

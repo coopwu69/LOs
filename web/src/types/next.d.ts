@@ -7,12 +7,14 @@
 import type { ReactNode } from "react";
 
 declare global {
-  type PageProps<_T = string> = {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for call-site compatibility (PageProps<"/route">)
+  type PageProps<T = string> = {
     params: Promise<Record<string, string>>;
     searchParams: Promise<Record<string, string | string[] | undefined>>;
   };
 
-  type LayoutProps<_T = string> = {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for call-site compatibility (LayoutProps<"/route">)
+  type LayoutProps<T = string> = {
     children: ReactNode;
     params?: Promise<Record<string, string>>;
   };
