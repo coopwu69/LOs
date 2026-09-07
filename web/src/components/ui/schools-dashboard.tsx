@@ -219,19 +219,19 @@ export function SchoolsDashboard({ schools, locale }: { schools: SchoolSummary[]
                 <Link
                   key={school.name}
                   href={school.href}
-                  className="block rounded-lg border border-border-default bg-raised p-3.5 transition-colors hover:border-border-focus hover:bg-hover"
+                  className="group block rounded-lg border border-border-default bg-raised p-4 transition-colors hover:border-border-focus hover:bg-hover"
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-sm font-semibold text-primary leading-snug">{school.displayName}</h3>
-                    <span className="flex-shrink-0 text-tertiary"><ArrowRightIcon /></span>
+                    <h3 className="text-base font-semibold text-primary leading-snug">{school.displayName}</h3>
+                    <span className="flex-shrink-0 pt-0.5 text-tertiary transition-transform group-hover:translate-x-0.5"><ArrowRightIcon /></span>
                   </div>
-                  <div className="mt-2 flex items-center gap-3 text-xs text-secondary">
-                    <span><strong className="text-primary">{school.program_count}</strong> {c.programsUnit}</span>
-                    <span className="inline-flex items-center gap-1"><StatusDot variant="success" />{school.submitted_count} {c.available}</span>
-                    {school.pending_count > 0 && <span className="inline-flex items-center gap-1"><StatusDot variant={statusVariant} />{school.pending_count} {c.pending}</span>}
+                  <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-secondary">
+                    <span><strong className="text-primary tabular-nums">{school.program_count}</strong> {c.programsUnit}</span>
+                    <span className="inline-flex items-center gap-1.5"><StatusDot variant="success" /><span className="tabular-nums">{school.submitted_count}</span> {c.available}</span>
+                    {school.pending_count > 0 && <span className="inline-flex items-center gap-1.5"><StatusDot variant={statusVariant} /><span className="tabular-nums">{school.pending_count}</span> {c.pending}</span>}
                   </div>
                   {(school.standard_4_count > 0 || school.legacy_5_count > 0 || school.needs_descriptions_count > 0) && (
-                    <div className="mt-2.5 flex flex-wrap gap-1">
+                    <div className="mt-3 flex flex-wrap gap-1 border-t border-border-default pt-3">
                       <ScaleBadges school={school} c={c} />
                     </div>
                   )}

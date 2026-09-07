@@ -1,4 +1,5 @@
 import { Pool } from "pg";
+import { UUID_PATTERN } from "./evaluation-schema";
 import type {
   ProgramRow,
   TemplateDoc,
@@ -12,16 +13,16 @@ import type {
 } from "./types";
 
 const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error(
-    "DATABASE_URL is not set. Configure it in web/.env.local (local dev) or the Vercel project env (production)."
-  );
-}
 
 let pool: Pool | null = null;
 
 export function getPool() {
   if (!pool) {
+    if (!connectionString) {
+      throw new Error(
+        "DATABASE_URL is not set. Configure it in web/.env.local (local dev) or the Vercel project env (production)."
+      );
+    }
     pool = new Pool({
       connectionString,
       ssl: { rejectUnauthorized: false },
@@ -139,15 +140,15 @@ export async function getTemplateDoc(
   if (!template) return null;
 
   const [sectionResult, questionResult, optionResult] = await Promise.all([
-    getPool().query(`SELECT id::text, title_th, domain_type::text, sequence FROM assessment_sections WHERE template_id = $1 ORDER BY sequence`, [template.id]),
+    getPool().query(`SELECT id::text, title_th, title_en, domain_type::text, sequence FROM assessment_sections WHERE template_id = $1 ORDER BY sequence`, [template.id]),
     getPool().query(`SELECT id::text, section_id::text, lo_code, text, text_en, sequence FROM evaluation_questions WHERE template_id = $1 ORDER BY sequence`, [template.id]),
-    getPool().query(`SELECT o.id::text, o.question_id::text, o.score, o.label_th, o.description_th, o.sequence FROM assessment_options o JOIN evaluation_questions q ON q.id = o.question_id WHERE q.template_id = $1 ORDER BY o.question_id, o.sequence`, [template.id]),
+    getPool().query(`SELECT o.id::text, o.question_id::text, o.score, o.label_th, o.label_en, o.description_th, o.description_en, o.sequence FROM assessment_options o JOIN evaluation_questions q ON q.id = o.question_id WHERE q.template_id = $1 ORDER BY o.question_id, o.sequence`, [template.id]),
   ]);
   const optionsByQuestion = new Map<string, OptionRow[]>();
   for (const row of optionResult.rows) {
     const questionId = String(row.question_id);
     optionsByQuestion.set(questionId, [...(optionsByQuestion.get(questionId) ?? []), {
-      id: String(row.id), score: Number(row.score), label_th: String(row.label_th), description_th: row.description_th ? String(row.description_th) : null, sequence: Number(row.sequence),
+      id: String(row.id), score: Number(row.score), label_th: String(row.label_th), label_en: row.label_en ? String(row.label_en) : null, description_th: row.description_th ? String(row.description_th) : null, description_en: row.description_en ? String(row.description_en) : null, sequence: Number(row.sequence),
     }]);
   }
   const questionsBySection = new Map<string, QuestionRow[]>();
@@ -159,7 +160,7 @@ export async function getTemplateDoc(
   }
   const sections: SectionRow[] = sectionResult.rows.map((row) => {
     const domain = asDomain(row.domain_type);
-    return { id: String(row.id), domain_type: domain, title_th: String(row.title_th), part: ["knowledge", "skills"].includes(domain) ? 1 : 2, sequence: Number(row.sequence), questions: questionsBySection.get(String(row.id)) ?? [] };
+    return { id: String(row.id), domain_type: domain, title_th: String(row.title_th), title_en: row.title_en ? String(row.title_en) : null, part: ["knowledge", "skills"].includes(domain) ? 1 : 2, sequence: Number(row.sequence), questions: questionsBySection.get(String(row.id)) ?? [] };
   });
   const options = [...optionsByQuestion.values()].flat();
   const maxScore = options.reduce((max, option) => Math.max(max, option.score), 0);
@@ -231,6 +232,7 @@ export async function getExtendedTemplateDoc(programRef: string): Promise<Templa
               'id', s.id::text,
               'domain_type', s.domain_type,
               'title_th', s.title_th,
+              'title_en', s.title_en,
               'part', COALESCE(s.part, 1),
               'sequence', s.sequence,
               'questions', COALESCE((
@@ -248,7 +250,9 @@ export async function getExtendedTemplateDoc(programRef: string): Promise<Templa
                           'id', o.id::text,
                           'score', o.score,
                           'label_th', o.label_th,
+                          'label_en', o.label_en,
                           'description_th', o.description_th,
+                          'description_en', o.description_en,
                           'sequence', o.sequence
                         ) ORDER BY o.score DESC, o.sequence
                       ) FILTER (WHERE o.id IS NOT NULL)
@@ -614,4 +618,100 @@ export async function getRevision(
     | (RevisionRow & { template_id: string; snapshot_json: unknown })
     | undefined;
   return r ?? null;
+}
+
+// ---------- Advisor form drafts and submissions ----------
+
+export type AdvisorDraftInput = {
+  draftToken: string;
+  programId: string;
+  templateId: string;
+  currentStep: number;
+  payload: Record<string, string>;
+};
+
+export async function saveAdvisorDraft(input: AdvisorDraftInput): Promise<
+  | { success: true; updatedAt: string }
+  | { success: false }
+> {
+  if (
+    !UUID_PATTERN.test(input.draftToken) ||
+    !UUID_PATTERN.test(input.programId) ||
+    !UUID_PATTERN.test(input.templateId)
+  ) {
+    return { success: false };
+  }
+
+  try {
+    const result = await getPool().query(
+      `INSERT INTO advisor_drafts (draft_token, program_id, template_id, payload_json, current_step)
+       VALUES ($1, $2, $3, $4::jsonb, $5)
+       ON CONFLICT (draft_token) DO UPDATE
+       SET payload_json = EXCLUDED.payload_json,
+           current_step = EXCLUDED.current_step,
+           updated_at = now()
+       WHERE advisor_drafts.status = 'draft'
+       RETURNING updated_at`,
+      [
+        input.draftToken,
+        input.programId,
+        input.templateId,
+        JSON.stringify(input.payload),
+        Math.max(0, Math.min(input.currentStep, 5)),
+      ]
+    );
+    const updatedAt = result.rows[0]?.updated_at;
+    return updatedAt
+      ? { success: true, updatedAt: new Date(updatedAt).toISOString() }
+      : { success: false };
+  } catch (error) {
+    console.error("Unable to save advisor draft", error);
+    return { success: false };
+  }
+}
+
+export async function loadAdvisorDraft(
+  draftToken: string,
+  programId: string,
+  templateId: string
+): Promise<{ payload: Record<string, string>; currentStep: number } | null> {
+  if (
+    !UUID_PATTERN.test(draftToken) ||
+    !UUID_PATTERN.test(programId) ||
+    !UUID_PATTERN.test(templateId)
+  ) {
+    return null;
+  }
+
+  try {
+    const result = await getPool().query(
+      `SELECT payload_json, current_step
+       FROM advisor_drafts
+       WHERE draft_token = $1 AND program_id = $2 AND template_id = $3 AND status = 'draft'`,
+      [draftToken, programId, templateId]
+    );
+    if (!result.rows[0]) return null;
+    return {
+      payload: result.rows[0].payload_json as Record<string, string>,
+      currentStep: Number(result.rows[0].current_step) || 0,
+    };
+  } catch (error) {
+    console.error("Unable to load advisor draft", error);
+    return null;
+  }
+}
+
+export async function getAdvisorSubmissionCount(programId: string): Promise<number> {
+  if (!UUID_PATTERN.test(programId)) return 0;
+
+  try {
+    const result = await getPool().query(
+      `SELECT COUNT(*)::int AS count FROM advisor_submissions WHERE program_id = $1`,
+      [programId]
+    );
+    return Number(result.rows[0]?.count) || 0;
+  } catch (error) {
+    console.error("Unable to count advisor submissions", error);
+    return 0;
+  }
 }

@@ -2,7 +2,7 @@
 
 import type { Option } from "@/lib/db";
 import type { Locale } from "@/lib/i18n";
-import { ENGLISH_SCORE_LABELS } from "./copy";
+import { optionLabel } from "./copy";
 
 type RatingOption = Option | { value: string; label: string };
 
@@ -34,9 +34,7 @@ export function RatingScale({ name, options, required = true, locale, error }: R
           const value = "score" in option ? String(option.score) : option.value;
           const label =
             "label_th" in option
-              ? locale === "en"
-                ? option.label_en || ENGLISH_SCORE_LABELS[option.score] || option.label_th
-                : option.label_th
+              ? optionLabel(option, locale)
               : option.label;
           const id = `${name}-${value}-${index}`;
           return (

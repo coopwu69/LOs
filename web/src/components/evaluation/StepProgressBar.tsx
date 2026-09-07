@@ -9,6 +9,9 @@ type StepProgressBarProps = {
   onSelect: (step: number) => void;
   locale: Locale;
   allowUnrestrictedNavigation?: boolean;
+  // Optional step labels. Defaults to the locale's standard wizard steps so
+  // existing wizards keep working; other wizards can pass a custom array.
+  steps?: readonly [string, string, string][];
 };
 
 /**
@@ -35,9 +38,11 @@ export function StepProgressBar({
   onSelect,
   locale,
   allowUnrestrictedNavigation = false,
+  steps: stepsProp,
 }: StepProgressBarProps) {
   const copy = COPY[locale];
-  const total = copy.steps.length;
+  const steps = stepsProp ?? copy.steps;
+  const total = steps.length;
   const clamped = Math.max(0, Math.min(currentStep, total - 1));
   const progressPct = ((clamped + 1) / total) * 100;
 
@@ -45,7 +50,7 @@ export function StepProgressBar({
     <nav aria-label={copy.stepsLabel}>
       {/* Row 1 — step circles + labels */}
       <ol className="grid" style={{ gridTemplateColumns: `repeat(${total}, minmax(0, 1fr))` }}>
-        {copy.steps.map((step, index) => {
+        {steps.map((step, index) => {
           const isCompleted = index < clamped;
           const isActive = index === clamped;
           const complete = stepCompletion[index];

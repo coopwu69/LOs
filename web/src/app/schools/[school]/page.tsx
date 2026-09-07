@@ -1,8 +1,9 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import { getProgramRouteKey, getProgramsBySchool } from "@/lib/db";
 import { getSchoolNameBySlug, getSchoolSlug } from "@/lib/schools";
+import { formPath } from "@/lib/routes";
 import { isFixtureMode, getFixtureProgramsBySchool } from "@/lib/fixtures";
-import { isInternationalContext, resolveLocale, schoolDisplayName, uiCopy, withLocale } from "@/lib/i18n";
+import { isInternationalContext, programDisplayName, resolveLocale, schoolDisplayName, uiCopy, withLocale } from "@/lib/i18n";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { PageHeader } from "@/components/PageHeader";
 import { ProgramsList, type ProgramSummary } from "@/components/ui/programs-list";
@@ -29,12 +30,18 @@ export default async function SchoolPage({ params, searchParams }: PageProps<"/s
 
   // Serialize for client component
   const summaries: ProgramSummary[] = programs.map((program) => {
-    const programName = locale === "en" ? program.name_en || (program.code === "INTL" ? "International Program (WUIC)" : program.name_th) : program.name_th;
+    const programName = programDisplayName(program, locale);
+    const programKey = getProgramRouteKey(program);
+    const companyHref = formPath(canonicalSlug, programKey, "company", locale);
+    const advisorHref = formPath(canonicalSlug, programKey, "advisor", locale);
     return {
       id: program.id,
+      key: programKey,
       code: program.code,
       name: programName,
-      href: withLocale(`/programs/${getProgramRouteKey(program)}`, locale),
+      href: companyHref,
+      companyHref,
+      advisorHref,
       form_status: program.form_status,
     };
   });

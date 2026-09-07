@@ -42,14 +42,37 @@ const SCHOOL_NAMES_EN: Record<string, string> = {
 
 export function schoolDisplayName(name: string, locale: Locale): string {
   const canonicalName = SCHOOL_NAME_ALIASES[name] ?? name;
-  return locale === "en" ? SCHOOL_NAMES_EN[canonicalName] ?? canonicalName : canonicalName;
+  const mapped = SCHOOL_NAMES_EN[canonicalName];
+  if (locale === "th") return canonicalName;
+  if (mapped) return mapped;
+  if (canonicalName && !/[\u0E00-\u0E7F]/.test(canonicalName)) return canonicalName;
+  return "School";
+}
+
+export interface ProgramNameSource {
+  name_th: string;
+  name_en?: string | null;
+  code: string;
+}
+
+export function programDisplayName(program: ProgramNameSource, locale: Locale): string {
+  if (locale === "th") return program.name_th;
+  return program.name_en?.trim() || (program.code === "INTL" ? "International Program (WUIC)" : program.code);
+}
+
+export function splitBilingual(text: string): { thai: string; english: string | null } {
+  const m = text.match(/\s*\(\s*([^()]+)\)\s*$/);
+  if (!m) return { thai: text, english: null };
+  const candidate = m[1].trim();
+  if (!/[a-zA-Z]{3,}/.test(candidate)) return { thai: text, english: null };
+  return { thai: text.slice(0, m.index).trim(), english: candidate };
 }
 
 export const uiCopy = {
   th: {
     home: "หน้าแรก",
     appTitle: "แบบประเมิน LOs รายวิชาสหกิจศึกษา",
-    appDescription: "ระบบเรียกดูผลลัพธ์การเรียนรู้ที่คาดหวัง (Learning Outcomes) ของรายวิชาสหกิจศึกษา จัดกลุ่มตามสำนักวิชาและหลักสูตร",
+    appDescription: "ระบบเรียกดูผลลัพธ์การเรียนรู้ที่คาดหวังของรายวิชาสหกิจศึกษา จัดกลุ่มตามสำนักวิชาและหลักสูตร",
     schools: "สำนักวิชา",
     programs: "หลักสูตร",
     submitted: "ส่งแบบประเมินแล้ว",
@@ -66,11 +89,11 @@ export const uiCopy = {
     addPrograms: "กรุณาเพิ่มข้อมูลหลักสูตรในฐานข้อมูล",
     loadError: "เกิดข้อผิดพลาดในการโหลดข้อมูล",
     loadErrorHelp: "กรุณาลองใหม่อีกครั้ง หากยังพบปัญหาโปรดติดต่อผู้ดูแลระบบ",
-    footer: "ระบบแบบประเมิน LOs รายวิชาสหกิจศึกษา — COOP69",
+    footer: "ระบบแบบประเมินผลลัพธ์การเรียนรู้รายวิชาสหกิจศึกษา — สหกิจ 69",
     view: "ดู",
     edit: "แก้ไข",
     print: "พิมพ์ / บันทึก PDF",
-    downloadWord: "ดาวน์โหลด Word",
+    downloadWord: "ดาวน์โหลดเอกสาร",
     history: "ประวัติการแก้ไข",
     previewSubtitle: "ตัวอย่างหน้าตาแบบประเมิน — ยังไม่มีชุดคำถามเฉพาะหลักสูตร",
     tools: "เครื่องมือแบบประเมิน",

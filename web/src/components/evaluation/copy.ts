@@ -1,4 +1,4 @@
-import type { Locale } from "@/lib/i18n";
+import { splitBilingual, type Locale } from "@/lib/i18n";
 
 // Localized copy for the evaluation wizard.
 // Extracted from the original monolithic EvaluationWizard so focused
@@ -28,6 +28,7 @@ export type WizardCopy = {
   noQuestions: string;
   questions: string;
   question: string;
+  untranslatedQuestion: string;
   rubric: string;
   reportItems: string[];
   rating: string[];
@@ -118,6 +119,7 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     noQuestions: "หลักสูตรนี้ยังไม่มีคำถามในหมวดนี้",
     questions: "ข้อ",
     question: "ข้อ",
+    untranslatedQuestion: "คำถามนี้ยังไม่มีข้อความภาษาอังกฤษ",
     rubric: "ดูเกณฑ์การให้คะแนน",
     reportItems: [
       "รายงาน/โครงงานเป็นไปตามวัตถุประสงค์และความต้องการของหน่วยงาน",
@@ -210,6 +212,7 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     noQuestions: "No questions are available in this category yet.",
     questions: "questions",
     question: "Question",
+    untranslatedQuestion: "Question text not available in English.",
     rubric: "View scoring criteria",
     reportItems: [
       "The report or project meets the organization's objectives and requirements.",
@@ -283,13 +286,36 @@ export const ENGLISH_SCORE_LABELS: Record<number, string> = {
   1: "Needs improvement",
 };
 
-export function englishQuestionFallback(text: string, textEn: string | null): string {
+export function questionText(
+  question: { text: string; text_en: string | null },
+  locale: Locale,
+  copy: WizardCopy,
+): string {
+  if (locale === "th") return question.text;
+  const textEn = question.text_en?.trim();
   if (textEn) return textEn;
-  if (text.includes("ระบุและแก้ปัญหาที่ซับซ้อน")) return "Identify and solve complex workplace problems by applying appropriate business administration principles.";
-  if (text.includes("รวบรวม วิเคราะห์") && text.includes("แปลผลข้อมูล")) return "Collect, analyze, and interpret workplace data to produce useful conclusions.";
-  if (text.includes("สื่อสารกับเพื่อนร่วมงาน") && text.includes("ภาษาอังกฤษ")) return "Communicate appropriately in English with colleagues and workplace personnel to achieve work objectives.";
-  if (text.includes("เรียนรู้และพัฒนาทักษะใหม่")) return "Independently learn and develop new skills relevant to workplace responsibilities.";
-  if (text.includes("ความรับผิดชอบ") && text.includes("จริยธรรม")) return "Work responsibly and uphold professional ethics while considering economic, social, and environmental impacts.";
-  if (text.includes("ทำงานร่วมกับทีม")) return "Collaborate effectively, demonstrating appropriate leadership and cooperation within the team.";
-  return text;
+  const { english } = splitBilingual(question.text);
+  return english ?? copy.untranslatedQuestion;
+}
+
+export function sectionTitle(
+  section: { title_th: string; title_en?: string | null; domain_type: string },
+  locale: Locale,
+  copy: WizardCopy,
+): string {
+  if (locale === "th") return section.title_th;
+  const titleEn = section.title_en?.trim();
+  if (titleEn) return titleEn;
+  const domain = copy.domains[section.domain_type] ?? "General";
+  return `${domain} competencies`;
+}
+
+export function optionLabel(
+  option: { label_th: string; label_en?: string | null; score: number },
+  locale: Locale,
+): string {
+  if (locale === "th") return option.label_th;
+  const labelEn = option.label_en?.trim();
+  if (labelEn) return labelEn;
+  return ENGLISH_SCORE_LABELS[option.score] ?? `Level ${option.score}`;
 }

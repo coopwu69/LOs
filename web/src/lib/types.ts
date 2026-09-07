@@ -6,7 +6,9 @@ export type OptionRow = {
   id: string;
   score: number;
   label_th: string;
+  label_en?: string | null;
   description_th: string | null;
+  description_en?: string | null;
   sequence: number;
 };
 
@@ -24,6 +26,7 @@ export type SectionRow = {
   id: string;
   domain_type: Domain;
   title_th: string;
+  title_en?: string | null;
   part: number;
   sequence: number;
   questions: QuestionRow[];

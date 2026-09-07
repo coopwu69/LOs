@@ -1,7 +1,7 @@
 import type { Locale } from "@/lib/i18n";
 import type { TemplateDoc, SectionRow, QuestionRow } from "@/lib/types";
 import { FormShell } from "./FormShell";
-import { ENGLISH_SCORE_LABELS, PRIMARY_DOMAINS, WIZARD_COPY as COPY, englishQuestionFallback } from "./evaluation/copy";
+import { PRIMARY_DOMAINS, WIZARD_COPY as COPY, optionLabel, questionText, sectionTitle } from "./evaluation/copy";
 
 function normalizedSections(sections: SectionRow[]): SectionRow[] {
   const selected = new Map<string, QuestionRow>();
@@ -27,8 +27,8 @@ function QuestionView({ question, index, locale }: { question: QuestionRow; inde
     ? [...question.options].sort((a, b) => a.sequence - b.sequence).map((option) => ({
         key: option.id,
         score: option.score,
-        label: locale === "en" ? ENGLISH_SCORE_LABELS[option.score] || option.label_th : option.label_th,
-        description: option.description_th,
+        label: optionLabel(option, locale),
+        description: locale === "en" ? option.description_en : option.description_th,
       }))
     : copy.rating.map((label, optionIndex) => ({ key: String(optionIndex), score: optionIndex + 1, label, description: null }));
   const hasDescriptions = options.some((option) => option.description);
@@ -37,7 +37,7 @@ function QuestionView({ question, index, locale }: { question: QuestionRow; inde
     <fieldset className="py-6 print-break-avoid">
       <legend className="w-full text-base font-medium leading-relaxed text-primary">
         <span className="mr-2 text-sm font-semibold text-action">{question.lo_code ?? `${copy.question} ${index + 1}`}</span>
-        {locale === "en" ? englishQuestionFallback(question.text, question.text_en) : question.text}
+        {questionText(question, locale, copy)}
       </legend>
       <div
         className="mt-4 grid gap-2 [grid-template-columns:repeat(var(--option-count),minmax(0,1fr))]"
@@ -73,7 +73,7 @@ function SectionView({ section, locale }: { section: SectionRow; locale: Locale 
         <div>
           <p className="text-sm font-medium text-action">{copy.domains[section.domain_type] ?? section.domain_type}</p>
           <h3 id={`print-section-${section.id}`} className="mt-1 text-lg font-semibold text-primary">
-            {locale === "en" ? `${copy.domains[section.domain_type] ?? "General"} competencies` : section.title_th}
+            {sectionTitle(section, locale, copy)}
           </h3>
         </div>
         <span className="text-sm text-secondary">{section.questions.length} {copy.questions}</span>

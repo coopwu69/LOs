@@ -5,7 +5,7 @@ import { AssessmentDocument } from "@/components/AssessmentDocument";
 import { PrintButton } from "@/components/PrintButton";
 import { getProgram, getProgramRouteKey, getTemplateDoc } from "@/lib/db";
 import { getFixtureProgram, getFixtureTemplateDoc, isFixtureMode } from "@/lib/fixtures";
-import { resolveLocale, uiCopy, withLocale } from "@/lib/i18n";
+import { programDisplayName, resolveLocale, uiCopy, withLocale } from "@/lib/i18n";
 import type { TemplateDoc } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +21,7 @@ export async function generateMetadata({
   const locale = resolveLocale((await searchParams).lang, false);
   const program = isFixtureMode() ? getFixtureProgram(programId) : await getProgram(programId);
   if (!program) return {};
-  const programName = locale === "en" ? program.name_en || program.name_th : program.name_th;
+  const programName = programDisplayName(program, locale);
   const formTitle = locale === "en"
     ? "Cooperative Education Learning Outcomes Evaluation"
     : "แบบประเมิน LOs รายวิชาสหกิจศึกษา";

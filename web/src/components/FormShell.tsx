@@ -1,4 +1,4 @@
-import type { Locale } from "@/lib/i18n";
+import { programDisplayName, schoolDisplayName, type Locale } from "@/lib/i18n";
 import type { ProgramRow } from "@/lib/types";
 import { WIZARD_COPY as COPY } from "./evaluation/copy";
 
@@ -75,7 +75,7 @@ function StepSection({ step, title, description, children, locale, newPage = fal
 
 export function FormShell({
   program,
-  title,
+  title: _title,
   revisionLabel,
   courseCodes,
   locale,
@@ -89,8 +89,8 @@ export function FormShell({
   children: React.ReactNode;
 }) {
   const copy = COPY[locale];
-  const programName = locale === "en" ? program.name_en || program.name_th : program.name_th;
-  const schoolName = program.school ?? "";
+  const programName = programDisplayName(program, locale);
+  const schoolName = schoolDisplayName(program.school ?? "", locale);
 
   return (
     <article className="space-y-8">

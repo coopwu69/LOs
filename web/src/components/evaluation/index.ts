@@ -15,5 +15,5 @@ export {
   FeedbackStep,
   ProcessStep,
 } from "./steps";
-export { WIZARD_COPY, PRIMARY_DOMAINS, ENGLISH_SCORE_LABELS, englishQuestionFallback } from "./copy";
+export { WIZARD_COPY, PRIMARY_DOMAINS, ENGLISH_SCORE_LABELS, questionText, sectionTitle, optionLabel } from "./copy";
 export type { WizardCopy } from "./copy";
