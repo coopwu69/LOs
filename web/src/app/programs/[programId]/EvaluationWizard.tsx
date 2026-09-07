@@ -110,6 +110,8 @@ export function EvaluationWizard({ program, template, sections, questions, local
   const copy: WizardCopy = COPY[locale];
   const [state, formAction, pending] = useActionState(submitEvaluation, null as SubmitResult | null);
   const [currentStep, setCurrentStep] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- setter is used below; the value itself isn't read yet
+  const [maxVisited, setMaxVisited] = useState(0);
   const [saveState, setSaveState] = useState<SaveState>(template ? "preparing" : "preview");
   const [savedAt, setSavedAt] = useState<string>("");
   const [answered, setAnswered] = useState(0);
