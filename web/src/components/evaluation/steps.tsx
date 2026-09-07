@@ -2,17 +2,18 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Option, Program, Question, Section } from "@/lib/db";
-import type { Locale } from "@/lib/i18n";
+import { programDisplayName, schoolDisplayName, type Locale } from "@/lib/i18n";
 import {
   WIZARD_COPY as COPY,
   PRIMARY_DOMAINS,
-  ENGLISH_SCORE_LABELS,
-  englishQuestionFallback,
+  optionLabel,
+  questionText,
+  sectionTitle,
 } from "./copy";
 import { Field, SelectField, TextAreaField, Required } from "./fields";
-import { RatingScale } from "./RatingScale";
 import { RatingCard, type RatingLevel } from "./RatingCard";
 import { ChoiceGroup } from "./ChoiceGroup";
+import { ACADEMIC_TERMS } from "@/lib/evaluation-schema";
 
 type QuestionWithOptions = Question & { options: Option[] };
 type FieldErrors = Record<string, string>;
@@ -28,18 +29,17 @@ export function GeneralStep({
   errors?: FieldErrors;
 }) {
   const copy = COPY[locale];
-  const semesterOptions = [1, 2].map((semester) => ({
-    value: String(semester),
+  const years = [...new Set(ACADEMIC_TERMS.map((t) => t.year))].sort();
+  const semesters = [...new Set(ACADEMIC_TERMS.map((t) => t.semester))].sort();
+  const academicYearOptions = years.map((year) => ({
+    value: year,
+    label: locale === "en" ? String(Number(year) - 543) : year,
+  }));
+  const semesterOptions = semesters.map((semester) => ({
+    value: semester,
     label: locale === "en" ? `Semester ${semester}` : `ภาคการศึกษาที่ ${semester}`,
   }));
-  const academicYearOptions = [2569, 2570].map((year) => ({
-    value: String(year),
-    label: locale === "en" ? String(year - 543) : String(year),
-  }));
-  const programName =
-    locale === "en"
-      ? program.name_en || (program.code === "INTL" ? "International Program (WUIC)" : program.name_th)
-      : program.name_th;
+  const programName = programDisplayName(program, locale);
 
   return (
     <div className="space-y-10">
@@ -48,8 +48,8 @@ export function GeneralStep({
         <div className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
           <Field label={copy.email} name="evaluator_email" type="email" placeholder="name@company.com" inputMode="email" autoComplete="email" spellCheck={false} required locale={locale} error={errors?.evaluator_email} />
           <div className="grid grid-cols-2 gap-3">
-            <SelectField label={copy.semester} name="semester" options={semesterOptions} placeholder={copy.selectSemester} required error={errors?.semester} />
             <SelectField label={copy.academicYear} name="academic_year" options={academicYearOptions} placeholder={copy.selectAcademicYear} required error={errors?.academic_year} />
+            <SelectField label={copy.semester} name="semester" options={semesterOptions} placeholder={copy.selectSemester} required error={errors?.semester} />
           </div>
           <div className="sm:col-span-2">
             <Field label={copy.company} name="company" autoComplete="organization" required locale={locale} error={errors?.company} />
@@ -69,7 +69,7 @@ export function GeneralStep({
           <div className="sm:col-span-2">
             <Field label={copy.studentName} name="student_name" autoComplete="name" required locale={locale} error={errors?.student_name} />
           </div>
-          <Field label={copy.school} name="school" defaultValue={program.school ?? ""} readOnly locale={locale} />
+          <Field label={copy.school} name="school" defaultValue={schoolDisplayName(program.school ?? "", locale)} readOnly locale={locale} />
           <Field label={copy.program} name="program" defaultValue={programName} readOnly locale={locale} />
         </div>
       </fieldset>
@@ -146,9 +146,7 @@ export function CompetencyStep({
                   {copy.domains[section.domain_type] ?? section.domain_type}
                 </p>
                 <h3 id={`section-${section.id}`} className="mt-1 text-lg font-semibold text-primary">
-                  {locale === "en"
-                    ? section.title_en || `${copy.domains[section.domain_type] ?? "General"} competencies`
-                    : section.title_th}
+                  {sectionTitle(section, locale, copy)}
                 </h3>
               </div>
               <span className="text-sm text-secondary">
@@ -163,10 +161,7 @@ export function CompetencyStep({
                         .sort((a, b) => b.score - a.score)
                         .map((option) => ({
                           value: option.score,
-                          label:
-                            locale === "en"
-                              ? option.label_en || ENGLISH_SCORE_LABELS[option.score] || option.label_th
-                              : option.label_th,
+                          label: optionLabel(option, locale),
                           description: (locale === "en" ? option.description_en : option.description_th) || undefined,
                         }))
                     : copy.rating.map((label, i) => ({
@@ -180,7 +175,7 @@ export function CompetencyStep({
                       <span className="mr-2 text-sm font-semibold text-action">
                         {question.lo_code ?? `${copy.question} ${index + 1}`}
                       </span>
-                      {locale === "en" ? englishQuestionFallback(question.text, question.text_en) : question.text}
+                      {questionText(question, locale, copy)}
                       {question.is_required && <Required />}
                     </legend>
                     <div className="mt-4">
