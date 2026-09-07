@@ -52,12 +52,12 @@ function CloseIcon() {
   return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg>;
 }
 
-function CopyFormLinkButton({ href, copyLabel, copiedLabel, ariaLabel }: { href: string; copyLabel: string; copiedLabel: string; ariaLabel: string }) {
+function CopyFormLinkButton({ href, name, copyLabel, copiedLabel, ariaLabel }: { href: string; name: string; copyLabel: string; copiedLabel: string; ariaLabel: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
     const url = `${window.location.origin}${href}`;
-    navigator.clipboard.writeText(url).then(() => {
+    navigator.clipboard.writeText(`${name} : ${url}`).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     }).catch(() => {});
@@ -117,7 +117,7 @@ function FormOption({
         </span>
       </Link>
       <div className="flex items-stretch border-l border-border-default">
-        <CopyFormLinkButton href={href} copyLabel={copyLabel} copiedLabel={copiedLabel} ariaLabel={`${copyLabel}: ${name}`} />
+        <CopyFormLinkButton href={href} name={name} copyLabel={copyLabel} copiedLabel={copiedLabel} ariaLabel={`${copyLabel}: ${name}`} />
       </div>
     </li>
   );
