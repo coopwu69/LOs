@@ -13,7 +13,7 @@ import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { PageHeader } from "@/components/PageHeader";
 import { PrintButton } from "@/components/PrintButton";
 import { ViewEditToggle } from "@/components/ViewEditToggle";
-import { EvaluationWizard } from "../../../programs/[programId]/EvaluationWizard";
+import { EvaluationWizard } from "../../../../programs/[programId]/EvaluationWizard";
 import { AdvisorWizard } from "../../advisor/AdvisorWizard";
 
 export const dynamic = "force-dynamic";
