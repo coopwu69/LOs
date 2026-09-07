@@ -110,7 +110,6 @@ export function EvaluationWizard({ program, template, sections, questions, local
   const copy: WizardCopy = COPY[locale];
   const [state, formAction, pending] = useActionState(submitEvaluation, null as SubmitResult | null);
   const [currentStep, setCurrentStep] = useState(0);
-  const [maxVisited, setMaxVisited] = useState(0);
   const [saveState, setSaveState] = useState<SaveState>(template ? "preparing" : "preview");
   const [savedAt, setSavedAt] = useState<string>("");
   const [answered, setAnswered] = useState(0);
