@@ -224,17 +224,18 @@ export async function submitAdvisorEvaluation(
     await client.query("BEGIN");
     const result = await client.query(
       `INSERT INTO advisor_submissions (
-         program_id, template_id, payload_json,
+         program_id, template_id, payload_json, locale,
          lo_score, lo_count, lo_max,
          other_score, other_count,
          center_score, center_count,
          report_score, report_count
-       ) VALUES ($1, $2, $3::jsonb, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+       ) VALUES ($1, $2, $3::jsonb, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
        RETURNING id`,
       [
         programId,
         templateId,
         payload,
+        locale,
         loScore,
         loCount,
         loMax,

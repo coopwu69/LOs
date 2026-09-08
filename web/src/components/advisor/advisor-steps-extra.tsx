@@ -161,6 +161,45 @@ export function AdvisorProcessStep({ locale, errors, formVersion }: StepProps) {
   const copy = ADVISOR_COPY[locale];
   const levels = rating4Levels(copy);
   const { containerRef, ratings, setRatings } = useDomSyncedRatings(formVersion, PROCESS_NAMES);
+  const [placement, setPlacement] = useState<string>("");
+  const otherInputRef = useRef<HTMLInputElement>(null);
+  const prevPlacementRef = useRef<string>("");
+
+  // The wizard keeps inputs uncontrolled (FormData on submit), so read the
+  // adv_future_placement radio state straight from the DOM whenever
+  // formVersion bumps — same bridge pattern as useDomSyncedRatings.
+  useEffect(() => {
+    const form = containerRef.current?.closest("form");
+    if (!form) return;
+    const group = form.elements.namedItem("adv_future_placement");
+    let value = "";
+    if (group instanceof RadioNodeList) {
+      for (const radio of group) {
+        if (radio instanceof HTMLInputElement && radio.checked) {
+          value = radio.value;
+          break;
+        }
+      }
+    } else if (group instanceof HTMLInputElement && group.checked) {
+      value = group.value;
+    }
+    setPlacement(value);
+  }, [formVersion, containerRef]);
+
+  const showOther = placement === "other";
+
+  // Move focus into the newly revealed field, matching the disclosure spec —
+  // but only when the user just selected "other" (the radio still has focus),
+  // not when a restored draft already had it selected.
+  useEffect(() => {
+    if (showOther && prevPlacementRef.current !== "other") {
+      const active = document.activeElement;
+      if (active instanceof HTMLInputElement && active.name === "adv_future_placement") {
+        otherInputRef.current?.focus();
+      }
+    }
+    prevPlacementRef.current = placement;
+  }, [showOther, placement]);
 
   const renderItem = (name: string, index: number, label: string) => (
     <RatingItem
@@ -206,18 +245,26 @@ export function AdvisorProcessStep({ locale, errors, formVersion }: StepProps) {
           options={[
             { value: "should", label: copy.futureShould },
             { value: "should_not", label: copy.futureShouldNot },
-            { value: "other", label: copy.futureOther },
+            {
+              value: "other",
+              label: copy.futureOther,
+              controlsId: "adv-future-placement-other-region",
+            },
           ]}
           error={errors?.adv_future_placement}
         />
-        <div className="mt-5">
-          <Field
-            label={copy.futureOtherSpecify}
-            name="adv_future_placement_other"
-            locale={locale}
-            error={errors?.adv_future_placement_other}
-          />
-        </div>
+        {showOther && (
+          <div id="adv-future-placement-other-region" className="mt-5">
+            <Field
+              ref={otherInputRef}
+              label={copy.futureOtherSpecify}
+              name="adv_future_placement_other"
+              locale={locale}
+              required
+              error={errors?.adv_future_placement_other}
+            />
+          </div>
+        )}
       </div>
       <TextAreaField
         label={copy.otherComments}

@@ -102,14 +102,13 @@ export default async function FormPage({
         { label: programName },
       ]}
     >
+      {role !== "company" && (
+        <p className="mt-2 text-sm text-secondary">
+          {locale === "en" ? "Advisor evaluation form" : "แบบประเมินอาจารย์นิเทศ"}
+        </p>
+      )}
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        {role === "company" ? (
-          <Toolbar programKey={programKey} hasTemplate={Boolean(template)} locale={locale} />
-        ) : (
-          <p className="text-sm text-secondary">
-            {locale === "en" ? "Advisor evaluation form" : "แบบประเมินอาจารย์นิเทศ"}
-          </p>
-        )}
+        <Toolbar programKey={programKey} hasTemplate={Boolean(template)} locale={locale} />
         <LanguageSwitch
           locale={locale}
           thHref={formPath(school, programKey, role, "th")}
@@ -144,7 +143,7 @@ export default async function FormPage({
           program={programRow}
           template={template}
           sections={sections}
-          questions={questions as QuestionWithOptions[]}
+          questions={dedupeByLoCode(questions as QuestionWithOptions[])}
           locale={locale}
           role={role}
         />

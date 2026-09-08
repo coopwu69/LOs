@@ -2,7 +2,10 @@
 
 import { Required } from "./fields";
 
-type Choice = { value: string; label: string };
+// `controlsId` links an option to a conditionally-revealed region
+// (aria-controls). aria-expanded is intentionally not used: ARIA forbids it
+// on role=radio — the reveal itself is announced because focus moves into it.
+type Choice = { value: string; label: string; controlsId?: string };
 
 type ChoiceGroupProps = {
   legend: string;
@@ -38,6 +41,7 @@ export function ChoiceGroup({ legend, name, options, required = true, error }: C
               value={option.value}
               required={required && index === 0}
               aria-describedby={errorId}
+              aria-controls={option.controlsId}
               className="h-5 w-5 shrink-0 accent-action"
             />
             <span>{option.label}</span>
