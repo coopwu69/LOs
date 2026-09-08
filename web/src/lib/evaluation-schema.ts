@@ -10,27 +10,27 @@ import { z } from "zod";
 // draft restore logic.
 
 export const SEMESTER_PATTERN = /^[1-3]$/;
-// Buddhist-era academic year, offered from 2568 onward.
-export const ACADEMIC_YEAR_PATTERN = /^25(6[8-9]|[7-9][0-9])$/;
+// Buddhist-era academic year. Only 2569 and 2570 are offered — see ACADEMIC_TERMS.
+export const ACADEMIC_YEAR_PATTERN = /^(2569|2570)$/;
 export const STUDENT_CODE_PATTERN = /^\d{8}$/;
 export const PHONE_PATTERN = /^[0-9+()\-\s]{8,20}$/;
 export const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 // Allowed (year, semester) pairs. Shared source of truth for both company and
-// advisor forms so they cannot drift. This cross-product is a temporary list
-// pending final confirmation of the exact allowed pairs.
+// advisor forms so they cannot drift. 2569 still has 3 semesters; 2570 onward
+// drops to 2 semesters per the coop center's academic calendar change.
 export const ACADEMIC_TERMS: readonly { year: string; semester: string }[] = [
-  { year: "2568", semester: "1" },
-  { year: "2568", semester: "2" },
-  { year: "2568", semester: "3" },
   { year: "2569", semester: "1" },
   { year: "2569", semester: "2" },
   { year: "2569", semester: "3" },
   { year: "2570", semester: "1" },
   { year: "2570", semester: "2" },
-  { year: "2570", semester: "3" },
 ] as const;
+
+export function semestersForYear(year: string): string[] {
+  return [...new Set(ACADEMIC_TERMS.filter((t) => t.year === year).map((t) => t.semester))].sort();
+}
 
 export function isValidTerm(year: string, semester: string): boolean {
   return ACADEMIC_TERMS.some(

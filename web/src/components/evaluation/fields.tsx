@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
+import type { ChangeEvent } from "react";
 import type { Locale } from "@/lib/i18n";
 import { WIZARD_COPY } from "./copy";
 import { localizeError } from "@/lib/evaluation-schema";
@@ -87,9 +88,10 @@ type SelectFieldProps = {
   placeholder: string;
   required?: boolean;
   error?: string;
+  onChange?: (event: ChangeEvent<HTMLSelectElement>) => void;
 };
 
-export function SelectField({ label, name, options, placeholder, required, error }: SelectFieldProps) {
+export function SelectField({ label, name, options, placeholder, required, error, onChange }: SelectFieldProps) {
   const errorId = error ? `${name}-error` : undefined;
   return (
     <div>
@@ -102,6 +104,7 @@ export function SelectField({ label, name, options, placeholder, required, error
         name={name}
         required={required}
         defaultValue=""
+        onChange={onChange}
         autoComplete="off"
         aria-invalid={error ? "true" : undefined}
         aria-describedby={errorId}

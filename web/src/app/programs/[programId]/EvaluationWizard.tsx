@@ -410,7 +410,7 @@ export function EvaluationWizard({ program, template, sections, questions, local
 
         <div className="px-5 py-7 sm:px-8 sm:py-9">
           <div hidden={currentStep !== 0}>
-            <GeneralStep program={program} locale={locale} errors={effectiveFieldErrors} />
+            <GeneralStep program={program} locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
           </div>
           <div hidden={currentStep !== 1}>
             <CompetencyStep sections={primarySections} questions={primaryQuestions} locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />

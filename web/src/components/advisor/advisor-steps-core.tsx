@@ -12,7 +12,8 @@ import {
 } from "@/components/evaluation/copy";
 import { Field, SelectField, Required } from "@/components/evaluation";
 import { RatingCard, type RatingLevel } from "@/components/evaluation";
-import { ACADEMIC_TERMS } from "@/lib/evaluation-schema";
+import type { ChangeEvent } from "react";
+import { ACADEMIC_TERMS, semestersForYear } from "@/lib/evaluation-schema";
 
 type QuestionWithOptions = Question & { options: Option[] };
 type FieldErrors = Record<string, string>;
@@ -49,26 +50,50 @@ export const ADVISOR_GENERAL_FIELDS = [
 export function AdvisorGeneralStep({
   locale,
   errors,
+  formVersion,
 }: {
   locale: Locale;
   errors?: FieldErrors;
+  formVersion: number;
 }) {
   const copy = COPY[locale];
   const years = [...new Set(ACADEMIC_TERMS.map((t) => t.year))].sort();
-  const semesters = [...new Set(ACADEMIC_TERMS.map((t) => t.semester))].sort();
   const academicYearOptions = years.map((year) => ({
     value: year,
     label: locale === "en" ? String(Number(year) - 543) : year,
   }));
-  const semesterOptions = semesters.map((semester) => ({
+  const semesterLabel = (semester: string) => (locale === "en" ? `Semester ${semester}` : `ภาคการศึกษาที่ ${semester}`);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [selectedYear, setSelectedYear] = useState("");
+
+  // academic_year drives which semesters are selectable (2569 has 3, 2570
+  // onward has 2). The form stays uncontrolled (restoreForm sets DOM values
+  // directly on draft restore), so mirror the select's value into state via
+  // formVersion the same way ratings/disclosure fields sync from the DOM.
+  useEffect(() => {
+    const el = containerRef.current?.closest("form")?.elements.namedItem("academic_year");
+    if (el instanceof HTMLSelectElement) setSelectedYear(el.value);
+  }, [formVersion]);
+
+  const semesterOptions = semestersForYear(selectedYear || years[0]).map((semester) => ({
     value: semester,
-    label: locale === "en" ? `Semester ${semester}` : `ภาคการศึกษาที่ ${semester}`,
+    label: semesterLabel(semester),
   }));
+
+  const handleYearChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    const year = event.target.value;
+    setSelectedYear(year);
+    const semesterEl = event.target.form?.elements.namedItem("semester");
+    if (semesterEl instanceof HTMLSelectElement && semesterEl.value && !semestersForYear(year).includes(semesterEl.value)) {
+      semesterEl.value = "";
+    }
+  };
 
   const advisorNameLabel = locale === "en" ? "Advisor's full name" : "ชื่อ–สกุลอาจารย์นิเทศ";
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10" ref={containerRef}>
       <fieldset>
         <legend className="text-lg font-semibold text-primary">{copy.evaluatorInfo}</legend>
         <div className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
@@ -79,6 +104,7 @@ export function AdvisorGeneralStep({
             placeholder={copy.selectAcademicYear}
             required
             error={errors?.academic_year}
+            onChange={handleYearChange}
           />
           <SelectField
             label={copy.semester}
