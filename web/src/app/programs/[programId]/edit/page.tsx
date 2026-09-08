@@ -7,6 +7,7 @@ import {
 } from "@/lib/fixtures";
 import type { TemplateDoc } from "@/lib/types";
 import { getSchoolSlug } from "@/lib/schools";
+import { isSafeReturnPath } from "@/lib/routes";
 import { PageHeader } from "@/components/PageHeader";
 import { ScaleBadge } from "@/components/ScaleBadge";
 import { ViewEditToggle } from "@/components/ViewEditToggle";
@@ -16,13 +17,19 @@ export const dynamic = "force-dynamic";
 
 export default async function EditPage({
   params,
+  searchParams,
 }: PageProps<"/programs/[programId]/edit">) {
   const { programId } = await params;
+  const { from } = await searchParams;
 
   const program = isFixtureMode() ? getFixtureProgram(programId) : await getProgram(programId);
   if (!program) notFound();
   const programKey = getProgramRouteKey(program);
   const programPath = `/programs/${programKey}`;
+  // `from` carries whichever form (company or advisor) linked here, so "ดู"
+  // sends the user back to it instead of always redirecting to the company
+  // form (the legacy default `programPath` now permanently redirects to).
+  const viewPath = isSafeReturnPath(from) ? from : programPath;
   if (programId !== programKey) permanentRedirect(`${programPath}/edit`);
 
   let doc: TemplateDoc | null = null;
@@ -49,12 +56,12 @@ export default async function EditPage({
             program.school
               ? { label: program.school, href: `/schools/${getSchoolSlug(program.school)}` }
               : { label: "สำนักวิชา" },
-            { label: program.name_th, href: programPath },
+            { label: program.name_th, href: viewPath },
             { label: "แก้ไข" },
           ]}
         >
           <div className="mt-4">
-            <ViewEditToggle active="edit" viewHref={programPath} editHref={`${programPath}/edit`} viewLabel="ดู" editLabel="แก้ไข" groupLabel="เครื่องมือแบบประเมิน" />
+            <ViewEditToggle active="edit" viewHref={viewPath} editHref={`${programPath}/edit`} viewLabel="ดู" editLabel="แก้ไข" groupLabel="เครื่องมือแบบประเมิน" />
           </div>
         </PageHeader>
         <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
@@ -89,12 +96,12 @@ export default async function EditPage({
           subtitle="ระบบแก้ไขยังไม่พร้อมใช้งานกับฐานข้อมูลชุดนี้"
           breadcrumbs={[
             { label: "หน้าแรก", href: "/" },
-            { label: program.name_th, href: programPath },
+            { label: program.name_th, href: viewPath },
             { label: "แก้ไข" },
           ]}
         >
           <div className="mt-4">
-            <ViewEditToggle active="edit" viewHref={programPath} editHref={`${programPath}/edit`} viewLabel="ดู" editLabel="แก้ไข" groupLabel="เครื่องมือแบบประเมิน" />
+            <ViewEditToggle active="edit" viewHref={viewPath} editHref={`${programPath}/edit`} viewLabel="ดู" editLabel="แก้ไข" groupLabel="เครื่องมือแบบประเมิน" />
           </div>
         </PageHeader>
         <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
@@ -119,12 +126,12 @@ export default async function EditPage({
             program.school
               ? { label: program.school, href: `/schools/${getSchoolSlug(program.school)}` }
               : { label: "สำนักวิชา" },
-            { label: program.name_th, href: programPath },
+            { label: program.name_th, href: viewPath },
             { label: "แก้ไข" },
           ]}
         >
           <div className="mt-4">
-            <ViewEditToggle active="edit" viewHref={programPath} editHref={`${programPath}/edit`} viewLabel="ดู" editLabel="แก้ไข" groupLabel="เครื่องมือแบบประเมิน" />
+            <ViewEditToggle active="edit" viewHref={viewPath} editHref={`${programPath}/edit`} viewLabel="ดู" editLabel="แก้ไข" groupLabel="เครื่องมือแบบประเมิน" />
           </div>
         </PageHeader>
         <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
@@ -149,12 +156,12 @@ export default async function EditPage({
           program.school
             ? { label: program.school, href: `/schools/${getSchoolSlug(program.school)}` }
             : { label: "สำนักวิชา" },
-          { label: program.name_th, href: programPath },
+          { label: program.name_th, href: viewPath },
           { label: "แก้ไข" },
         ]}
       >
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <ViewEditToggle active="edit" viewHref={programPath} editHref={`${programPath}/edit`} viewLabel="ดู" editLabel="แก้ไข" groupLabel="เครื่องมือแบบประเมิน" />
+          <ViewEditToggle active="edit" viewHref={viewPath} editHref={`${programPath}/edit`} viewLabel="ดู" editLabel="แก้ไข" groupLabel="เครื่องมือแบบประเมิน" />
           <span className="inline-flex items-center rounded-md bg-white/15 px-2 py-1 text-xs font-mono font-medium text-white">
             {program.code}
           </span>

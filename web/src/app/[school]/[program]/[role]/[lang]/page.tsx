@@ -40,24 +40,30 @@ function dedupeByLoCode(questions: QuestionWithOptions[]): QuestionWithOptions[]
   return [...uniqueQuestions.values()].sort((a, b) => a.sequence - b.sequence);
 }
 
-function Toolbar({ programKey, hasTemplate, locale }: { programKey: string; hasTemplate: boolean; locale: Locale }) {
+function Toolbar({ programKey, hasTemplate, locale, returnPath }: { programKey: string; hasTemplate: boolean; locale: Locale; returnPath: string }) {
   const copy = uiCopy[locale];
   const secondary = "inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg border border-border-strong bg-raised px-4 text-sm font-medium text-primary transition-colors hover:border-border-focus hover:bg-hover";
+  // The template editor/print/history tools are shared by the company and
+  // advisor forms alike, but their own "back to view" links used to hardcode
+  // a redirect to the company form. Carry the current form's own URL through
+  // as `from` so those tools can send the user back to whichever form (and
+  // school/locale) they actually came from.
+  const withReturn = (path: string) => `${withLocale(path, locale)}&from=${encodeURIComponent(returnPath)}`;
 
   return (
     <nav aria-label={copy.tools} className="flex w-full gap-2 overflow-x-auto pb-1 print:hidden sm:w-auto">
       <ViewEditToggle
         active="view"
         viewHref="#main-content"
-        editHref={hasTemplate ? withLocale(`/programs/${programKey}/edit`, locale) : "#main-content"}
+        editHref={hasTemplate ? withReturn(`/programs/${programKey}/edit`) : "#main-content"}
         viewLabel={copy.view}
         editLabel={copy.edit}
         groupLabel={copy.tools}
       />
       {hasTemplate && <>
-        <PrintButton className={secondary} label={copy.print} previewHref={withLocale(`/programs/${programKey}/print`, locale)} />
+        <PrintButton className={secondary} label={copy.print} previewHref={withReturn(`/programs/${programKey}/print`)} />
         <Link href={withLocale(`/programs/${programKey}/export/docx`, locale)} className={secondary}>{copy.downloadWord}</Link>
-        <Link href={withLocale(`/programs/${programKey}/history`, locale)} className={secondary}>{copy.history}</Link>
+        <Link href={withReturn(`/programs/${programKey}/history`)} className={secondary}>{copy.history}</Link>
       </>}
     </nav>
   );
@@ -91,6 +97,7 @@ export default async function FormPage({
   const programName = programDisplayName(programRow, locale);
   const schoolNameDisplay = schoolDisplayName(programRow.school ?? "", locale);
   const programKey = getProgramRouteKey(programRow);
+  const returnPath = formPath(school, programKey, role, locale);
 
   const header = (
     <PageHeader
@@ -108,7 +115,7 @@ export default async function FormPage({
         </p>
       )}
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <Toolbar programKey={programKey} hasTemplate={Boolean(template)} locale={locale} />
+        <Toolbar programKey={programKey} hasTemplate={Boolean(template)} locale={locale} returnPath={returnPath} />
         <LanguageSwitch
           locale={locale}
           thHref={formPath(school, programKey, role, "th")}

@@ -9,6 +9,7 @@ import {
 } from "@/lib/fixtures";
 import type { RevisionRow } from "@/lib/types";
 import { getSchoolSlug } from "@/lib/schools";
+import { isSafeReturnPath } from "@/lib/routes";
 import { PageHeader } from "@/components/PageHeader";
 import { RestoreButton } from "./RestoreButton";
 
@@ -34,13 +35,18 @@ function formatDate(iso: string): string {
 
 export default async function HistoryPage({
   params,
+  searchParams,
 }: PageProps<"/programs/[programId]/history">) {
   const { programId } = await params;
+  const { from } = await searchParams;
 
   const program = isFixtureMode() ? getFixtureProgram(programId) : await getProgram(programId);
   if (!program) notFound();
   const programKey = getProgramRouteKey(program);
   const programPath = `/programs/${programKey}`;
+  // `from` carries whichever form (company or advisor) linked here, so the
+  // back link returns there instead of always landing on the company form.
+  const viewPath = isSafeReturnPath(from) ? from : programPath;
   if (programId !== programKey) permanentRedirect(`${programPath}/history`);
 
   let revisions: RevisionRow[] = [];
@@ -72,7 +78,7 @@ export default async function HistoryPage({
           program.school
             ? { label: program.school, href: `/schools/${getSchoolSlug(program.school)}` }
             : { label: "สำนักวิชา" },
-          { label: program.name_th, href: programPath },
+          { label: program.name_th, href: viewPath },
           { label: "ประวัติ" },
         ]}
       />
@@ -124,7 +130,7 @@ export default async function HistoryPage({
         )}
         <div className="mt-6">
           <Link
-            href={programPath}
+            href={viewPath}
             className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border-strong bg-raised px-4 text-sm font-medium text-primary hover:bg-hover"
           >
             กลับไปหน้าดูแบบประเมิน

@@ -19,6 +19,15 @@ export function formPath(
   return `/${schoolSlug}/${programKey}/${role}/${locale}`;
 }
 
+// Validates a `from` query param used to send template-editor tools
+// (edit/print/history) back to whichever form (company or advisor) linked to
+// them, instead of hardcoding a redirect back to the company form. Must be a
+// same-origin path — reject protocol-relative ("//host/...") and absolute
+// URLs to avoid an open redirect via a crafted `from` value.
+export function isSafeReturnPath(value: string | string[] | undefined): value is string {
+  return typeof value === "string" && value.startsWith("/") && !value.startsWith("//");
+}
+
 export function schoolPath(schoolSlug: string, locale: Locale): string {
   return withLocale(`/schools/${schoolSlug}`, locale);
 }

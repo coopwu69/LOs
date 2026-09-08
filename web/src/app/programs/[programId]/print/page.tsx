@@ -7,6 +7,7 @@ import { getProgram, getProgramRouteKey, getTemplateDoc } from "@/lib/db";
 import { getFixtureProgram, getFixtureTemplateDoc, isFixtureMode } from "@/lib/fixtures";
 import { programDisplayName, resolveLocale, uiCopy, withLocale } from "@/lib/i18n";
 import type { TemplateDoc } from "@/lib/types";
+import { isSafeReturnPath } from "@/lib/routes";
 
 export const dynamic = "force-dynamic";
 
@@ -34,12 +35,16 @@ export default async function PrintPreviewPage({
   searchParams,
 }: PageProps<"/programs/[programId]/print">) {
   const { programId } = await params;
-  const locale = resolveLocale((await searchParams).lang, false);
+  const resolvedSearchParams = await searchParams;
+  const locale = resolveLocale(resolvedSearchParams.lang, false);
   const program = isFixtureMode() ? getFixtureProgram(programId) : await getProgram(programId);
   if (!program) notFound();
 
   const programKey = getProgramRouteKey(program);
   const programPath = `/programs/${programKey}`;
+  // `from` carries whichever form (company or advisor) linked here, so the
+  // back link returns there instead of always landing on the company form.
+  const viewPath = isSafeReturnPath(resolvedSearchParams.from) ? resolvedSearchParams.from : programPath;
   if (programId !== programKey) permanentRedirect(withLocale(`${programPath}/print`, locale));
 
   let doc: TemplateDoc | null = null;
@@ -63,7 +68,7 @@ export default async function PrintPreviewPage({
             <p className="text-sm text-secondary">ตรวจสอบแบบประเมิน แล้วเลือกพิมพ์หรือบันทึกเป็น PDF</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Link href={withLocale(programPath, locale)} className={secondary}>กลับไปแบบประเมิน</Link>
+            <Link href={withLocale(viewPath, locale)} className={secondary}>กลับไปแบบประเมิน</Link>
             <PrintButton className={primary} label={copy.print} />
           </div>
         </div>
