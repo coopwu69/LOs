@@ -240,10 +240,11 @@ export function ReportStep({
   const containerRef = useRef<HTMLDivElement>(null);
   const [ratings, setRatings] = useState<Record<number, number | undefined>>({});
 
-  // 5 levels displayed high → low. copy.rating is [Lowest..Highest] (index 0→4),
-  // and the form schema maps value = index + 1 (1=Lowest, 5=Highest).
-  // Reverse so the highest score renders first (leftmost).
-  const levels: RatingLevel[] = copy.rating
+  // 4 levels displayed high → low. copy.reportRating is
+  // [ต้องปรับปรุง..ดีมาก] (index 0→3), and the form schema maps
+  // value = index + 1 (1=ต้องปรับปรุง, 4=ดีมาก). Reverse so the highest score
+  // renders first (leftmost).
+  const levels: RatingLevel[] = copy.reportRating
     .map((label, i) => ({ value: i + 1, label }))
     .reverse();
 

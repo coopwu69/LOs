@@ -69,7 +69,8 @@ export function CompletionScreen({
           <dt className="text-sm text-secondary">{copy.completionReport}</dt>
           <dd className="mt-1 text-2xl font-semibold text-primary">
             {cScore}
-            <span className="text-base font-normal text-secondary"> / {cCount * 5}</span>
+            {/* Report scale is 1–4, not 1–5 (G4, goal.md) — divisor must match or this shows e.g. "16 / 25" for a full 20. */}
+            <span className="text-base font-normal text-secondary"> / {cCount * 4}</span>
           </dd>
         </div>
       </dl>

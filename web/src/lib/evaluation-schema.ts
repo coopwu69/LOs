@@ -85,14 +85,17 @@ export const feedbackStepSchema = z.object({
     .refine((v) => Number.isInteger(Number(v)) && Number(v) >= 0, "non_negative"),
 });
 
-// --- Report step (step 3) — five fixed items, scores 1–5 (25 points total) ---
+// --- Report step (step 3) — five fixed items, scores 1–4 (20 points total) ---
+// Was 1–5 (25 points) — narrowed to match every other scale in the project
+// (G4, goal.md, 2026-09-11). See migrations/019_convert_report_scale_5_to_4.mjs
+// for the one-time conversion of previously-submitted c_score values.
 export const REPORT_ITEM_COUNT = 5;
 export const reportItemSchema = z
   .string()
   .min(1, "required")
   .refine((v) => {
     const n = Number(v);
-    return Number.isInteger(n) && n >= 1 && n <= 5;
+    return Number.isInteger(n) && n >= 1 && n <= 4;
   }, "score_range");
 
 export const reportStepSchema = z.object({
@@ -116,8 +119,9 @@ export function buildCompetencySchema(config: {
   for (const questionId of config.requiredQuestionIds) {
     const allowed = config.allowedScoresByQuestion.get(questionId);
     const usesFallback = !allowed || allowed.size === 0;
-    // Every LO/competency question in this project uses a 4-level scale
-    // (only the hardcoded report step uses 5) — fallback matches that.
+    // Every rated item in this project uses a 4-level scale, no exceptions
+    // (the report step used to be the one 5-level holdout — no longer, G4) —
+    // fallback matches that.
     const validSet = usesFallback ? new Set([1, 2, 3, 4]) : allowed;
     const validArr = [...(validSet ?? [])].sort((a, b) => a - b);
     shape[`lo-${questionId}`] = z

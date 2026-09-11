@@ -32,7 +32,14 @@ export type WizardCopy = {
   untranslatedQuestion: string;
   rubric: string;
   reportItems: string[];
+  // Fallback rating labels for LO questions with no DB-configured options —
+  // NOT the report scale (that's reportRating below). Keeping these separate
+  // avoids accidentally changing the LO fallback scale when the report scale
+  // changes, and vice versa (G4, goal.md).
   rating: string[];
+  // Report/project scale, 4 levels low→high (G4, goal.md — was a shared
+  // 5-level `rating` array with the LO fallback above).
+  reportRating: [string, string, string, string];
   strengths: string;
   strengthsHelp: string;
   improvements: string;
@@ -130,6 +137,7 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
       "ประโยชน์ของรายงาน/โครงงาน ต่อหน่วยงานและนำไปใช้ได้จริง",
     ],
     rating: ["น้อยที่สุด", "น้อย", "ปานกลาง", "มาก", "มากที่สุด"],
+    reportRating: ["ต้องปรับปรุง", "พอใช้", "ดี", "ดีมาก"],
     strengths: "จุดเด่นของนักศึกษา",
     strengthsHelp: "ระบุพฤติกรรมหรือผลงานที่เห็นได้ชัดจากการปฏิบัติงาน",
     improvements: "ข้อควรปรับปรุงของนักศึกษา",
@@ -223,6 +231,7 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
       "The report or project is beneficial to the organization and practically applicable.",
     ],
     rating: ["Lowest", "Low", "Moderate", "High", "Highest"],
+    reportRating: ["Needs improvement", "Fair", "Good", "Very good"],
     strengths: "Student strengths",
     strengthsHelp: "Describe observable strengths, behaviors, or work outcomes.",
     improvements: "Areas for improvement",

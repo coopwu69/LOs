@@ -223,17 +223,22 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
         const score = parseInt(String(value), 10);
         const configuredScores = allowedScores.get(questionId);
         const usesFallbackScale = configuredScores?.size === 0;
-        if (!configuredScores || (usesFallbackScale ? score < 1 || score > 5 : !configuredScores.has(score))) {
+        // Fallback (no DB options configured) is 1–4, matching every other
+        // scale in the project (buildCompetencySchema on the client uses the
+        // same fallback) — was incorrectly 1–5 here, allowing a value the
+        // client-side schema would never send.
+        if (!configuredScores || (usesFallbackScale ? score < 1 || score > 4 : !configuredScores.has(score))) {
           competencyFieldErrors[key] = localizeError("score_range", locale);
           continue;
         }
-        if (usesFallbackScale) loMax = Math.max(loMax, 5);
+        if (usesFallbackScale) loMax = Math.max(loMax, 4);
         loScore += score;
         loCount++;
       }
       if (key.startsWith("c-")) {
         const score = parseInt(String(value), 10);
-        if (!Number.isInteger(score) || score < 1 || score > 5) {
+        // Report scale is 1–4 (was 1–5 — G4, goal.md).
+        if (!Number.isInteger(score) || score < 1 || score > 4) {
           // Already validated by Zod, but keep the guard for safety.
           continue;
         }
