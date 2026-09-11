@@ -7,6 +7,7 @@ import { FormPickerDialog } from "./form-picker-dialog";
 import { Input } from "./input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table";
 import type { Locale } from "@/lib/i18n";
+import { FORM_NAMES } from "@/lib/form-names";
 
 export type ProgramSummary = {
   id: string;
@@ -33,7 +34,7 @@ const COPY = {
     forms: "แบบฟอร์ม",
     formCompany: "หน่วยงาน",
     formAdvisor: "อาจารย์นิเทศ",
-    pickerHint: "คลิกหลักสูตรเพื่อเลือกระหว่างแบบประเมินหน่วยงานและแบบประเมินอาจารย์นิเทศ",
+    pickerHint: `คลิกหลักสูตรเพื่อเลือกระหว่าง${FORM_NAMES.th.company}และ${FORM_NAMES.th.advisor}`,
     openPicker: "เลือกแบบฟอร์ม",
     noResults: "ไม่พบหลักสูตรที่ตรงกับการค้นหา",
     noResultsHelp: "ลองเปลี่ยนคำค้นหาหรือตัวกรอง",
@@ -51,7 +52,7 @@ const COPY = {
     forms: "Forms",
     formCompany: "Workplace",
     formAdvisor: "Advisor",
-    pickerHint: "Select a program, then choose between the workplace and advisor evaluation forms.",
+    pickerHint: `Select a program, then choose between the "${FORM_NAMES.en.company}" and "${FORM_NAMES.en.advisor}" forms.`,
     openPicker: "Choose a form",
     noResults: "No programs match your search",
     noResultsHelp: "Try adjusting your search or filter",

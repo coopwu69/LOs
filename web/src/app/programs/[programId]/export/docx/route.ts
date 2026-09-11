@@ -22,6 +22,7 @@ import {
   getFixtureTemplateDoc,
 } from "@/lib/fixtures";
 import type { TemplateDoc, SectionRow, QuestionRow } from "@/lib/types";
+import { TEMPLATE_DOC_TITLE } from "@/lib/form-names";
 
 export const dynamic = "force-dynamic";
 
@@ -368,9 +369,9 @@ function buildDocx(doc: TemplateDoc): Document {
   const embeddedFont = getEmbeddedFont();
 
   return new Document({
-    creator: "ระบบแบบประเมิน LOs รายวิชาสหกิจศึกษา",
-    title: doc.title ?? "แบบประเมิน LOs",
-    description: `แบบประเมิน LOs สำหรับ ${doc.program.name_th}`,
+    creator: "ระบบแบบประเมินสหกิจศึกษา (COOP69)",
+    title: doc.title ?? TEMPLATE_DOC_TITLE.th,
+    description: `${TEMPLATE_DOC_TITLE.th} สำหรับ ${doc.program.name_th}`,
     ...(embeddedFont ? { fonts: [{ name: FONT_NAME, data: embeddedFont }] } : {}),
     styles: {
       default: {

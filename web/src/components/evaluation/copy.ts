@@ -1,4 +1,5 @@
 import { splitBilingual, type Locale } from "@/lib/i18n";
+import { FORM_NAMES } from "@/lib/form-names";
 
 // Localized copy for the evaluation wizard.
 // Extracted from the original monolithic EvaluationWizard so focused
@@ -165,7 +166,7 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     saving: "กำลังบันทึก…",
     saved: "บันทึกร่างแล้ว",
     saveFailed: "บันทึกร่างไม่สำเร็จ — ระบบจะลองอีกครั้ง",
-    successTitle: "ส่งแบบประเมินเรียบร้อยแล้ว",
+    successTitle: `ส่ง${FORM_NAMES.th.company}เรียบร้อยแล้ว`,
     successText: "ขอบคุณสำหรับข้อมูล รหัสแบบประเมินคือ",
     successSummary: "สรุปคะแนน",
     successReference: "รหัสอ้างอิง",
@@ -258,7 +259,7 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     saving: "Saving…",
     saved: "Draft saved at",
     saveFailed: "Unable to save draft — the system will retry",
-    successTitle: "Evaluation submitted",
+    successTitle: `${FORM_NAMES.en.company} submitted`,
     successText: "Thank you. Your evaluation reference is",
     successSummary: "Score summary",
     successReference: "Reference",

@@ -9,6 +9,8 @@ import {
 import { getSchoolSlug, getSchoolNameBySlug } from "@/lib/schools";
 import { isInternationalContext, programDisplayName, resolveLocale, schoolDisplayName, uiCopy, withLocale, type Locale } from "@/lib/i18n";
 import { formPath, isFormRole } from "@/lib/routes";
+import { formName } from "@/lib/form-names";
+import type { Metadata } from "next";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { PageHeader } from "@/components/PageHeader";
 import { PrintButton } from "@/components/PrintButton";
@@ -69,6 +71,21 @@ function Toolbar({ programKey, hasTemplate, locale, returnPath }: { programKey: 
   );
 }
 
+// Browser-tab title — role-specific so a filler always sees which form
+// they're on, not the system-wide fallback in the root layout (G1, goal.md).
+// Doesn't re-fetch program data (that'd double the DB query the page below
+// already makes); the program name isn't essential for the tab title.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<PageParams>;
+}): Promise<Metadata> {
+  const { role, lang } = await params;
+  if (!isFormRole(role)) return {};
+  const locale = resolveLocale(lang, false);
+  return { title: `${formName(role, locale)} | COOP69` };
+}
+
 export default async function FormPage({
   params,
 }: {
@@ -109,11 +126,7 @@ export default async function FormPage({
         { label: programName },
       ]}
     >
-      {role !== "company" && (
-        <p className="mt-2 text-sm text-secondary">
-          {locale === "en" ? "Advisor evaluation form" : "แบบประเมินอาจารย์นิเทศ"}
-        </p>
-      )}
+      <p className="mt-2 text-sm text-secondary">{formName(role, locale)}</p>
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Toolbar programKey={programKey} hasTemplate={Boolean(template)} locale={locale} returnPath={returnPath} />
         <LanguageSwitch

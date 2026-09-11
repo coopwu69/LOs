@@ -1,6 +1,7 @@
 import { programDisplayName, schoolDisplayName, type Locale } from "@/lib/i18n";
 import type { ProgramRow } from "@/lib/types";
 import { WIZARD_COPY as COPY } from "./evaluation/copy";
+import { TEMPLATE_DOC_TITLE } from "@/lib/form-names";
 
 function BlankLine({ label, value }: { label: string; value?: string | null }) {
   return (
@@ -97,7 +98,7 @@ export function FormShell({
     <article className="space-y-8">
       <header className="text-center print-break-avoid">
         <h1 className="text-xl font-bold text-primary sm:text-2xl">
-          {locale === "en" ? "Cooperative Education Learning Outcomes Evaluation" : "แบบประเมิน LOs รายวิชาสหกิจศึกษา"}
+          {TEMPLATE_DOC_TITLE[locale]}
         </h1>
         <p className="mt-2 text-base font-medium text-primary">
           {locale === "en"

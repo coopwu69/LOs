@@ -15,10 +15,14 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+// System-wide fallback — shown on the home page, school/program lists, and
+// anywhere a route doesn't set its own title. Kept role-neutral since the
+// system now serves three distinct forms (company/advisor/student, G1);
+// each form route overrides this via its own generateMetadata.
 export const metadata: Metadata = {
-  title: "แบบประเมิน LOs รายวิชาสหกิจศึกษา | COOP69",
+  title: "ระบบแบบประเมินสหกิจศึกษา | COOP69",
   description:
-    "ระบบสำหรับเรียกดูแบบประเมินผลลัพธ์การเรียนรู้ที่คาดหวัง (LOs) ของรายวิชาสหกิจศึกษา จัดกลุ่มตามสำนักวิชาและหลักสูตร",
+    "ระบบแบบประเมินผลการปฏิบัติงานสหกิจศึกษา — แบบประเมินจากสถานประกอบการ แบบประเมินจากอาจารย์นิเทศ และแบบสอบถามนักศึกษา จัดกลุ่มตามสำนักวิชาและหลักสูตร",
 };
 
 // Viewport with cover mode so env(safe-area-inset-*) values are available

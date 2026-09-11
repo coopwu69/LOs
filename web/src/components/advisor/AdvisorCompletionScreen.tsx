@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { Locale } from "@/lib/i18n";
 import { homePath } from "@/lib/routes";
+import { FORM_NAMES } from "@/lib/form-names";
 
 type AdvisorCompletionScreenProps = {
   referenceId: string;
@@ -37,7 +38,7 @@ const COMPLETION_COPY: Record<Locale, {
   close: string;
 }> = {
   th: {
-    successTitle: "ส่งแบบประเมินอาจารย์นิเทศเรียบร้อยแล้ว",
+    successTitle: `ส่ง${FORM_NAMES.th.advisor}เรียบร้อยแล้ว`,
     successText: "ขอบคุณสำหรับข้อมูล รหัสแบบประเมินคือ",
     loLabel: "คะแนนสมรรถนะ",
     otherLabel: "คะแนนอื่น ๆ",
@@ -46,7 +47,7 @@ const COMPLETION_COPY: Record<Locale, {
     close: "กลับหน้าแรก",
   },
   en: {
-    successTitle: "Advisor evaluation submitted",
+    successTitle: `${FORM_NAMES.en.advisor} submitted`,
     successText: "Thank you. Your evaluation reference is",
     loLabel: "Competency score",
     otherLabel: "Other score",

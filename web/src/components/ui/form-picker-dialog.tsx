@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/lib/i18n";
+import { FORM_NAMES } from "@/lib/form-names";
 import type { ProgramSummary } from "./programs-list";
 
 const COPY = {
   th: {
     heading: "เลือกแบบฟอร์มที่ต้องการกรอก",
-    companyName: "แบบประเมินหน่วยงาน",
+    companyName: FORM_NAMES.th.company,
     companyDesc: "กรอกโดยหน่วยงานหรือพี่เลี้ยงที่ดูแลนักศึกษาระหว่างปฏิบัติงาน",
-    advisorName: "แบบประเมินอาจารย์นิเทศ",
+    advisorName: FORM_NAMES.th.advisor,
     advisorDesc: "กรอกโดยอาจารย์นิเทศที่ติดตามและประเมินนักศึกษา",
     copyLink: "คัดลอกลิงก์",
     linkCopied: "คัดลอกแล้ว",
@@ -18,9 +19,9 @@ const COPY = {
   },
   en: {
     heading: "Choose a form to fill in",
-    companyName: "Workplace evaluation",
+    companyName: FORM_NAMES.en.company,
     companyDesc: "Filled in by the host company or the on-site supervisor",
-    advisorName: "Advisor evaluation",
+    advisorName: FORM_NAMES.en.advisor,
     advisorDesc: "Filled in by the faculty advisor who supervises the student",
     copyLink: "Copy link",
     linkCopied: "Copied!",

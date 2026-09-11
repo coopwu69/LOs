@@ -8,6 +8,7 @@ import { getFixtureProgram, getFixtureTemplateDoc, isFixtureMode } from "@/lib/f
 import { programDisplayName, resolveLocale, uiCopy, withLocale } from "@/lib/i18n";
 import type { TemplateDoc } from "@/lib/types";
 import { isSafeReturnPath } from "@/lib/routes";
+import { TEMPLATE_DOC_TITLE } from "@/lib/form-names";
 
 export const dynamic = "force-dynamic";
 
@@ -23,9 +24,7 @@ export async function generateMetadata({
   const program = isFixtureMode() ? getFixtureProgram(programId) : await getProgram(programId);
   if (!program) return {};
   const programName = programDisplayName(program, locale);
-  const formTitle = locale === "en"
-    ? "Cooperative Education Learning Outcomes Evaluation"
-    : "แบบประเมิน LOs รายวิชาสหกิจศึกษา";
+  const formTitle = TEMPLATE_DOC_TITLE[locale];
   const programLabel = locale === "en" ? "Program" : "หลักสูตร";
   return { title: `${formTitle} _ ${programLabel} ${programName}` };
 }
