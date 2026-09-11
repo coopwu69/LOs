@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/lib/i18n";
@@ -69,16 +69,47 @@ function useDomSyncedRatings(formVersion: number, names: readonly string[]) {
   return { containerRef, ratings, setRatings };
 }
 
-// 5 levels displayed high โ’ low. copy.rating is ordered [lowest..highest]
-// (index 0โ’4 maps to value 1โ’5); reverse so the highest score renders
-// first (leftmost), matching ReportStep. Only the report step uses 5
-// levels -- every other rated section in this project uses 4.
+// Reads the checked value of a radio group straight from the DOM whenever
+// formVersion bumps — same bridge pattern as useDomSyncedRatings, for the
+// uncontrolled disclosure radios (premium workplace / future placement).
+function useDomSyncedRadio(
+  formVersion: number,
+  name: string,
+  containerRef: React.RefObject<HTMLDivElement | null>,
+) {
+  const [value, setValue] = useState<string>("");
+
+  useEffect(() => {
+    const form = containerRef.current?.closest("form");
+    if (!form) return;
+    const group = form.elements.namedItem(name);
+    let next = "";
+    if (group instanceof RadioNodeList) {
+      for (const radio of group) {
+        if (radio instanceof HTMLInputElement && radio.checked) {
+          next = radio.value;
+          break;
+        }
+      }
+    } else if (group instanceof HTMLInputElement && group.checked) {
+      next = group.value;
+    }
+    setValue(next);
+  }, [formVersion, name, containerRef]);
+
+  return value;
+}
+
+// copy.rating4 / copy.reportRating are ordered [lowest..highest] (index 0→3
+// maps to value 1→4); reverse so the highest score renders first (leftmost),
+// matching ReportStep. Since G4 every rated section uses 4 levels — the
+// former 5-level report exception was removed.
 function rating4Levels(copy: AdvisorCopy): RatingLevel[] {
   return copy.rating4.map((label, i) => ({ value: i + 1, label })).reverse();
 }
 
-function rating5Levels(copy: AdvisorCopy): RatingLevel[] {
-  return copy.rating5.map((label, i) => ({ value: i + 1, label })).reverse();
+function reportLevels(copy: AdvisorCopy): RatingLevel[] {
+  return copy.reportRating.map((label, i) => ({ value: i + 1, label })).reverse();
 }
 
 type RatingItemProps = {
@@ -113,7 +144,7 @@ function RatingItem({ name, index, label, levels, value, onChange, error }: Rati
   );
 }
 
-// --- Step 3: Other (overall items + strengths / improvements) ---
+// --- Section 5: Comments (overall items + strengths / improvements) ---
 export function AdvisorOtherStep({ locale, errors, formVersion }: StepProps) {
   const copy = ADVISOR_COPY[locale];
   const levels = rating4Levels(copy);
@@ -156,41 +187,34 @@ export function AdvisorOtherStep({ locale, errors, formVersion }: StepProps) {
   );
 }
 
-// --- Step 4: Co-op center + workplace process evaluation ---
+// --- Section 6: Co-op center + workplace evaluation ---
 export function AdvisorProcessStep({ locale, errors, formVersion }: StepProps) {
   const copy = ADVISOR_COPY[locale];
   const levels = rating4Levels(copy);
   const { containerRef, ratings, setRatings } = useDomSyncedRatings(formVersion, PROCESS_NAMES);
-  const [placement, setPlacement] = useState<string>("");
+  const placement = useDomSyncedRadio(formVersion, "adv_future_placement", containerRef);
+  const premium = useDomSyncedRadio(formVersion, "adv_premium_workplace", containerRef);
   const otherInputRef = useRef<HTMLInputElement>(null);
   const prevPlacementRef = useRef<string>("");
-
-  // The wizard keeps inputs uncontrolled (FormData on submit), so read the
-  // adv_future_placement radio state straight from the DOM whenever
-  // formVersion bumps — same bridge pattern as useDomSyncedRatings.
-  useEffect(() => {
-    const form = containerRef.current?.closest("form");
-    if (!form) return;
-    const group = form.elements.namedItem("adv_future_placement");
-    let value = "";
-    if (group instanceof RadioNodeList) {
-      for (const radio of group) {
-        if (radio instanceof HTMLInputElement && radio.checked) {
-          value = radio.value;
-          break;
-        }
-      }
-    } else if (group instanceof HTMLInputElement && group.checked) {
-      value = group.value;
-    }
-    setPlacement(value);
-  }, [formVersion, containerRef]);
+  const reasonInputRef = useRef<HTMLInputElement>(null);
+  const prevPremiumRef = useRef<string>("");
 
   const showOther = placement === "other";
+  const showPremiumReason = premium === "review";
+
+  // The reason input stays mounted (hidden) so draft restore can populate
+  // it, but its DOM value is cleared whenever the reason is not applicable —
+  // a stale answer must never ride along in the submitted payload.
+  useEffect(() => {
+    if (showPremiumReason) return;
+    const form = containerRef.current?.closest("form");
+    const element = form?.elements.namedItem("adv_premium_workplace_reason");
+    if (element instanceof HTMLInputElement) element.value = "";
+  }, [showPremiumReason, containerRef]);
 
   // Move focus into the newly revealed field, matching the disclosure spec —
-  // but only when the user just selected "other" (the radio still has focus),
-  // not when a restored draft already had it selected.
+  // but only when the user just selected the revealing option (the radio
+  // still has focus), not when a restored draft already had it selected.
   useEffect(() => {
     if (showOther && prevPlacementRef.current !== "other") {
       const active = document.activeElement;
@@ -200,6 +224,16 @@ export function AdvisorProcessStep({ locale, errors, formVersion }: StepProps) {
     }
     prevPlacementRef.current = placement;
   }, [showOther, placement]);
+
+  useEffect(() => {
+    if (showPremiumReason && prevPremiumRef.current !== "review") {
+      const active = document.activeElement;
+      if (active instanceof HTMLInputElement && active.name === "adv_premium_workplace") {
+        reasonInputRef.current?.focus();
+      }
+    }
+    prevPremiumRef.current = premium;
+  }, [showPremiumReason, premium]);
 
   const renderItem = (name: string, index: number, label: string) => (
     <RatingItem
@@ -236,6 +270,32 @@ export function AdvisorProcessStep({ locale, errors, formVersion }: StepProps) {
         </h3>
         <div className="divide-y divide-border-default">
           {copy.workplaceItems.map((item, index) => renderItem(`adv-workplace-${index}`, index, item))}
+        </div>
+        <div className="pt-7">
+          <ChoiceGroup
+            legend={`${copy.workplaceItems.length + 1}. ${copy.premiumWorkplace}`}
+            name="adv_premium_workplace"
+            options={[
+              { value: "yes", label: copy.premiumYes },
+              { value: "no", label: copy.premiumNo },
+              {
+                value: "review",
+                label: copy.premiumReview,
+                controlsId: "adv-premium-reason-region",
+              },
+            ]}
+            error={errors?.adv_premium_workplace}
+          />
+          <div id="adv-premium-reason-region" hidden={!showPremiumReason} className="mt-5">
+            <Field
+              ref={reasonInputRef}
+              label={copy.premiumReviewReason}
+              name="adv_premium_workplace_reason"
+              locale={locale}
+              required={showPremiumReason}
+              error={errors?.adv_premium_workplace_reason}
+            />
+          </div>
         </div>
       </section>
       <div className="border-t border-border-default pt-8">
@@ -275,10 +335,10 @@ export function AdvisorProcessStep({ locale, errors, formVersion }: StepProps) {
   );
 }
 
-// --- Step 5: Report appraisal ---
+// --- Section 4: Report appraisal ---
 export function AdvisorReportStep({ locale, errors, formVersion }: StepProps) {
   const copy = ADVISOR_COPY[locale];
-  const levels = rating5Levels(copy);
+  const levels = reportLevels(copy);
   const { containerRef, ratings, setRatings } = useDomSyncedRatings(formVersion, REPORT_NAMES);
 
   return (

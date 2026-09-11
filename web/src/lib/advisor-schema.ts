@@ -27,10 +27,9 @@ export const ADVISOR_WORKPLACE_COUNT = 5;
 export const ADVISOR_REPORT_COUNT = 5;
 
 // --- Score items ---
-// Only the report appraisal (step 5) uses a 5-level scale; every other rated
-// section in this project (other / center / workplace, and the competency
-// questions below) uses a 4-level scale. Do not widen adv4ScoreSchema to 5 —
-// this split is an explicit, locked project rule, not an oversight.
+// Every rated section in this project uses a 4-level scale — including the
+// report appraisal since G4 (2026-09-11); the former 5-level report
+// exception was removed.
 const adv4ScoreSchema = z
   .string()
   .min(1, "required")
@@ -39,15 +38,7 @@ const adv4ScoreSchema = z
     return Number.isInteger(n) && n >= 1 && n <= 4;
   }, "score_range");
 
-const adv5ScoreSchema = z
-  .string()
-  .min(1, "required")
-  .refine((v) => {
-    const n = Number(v);
-    return Number.isInteger(n) && n >= 1 && n <= 5;
-  }, "score_range");
-
-// --- Step 0: General info ---
+// --- Section 1: General info ---
 export const advisorGeneralStepSchema = z.object({
   academic_year: z.string().min(1, "required").regex(ACADEMIC_YEAR_PATTERN, "academic_year"),
   semester: z.string().min(1, "required").regex(SEMESTER_PATTERN, "semester"),
@@ -57,7 +48,16 @@ export const advisorGeneralStepSchema = z.object({
   advisor_name: z.string().min(1, "required").max(120, "length"),
 });
 
-// --- Step 3: Other items + strengths / improvements ---
+// --- Section 4: Report appraisal (4-level scale, same as every other item) ---
+export const advisorReportStepSchema = z.object({
+  "adv-report-0": adv4ScoreSchema,
+  "adv-report-1": adv4ScoreSchema,
+  "adv-report-2": adv4ScoreSchema,
+  "adv-report-3": adv4ScoreSchema,
+  "adv-report-4": adv4ScoreSchema,
+});
+
+// --- Section 5: Comments (overall items + strengths / improvements) ---
 export const advisorOtherStepSchema = z.object({
   "adv-other-0": adv4ScoreSchema,
   "adv-other-1": adv4ScoreSchema,
@@ -65,7 +65,7 @@ export const advisorOtherStepSchema = z.object({
   adv_improvements: z.string().min(1, "required").max(2000, "length"),
 });
 
-// --- Step 4: Co-op center + workplace process evaluation ---
+// --- Section 6: Co-op center + workplace evaluation ---
 export const advisorProcessStepSchema = z
   .object({
     "adv-center-0": adv4ScoreSchema,
@@ -75,11 +75,20 @@ export const advisorProcessStepSchema = z
     "adv-workplace-2": adv4ScoreSchema,
     "adv-workplace-3": adv4ScoreSchema,
     "adv-workplace-4": adv4ScoreSchema,
+    adv_premium_workplace: z.enum(["yes", "no", "review"], { error: "required" }),
+    adv_premium_workplace_reason: z.string().max(2000, "length").optional(),
     adv_future_placement: z.enum(["should", "should_not", "other"], { error: "required" }),
     adv_future_placement_other: z.string().optional(),
     adv_other_comments: z.string().max(2000, "length").optional(),
   })
   .superRefine((data, ctx) => {
+    if (data.adv_premium_workplace === "review" && !data.adv_premium_workplace_reason?.trim()) {
+      ctx.addIssue({
+        code: "custom",
+        message: "required",
+        path: ["adv_premium_workplace_reason"],
+      });
+    }
     if (data.adv_future_placement === "other" && !data.adv_future_placement_other?.trim()) {
       ctx.addIssue({
         code: "custom",
@@ -88,15 +97,6 @@ export const advisorProcessStepSchema = z
       });
     }
   });
-
-// --- Step 5: Report appraisal ---
-export const advisorReportStepSchema = z.object({
-  "adv-report-0": adv5ScoreSchema,
-  "adv-report-1": adv5ScoreSchema,
-  "adv-report-2": adv5ScoreSchema,
-  "adv-report-3": adv5ScoreSchema,
-  "adv-report-4": adv5ScoreSchema,
-});
 
 // --- Full submission envelope (hidden fields + all steps) ---
 export const advisorSubmissionEnvelopeSchema = z.object({
@@ -107,7 +107,7 @@ export const advisorSubmissionEnvelopeSchema = z.object({
   evaluatorRole: z.literal("advisor").catch("advisor"),
 });
 
-// --- Competency questions (steps 1 & 2) ---
+// --- Competency questions (sections 2 & 3) ---
 // Reuses buildCompetencySchema from the company form directly.
 export const buildAdvisorCompetencySchema = buildCompetencySchema;
 

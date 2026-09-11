@@ -71,12 +71,12 @@ export function AdvisorCompletionScreen({
 }: AdvisorCompletionScreenProps) {
   const copy = COMPLETION_COPY[locale];
 
-  // Only the report group uses a 5-level scale; other/center+workplace use 4
-  // (see [[los-wu-rating-scale-options]]).
+  // Every scored group uses a 4-level scale since G4 (2026-09-11) — the
+  // report appraisal no longer has a 5-level exception.
   const loPercent = loMax > 0 && loCount > 0 ? Math.round((loScore / (loCount * loMax)) * 100) : 0;
   const otherPercent = otherCount > 0 ? Math.round((otherScore / (otherCount * 4)) * 100) : 0;
   const centerPercent = centerCount > 0 ? Math.round((centerScore / (centerCount * 4)) * 100) : 0;
-  const reportPercent = reportCount > 0 ? Math.round((reportScore / (reportCount * 5)) * 100) : 0;
+  const reportPercent = reportCount > 0 ? Math.round((reportScore / (reportCount * 4)) * 100) : 0;
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -108,7 +108,7 @@ export function AdvisorCompletionScreen({
         <ScoreCard
           label={copy.reportLabel}
           score={reportScore}
-          max={reportCount * 5}
+          max={reportCount * 4}
           percent={reportPercent}
         />
       </dl>

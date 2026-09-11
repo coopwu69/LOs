@@ -19,6 +19,10 @@ import {
   AdvisorReportStep,
   AdvisorCompletionScreen,
   ADVISOR_STEPS,
+  ADVISOR_STEP,
+  ADVISOR_LEGACY_STEP_MAP,
+  ADVISOR_DRAFT_LAYOUT,
+  ADVISOR_DRAFT_LAYOUT_KEY,
   ADVISOR_GENERAL_FIELDS,
 } from "@/components/advisor";
 import { submitAdvisorEvaluation, saveAdvisorDraft, loadAdvisorDraft } from "./actions";
@@ -79,17 +83,18 @@ function hasStepData(
   primaryQuestions: QuestionWithOptions[],
   secondaryQuestions: QuestionWithOptions[],
 ): boolean {
-  if (step === 0) return ADVISOR_GENERAL_FIELDS.every((name) => data[name as keyof typeof data]);
-  if (step === 1) {
+  if (step === ADVISOR_STEP.GENERAL) return ADVISOR_GENERAL_FIELDS.every((name) => data[name as keyof typeof data]);
+  if (step === ADVISOR_STEP.KNOWLEDGE) {
     const required = primaryQuestions.filter((q) => q.is_required);
     return required.every((q) => data[`lo-${q.id}`]);
   }
-  if (step === 2) {
+  if (step === ADVISOR_STEP.ETHICS) {
     const required = secondaryQuestions.filter((q) => q.is_required);
     return required.every((q) => data[`lo-${q.id}`]);
   }
-  if (step === 3) return ["adv-other-0", "adv-other-1", "adv_strengths", "adv_improvements"].every((name) => data[name]);
-  if (step === 4) {
+  if (step === ADVISOR_STEP.REPORT) return ["adv-report-0", "adv-report-1", "adv-report-2", "adv-report-3", "adv-report-4"].every((name) => data[name]);
+  if (step === ADVISOR_STEP.COMMENTS) return ["adv-other-0", "adv-other-1", "adv_strengths", "adv_improvements"].every((name) => data[name]);
+  if (step === ADVISOR_STEP.PROCESS) {
     const required = [
       "adv-center-0",
       "adv-center-1",
@@ -98,12 +103,13 @@ function hasStepData(
       "adv-workplace-2",
       "adv-workplace-3",
       "adv-workplace-4",
+      "adv_premium_workplace",
       "adv_future_placement",
     ];
+    if (data.adv_premium_workplace === "review") required.push("adv_premium_workplace_reason");
     if (data.adv_future_placement === "other") required.push("adv_future_placement_other");
     return required.every((name) => data[name]);
   }
-  if (step === 5) return ["adv-report-0", "adv-report-1", "adv-report-2", "adv-report-3", "adv-report-4"].every((name) => data[name]);
   return false;
 }
 
@@ -112,31 +118,34 @@ function fieldStep(
   primaryQuestions: QuestionWithOptions[],
   secondaryQuestions: QuestionWithOptions[],
 ): number {
-  if (ADVISOR_GENERAL_FIELDS.includes(fieldName as (typeof ADVISOR_GENERAL_FIELDS)[number])) return 0;
+  if (ADVISOR_GENERAL_FIELDS.includes(fieldName as (typeof ADVISOR_GENERAL_FIELDS)[number])) return ADVISOR_STEP.GENERAL;
   if (fieldName.startsWith("lo-")) {
     const questionId = fieldName.slice(3);
-    if (primaryQuestions.some((q) => q.id === questionId)) return 1;
-    if (secondaryQuestions.some((q) => q.id === questionId)) return 2;
-    return 1;
+    if (primaryQuestions.some((q) => q.id === questionId)) return ADVISOR_STEP.KNOWLEDGE;
+    if (secondaryQuestions.some((q) => q.id === questionId)) return ADVISOR_STEP.ETHICS;
+    return ADVISOR_STEP.KNOWLEDGE;
   }
-  if (fieldName.startsWith("adv-other-") || fieldName === "adv_strengths" || fieldName === "adv_improvements") return 3;
+  if (fieldName.startsWith("adv-report-")) return ADVISOR_STEP.REPORT;
+  if (fieldName.startsWith("adv-other-") || fieldName === "adv_strengths" || fieldName === "adv_improvements")
+    return ADVISOR_STEP.COMMENTS;
   if (
     fieldName.startsWith("adv-center-") ||
     fieldName.startsWith("adv-workplace-") ||
+    fieldName === "adv_premium_workplace" ||
+    fieldName === "adv_premium_workplace_reason" ||
     fieldName === "adv_future_placement" ||
     fieldName === "adv_future_placement_other" ||
     fieldName === "adv_other_comments"
   )
-    return 4;
-  if (fieldName.startsWith("adv-report-")) return 5;
-  return 0;
+    return ADVISOR_STEP.PROCESS;
+  return ADVISOR_STEP.GENERAL;
 }
 
 export function AdvisorWizard({ program, template, sections, questions, locale, role = "advisor" }: Props) {
   const copy: WizardCopy = useMemo(() => ({ ...WIZARD_COPY[locale], steps: ADVISOR_STEPS[locale] }), [locale]);
 
   const [state, formAction, pending] = useActionState(submitAdvisorEvaluation, null as AdvisorSubmitResult | null);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState<number>(ADVISOR_STEP.GENERAL);
   const [saveState, setSaveState] = useState<SaveState>(template ? "preparing" : "preview");
   const [savedAt, setSavedAt] = useState<string>("");
   const [formVersion, setFormVersion] = useState(0);
@@ -195,12 +204,12 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
   const validateStep = useCallback(
     (step: number, data: Record<string, string>): FieldErrors => {
       let rawErrors: Record<string, string> = {};
-      if (step === 0) rawErrors = validateAdvisorGeneralStep(data);
-      else if (step === 1) rawErrors = validateAdvisorCompetencyStep(data, primaryConfig);
-      else if (step === 2) rawErrors = validateAdvisorCompetencyStep(data, secondaryConfig);
-      else if (step === 3) rawErrors = validateAdvisorOtherStep(data);
-      else if (step === 4) rawErrors = validateAdvisorProcessStep(data);
-      else if (step === 5) rawErrors = validateAdvisorReportStep(data);
+      if (step === ADVISOR_STEP.GENERAL) rawErrors = validateAdvisorGeneralStep(data);
+      else if (step === ADVISOR_STEP.KNOWLEDGE) rawErrors = validateAdvisorCompetencyStep(data, primaryConfig);
+      else if (step === ADVISOR_STEP.ETHICS) rawErrors = validateAdvisorCompetencyStep(data, secondaryConfig);
+      else if (step === ADVISOR_STEP.REPORT) rawErrors = validateAdvisorReportStep(data);
+      else if (step === ADVISOR_STEP.COMMENTS) rawErrors = validateAdvisorOtherStep(data);
+      else if (step === ADVISOR_STEP.PROCESS) rawErrors = validateAdvisorProcessStep(data);
       return localizeFieldErrors(rawErrors, locale);
     },
     [locale, primaryConfig, secondaryConfig],
@@ -218,7 +227,14 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
       const draft = await loadAdvisorDraft(token, program.id, template.id);
       if (draft && formRef.current) {
         restoreForm(formRef.current, draft.payload);
-        setCurrentStep(Math.min(draft.currentStep, copy.steps.length - 1));
+        // Drafts saved before the G9 reorder carry a step index from the old
+        // layout and no layout marker — translate it so the form reopens on
+        // the same section instead of jumping to the wrong one.
+        const savedStep =
+          draft.payload[ADVISOR_DRAFT_LAYOUT_KEY] === ADVISOR_DRAFT_LAYOUT
+            ? draft.currentStep
+            : (ADVISOR_LEGACY_STEP_MAP[draft.currentStep] ?? ADVISOR_STEP.GENERAL);
+        setCurrentStep(Math.min(savedStep, copy.steps.length - 1));
         setFormVersion((version) => version + 1);
         setSaveState("restored");
       } else {
@@ -238,6 +254,7 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
       const token = draftTokenRef.current;
       if (!formRef.current || !token || !template) return;
       const payload = formDataToRecord(formRef.current);
+      payload[ADVISOR_DRAFT_LAYOUT_KEY] = ADVISOR_DRAFT_LAYOUT;
       setSaveState("saving");
       startSaving(async () => {
         const result = await saveAdvisorDraft({
@@ -433,10 +450,10 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
         </header>
 
         <div className="px-5 py-7 sm:px-8 sm:py-9">
-          <div hidden={currentStep !== 0}>
+          <div hidden={currentStep !== ADVISOR_STEP.GENERAL}>
             <AdvisorGeneralStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
           </div>
-          <div hidden={currentStep !== 1}>
+          <div hidden={currentStep !== ADVISOR_STEP.KNOWLEDGE}>
             <AdvisorCompetencyStep
               sections={primarySections}
               questions={primaryQuestions}
@@ -445,7 +462,7 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
               formVersion={formVersion}
             />
           </div>
-          <div hidden={currentStep !== 2}>
+          <div hidden={currentStep !== ADVISOR_STEP.ETHICS}>
             <AdvisorCompetencyStep
               sections={secondarySections}
               questions={secondaryQuestions}
@@ -454,14 +471,14 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
               formVersion={formVersion}
             />
           </div>
-          <div hidden={currentStep !== 3}>
+          <div hidden={currentStep !== ADVISOR_STEP.REPORT}>
+            <AdvisorReportStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
+          </div>
+          <div hidden={currentStep !== ADVISOR_STEP.COMMENTS}>
             <AdvisorOtherStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
           </div>
-          <div hidden={currentStep !== 4}>
+          <div hidden={currentStep !== ADVISOR_STEP.PROCESS}>
             <AdvisorProcessStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
-          </div>
-          <div hidden={currentStep !== 5}>
-            <AdvisorReportStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
           </div>
         </div>
 

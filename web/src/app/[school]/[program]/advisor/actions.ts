@@ -80,7 +80,7 @@ export async function submitAdvisorEvaluation(
 
   const pool = getPool();
 
-  // --- Steps 1 & 2: Competency scoring ---
+  // --- Sections 2 & 3: Competency scoring ---
   const optionResult = await pool.query(
     `WITH selected_questions AS (
        SELECT DISTINCT ON (COALESCE(NULLIF(UPPER(BTRIM(lo_code)), ''), id::text))
@@ -180,7 +180,7 @@ export async function submitAdvisorEvaluation(
   let reportCount = 0;
   for (let i = 0; i < ADVISOR_REPORT_COUNT; i++) {
     const score = parseInt(raw[`adv-report-${i}`] ?? "", 10);
-    if (!Number.isNaN(score) && score >= 1 && score <= 5) {
+    if (!Number.isNaN(score) && score >= 1 && score <= 4) {
       reportScore += score;
       reportCount++;
     }

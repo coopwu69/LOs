@@ -18,22 +18,58 @@ import { ACADEMIC_TERMS, semestersForYear } from "@/lib/evaluation-schema";
 type QuestionWithOptions = Question & { options: Option[] };
 type FieldErrors = Record<string, string>;
 
+// Named step indices for the advisor wizard (G9 order). Every navigation,
+// validation, completion, and render decision must go through these
+// constants — never a raw number — so future reorders can't off-by-one.
+export const ADVISOR_STEP = {
+  GENERAL: 0,
+  KNOWLEDGE: 1,
+  ETHICS: 2,
+  REPORT: 3,
+  COMMENTS: 4,
+  PROCESS: 5,
+} as const;
+
+// Maps a step index saved by a pre-G9 draft to the current layout. Old
+// drafts recorded currentStep against the previous order
+// (general/lo1/lo2/other/process/report); the payload fields are unchanged
+// so only the position needs translating.
+export const ADVISOR_LEGACY_STEP_MAP: Record<number, number> = {
+  0: ADVISOR_STEP.GENERAL,
+  1: ADVISOR_STEP.KNOWLEDGE,
+  2: ADVISOR_STEP.ETHICS,
+  3: ADVISOR_STEP.COMMENTS,
+  4: ADVISOR_STEP.PROCESS,
+  5: ADVISOR_STEP.REPORT,
+};
+
+// Marker written into draft payloads so a restore can tell which layout the
+// saved step index belongs to. Drafts without it are pre-G9.
+export const ADVISOR_DRAFT_LAYOUT = "advisor-g9";
+export const ADVISOR_DRAFT_LAYOUT_KEY = "step_layout";
+
+// G9.1: the labels of the two LO sections (indices 1-2) are pinned to the
+// company form's section names — "ความรู้และทักษะ" / "จริยธรรมและบุคลิก",
+// the same strings as WIZARD_COPY[locale].steps. They are literals, not a
+// positional WIZARD_COPY.steps[N] import, because G6 inserts a new section
+// at index 1 on the company side and would silently desync the position.
+// If the company labels change, update these to match.
 export const ADVISOR_STEPS: Record<Locale, [string, string, string][]> = {
   th: [
     ["ข้อมูลทั่วไป", "ข้อมูลทั่วไปของอาจารย์นิเทศและนักศึกษา", "กรอกข้อมูลพื้นฐานที่จำเป็นสำหรับการประเมิน"],
-    ["LO ชุดแรก", "สมรรถนะความรู้และทักษะ", "ประเมินสมรรถนะที่เกี่ยวข้องกับความรู้และทักษะ"],
-    ["LO ชุดสอง", "สมรรถนะจริยธรรมและลักษณะบุคคล", "ประเมินสมรรถนะที่เกี่ยวข้องกับจริยธรรมและลักษณะบุคคล"],
-    ["อื่น ๆ", "ข้อคิดเห็นและจุดเด่น", "บันทึกข้อคิดเห็นเชิงคุณภาพ"],
+    ["ความรู้และทักษะ", "สมรรถนะความรู้และทักษะ", "ประเมินสมรรถนะที่เกี่ยวข้องกับความรู้และทักษะ"],
+    ["จริยธรรมและบุคลิก", "สมรรถนะจริยธรรมและลักษณะบุคคล", "ประเมินสมรรถนะที่เกี่ยวข้องกับจริยธรรมและลักษณะบุคคล"],
+    ["รายงาน/โครงงาน", "รายงานหรือโครงงาน", "ประเมินคุณภาพรายงานหรือโครงงานสหกิจศึกษา"],
+    ["ข้อคิดเห็น", "ข้อคิดเห็นและจุดเด่น", "บันทึกข้อคิดเห็นเชิงคุณภาพ"],
     ["ศูนย์สหกิจ+หน่วยงาน", "ศูนย์สหกิจศึกษาและสถานประกอบการ", "ประเมินด้านกระบวนการและความเหมาะสม"],
-    ["รายงาน", "รายงานหรือโครงงาน", "ประเมินคุณภาพรายงานหรือโครงงานสหกิจศึกษา"],
   ],
   en: [
     ["General information", "Advisor and student information", "Provide the basic information required for the evaluation."],
-    ["LO set 1", "Knowledge and skills competencies", "Evaluate knowledge- and skills-related competencies."],
-    ["LO set 2", "Ethics and character competencies", "Evaluate ethics- and character-related competencies."],
-    ["Other", "Comments and strengths", "Record qualitative comments."],
+    ["Knowledge and skills", "Knowledge and skills competencies", "Evaluate knowledge- and skills-related competencies."],
+    ["Ethics and character", "Ethics and character competencies", "Evaluate ethics- and character-related competencies."],
+    ["Report / project", "Report or project", "Evaluate the cooperative education report or project."],
+    ["Comments", "Comments and strengths", "Record qualitative comments."],
     ["Co-op center + workplace", "Cooperative education center and workplace", "Evaluate process and placement suitability."],
-    ["Report", "Report or project", "Evaluate the cooperative education report or project."],
   ],
 };
 
