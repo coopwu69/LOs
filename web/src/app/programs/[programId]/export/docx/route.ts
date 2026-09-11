@@ -36,21 +36,42 @@ const PART_TITLES: Record<number, string> = {
   2: "ตอนที่ 2 — ผลลัพธ์การเรียนรู้ด้านทักษะทางสังคม",
 };
 
+// ฟอนต์และขนาดมาตรฐานของเอกสาร (docx ใช้หน่วยครึ่งพอยต์ → 32 = 16pt)
+const FONT_NAME = "TH Sarabun New";
+const FONT = { ascii: FONT_NAME, hAnsi: FONT_NAME, cs: FONT_NAME, eastAsia: FONT_NAME };
+const SIZE_BODY = 32; // 16pt — เนื้อหาทั้งหมด
+const SIZE_HEADING = 36; // 18pt — หัวข้อ
+const SIZE_TITLE = 40; // 20pt — ชื่อเอกสาร
+
 const noBorder = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
 const dashedBorder = { style: BorderStyle.DASHED, size: 6, color: "000000" };
 const solidBorder = { style: BorderStyle.SINGLE, size: 4, color: "CCCCCC" };
 
+function run(opts: { text: string; bold?: boolean; size?: number; color?: string; break?: number }) {
+  const size = opts.size ?? SIZE_BODY;
+  return new TextRun({
+    text: opts.text,
+    bold: opts.bold,
+    boldComplexScript: opts.bold,
+    color: opts.color,
+    break: opts.break,
+    font: FONT,
+    size,
+    sizeComplexScript: size,
+  });
+}
+
 function p(text: string, opts?: { bold?: boolean; size?: number; align?: (typeof AlignmentType)[keyof typeof AlignmentType] }) {
   return new Paragraph({
     alignment: opts?.align,
-    children: [new TextRun({ text, bold: opts?.bold, size: opts?.size ?? 22 })],
+    children: [run({ text, bold: opts?.bold, size: opts?.size ?? SIZE_BODY })],
   });
 }
 
 function heading(text: string, level: (typeof HeadingLevel)[keyof typeof HeadingLevel]) {
   return new Paragraph({
     heading: level,
-    children: [new TextRun({ text, bold: true })],
+    children: [run({ text, bold: true, size: SIZE_HEADING })],
   });
 }
 
@@ -58,7 +79,7 @@ function emptyDashedLine(): Paragraph {
   return new Paragraph({
     border: { bottom: dashedBorder },
     spacing: { after: 120 },
-    children: [new TextRun({ text: "" })],
+    children: [run({ text: "" })],
   });
 }
 
@@ -119,7 +140,7 @@ function ratingScaleTable(doc: TemplateDoc): Table {
           width: { size: Math.floor(100 / levels.length), type: WidthType.PERCENTAGE },
           shading: { type: ShadingType.CLEAR, fill: "F0F0F0" },
           borders: { top: solidBorder, bottom: solidBorder, left: solidBorder, right: solidBorder },
-          children: [p(`${l.score}`, { bold: true, align: AlignmentType.CENTER }), p(l.label, { size: 18, align: AlignmentType.CENTER })],
+          children: [p(`${l.score}`, { bold: true, align: AlignmentType.CENTER }), p(l.label, { align: AlignmentType.CENTER })],
         })
     ),
   });
@@ -130,7 +151,7 @@ function ratingScaleTable(doc: TemplateDoc): Table {
         new TableCell({
           width: { size: Math.floor(100 / levels.length), type: WidthType.PERCENTAGE },
           borders: { top: solidBorder, bottom: solidBorder, left: solidBorder, right: solidBorder },
-          children: [p("☐", { align: AlignmentType.CENTER, size: 28 })],
+          children: [p("☐", { align: AlignmentType.CENTER })],
         })
     ),
   });
@@ -147,16 +168,16 @@ function questionBlock(question: QuestionRow, index: number): (Paragraph | Table
     new Paragraph({
       spacing: { before: 200, after: 80 },
       children: [
-        new TextRun({ text: `${loCode}  `, bold: true, color: "2563EB" }),
-        new TextRun({ text: question.text, bold: true }),
+        run({ text: `${loCode}  `, bold: true, color: "2563EB" }),
+        run({ text: question.text, bold: true }),
       ],
     })
   );
   if (question.text_en) {
-    blocks.push(p(question.text_en, { size: 18 }));
+    blocks.push(p(question.text_en));
   }
   if (question.plo_refs && question.plo_refs.length > 0) {
-    blocks.push(p(`อ้างอิง: ${question.plo_refs.join(", ")}`, { size: 18 }));
+    blocks.push(p(`อ้างอิง: ${question.plo_refs.join(", ")}`));
   }
 
   // Options as a table
@@ -184,7 +205,7 @@ function questionBlock(question: QuestionRow, index: number): (Paragraph | Table
           new TableCell({
             width: { size: 67, type: WidthType.PERCENTAGE },
             borders: { top: solidBorder, bottom: solidBorder, left: solidBorder, right: solidBorder },
-            children: [p(opt.description_th ?? "—", { size: 20 })],
+            children: [p(opt.description_th ?? "—")],
           }),
         ],
       })
@@ -196,7 +217,7 @@ function questionBlock(question: QuestionRow, index: number): (Paragraph | Table
     })
   );
   // Comment line
-  blocks.push(p("ความเห็นเพิ่มเติม:", { size: 18 }));
+  blocks.push(p("ความเห็นเพิ่มเติม:"));
   blocks.push(emptyDashedLine());
   return blocks;
 }
@@ -208,9 +229,9 @@ function sectionBlock(section: SectionRow): (Paragraph | Table)[] {
       spacing: { before: 300, after: 80 },
       border: { bottom: solidBorder },
       children: [
-        new TextRun({ text: DOMAIN_LABELS[section.domain_type] ?? section.domain_type, color: "2563EB", size: 20 }),
-        new TextRun({ text: "\n", break: 1 }),
-        new TextRun({ text: section.title_th, bold: true, size: 26 }),
+        run({ text: DOMAIN_LABELS[section.domain_type] ?? section.domain_type, color: "2563EB" }),
+        run({ text: "\n", break: 1 }),
+        run({ text: section.title_th, bold: true, size: SIZE_HEADING }),
       ],
     })
   );
@@ -228,14 +249,14 @@ function buildDocx(doc: TemplateDoc): Document {
     new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: { after: 80 },
-      children: [new TextRun({ text: doc.title ?? "แบบประเมินผลลัพธ์การเรียนรู้ที่คาดหวังของรายวิชาสหกิจศึกษา", bold: true, size: 32 })],
+      children: [run({ text: doc.title ?? "แบบประเมินผลลัพธ์การเรียนรู้ที่คาดหวังของรายวิชาสหกิจศึกษา", bold: true, size: SIZE_TITLE })],
     })
   );
   children.push(
     new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: { after: 40 },
-      children: [new TextRun({ text: doc.program.name_th, bold: true, size: 26 })],
+      children: [run({ text: doc.program.name_th, bold: true, size: SIZE_HEADING })],
     })
   );
   if (doc.program.revision_label) {
@@ -243,7 +264,7 @@ function buildDocx(doc: TemplateDoc): Document {
       new Paragraph({
         alignment: AlignmentType.CENTER,
         spacing: { after: 40 },
-        children: [new TextRun({ text: `(${doc.program.revision_label})`, size: 22 })],
+        children: [run({ text: `(${doc.program.revision_label})` })],
       })
     );
   }
@@ -252,7 +273,7 @@ function buildDocx(doc: TemplateDoc): Document {
       new Paragraph({
         alignment: AlignmentType.CENTER,
         spacing: { after: 200 },
-        children: [new TextRun({ text: `รหัสรายวิชา: ${doc.course_codes.join(", ")}`, size: 20 })],
+        children: [run({ text: `รหัสรายวิชา: ${doc.course_codes.join(", ")}` })],
       })
     );
   }
@@ -274,8 +295,8 @@ function buildDocx(doc: TemplateDoc): Document {
         new Paragraph({
           spacing: { after: 60 },
           children: [
-            new TextRun({ text: `${plo.code}  `, bold: true }),
-            new TextRun({ text: plo.text, size: 22 }),
+            run({ text: `${plo.code}  `, bold: true }),
+            run({ text: plo.text }),
           ],
         })
       );
@@ -298,7 +319,7 @@ function buildDocx(doc: TemplateDoc): Document {
     children.push(
       new Paragraph({
         pageBreakBefore: true,
-        children: [new TextRun({ text: PART_TITLES[2] ?? "ตอนที่ 2", bold: true, size: 32 })],
+        children: [run({ text: PART_TITLES[2] ?? "ตอนที่ 2", bold: true, size: SIZE_HEADING })],
       })
     );
     for (const s of part2) {
@@ -329,6 +350,45 @@ function buildDocx(doc: TemplateDoc): Document {
     creator: "ระบบแบบประเมิน LOs รายวิชาสหกิจศึกษา",
     title: doc.title ?? "แบบประเมิน LOs",
     description: `แบบประเมิน LOs สำหรับ ${doc.program.name_th}`,
+    styles: {
+      default: {
+        document: {
+          run: { font: FONT, size: SIZE_BODY, sizeComplexScript: SIZE_BODY },
+        },
+        heading1: {
+          run: {
+            font: FONT,
+            size: SIZE_HEADING,
+            sizeComplexScript: SIZE_HEADING,
+            bold: true,
+            boldComplexScript: true,
+            color: "000000",
+          },
+          paragraph: { spacing: { before: 240, after: 120 } },
+        },
+        heading2: {
+          run: {
+            font: FONT,
+            size: SIZE_HEADING,
+            sizeComplexScript: SIZE_HEADING,
+            bold: true,
+            boldComplexScript: true,
+            color: "000000",
+          },
+          paragraph: { spacing: { before: 200, after: 100 } },
+        },
+        heading3: {
+          run: {
+            font: FONT,
+            size: SIZE_BODY,
+            sizeComplexScript: SIZE_BODY,
+            bold: true,
+            boldComplexScript: true,
+            color: "000000",
+          },
+        },
+      },
+    },
     sections: [
       {
         properties: {
@@ -386,7 +446,7 @@ export async function GET(
   const buffer = await Packer.toBuffer(document);
   const uint8 = new Uint8Array(buffer);
 
-  const safeCode = program.code.replace(/[^\u0E00-\u0E7Fa-zA-Z0-9]/g, "_");
+  const safeCode = program.code.replace(/[^฀-๿a-zA-Z0-9]/g, "_");
   const filename = `LOs_${safeCode}.docx`;
 
   return new NextResponse(uint8, {
