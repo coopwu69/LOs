@@ -73,7 +73,22 @@ export const generalStepSchema = z.object({
   }
 });
 
-// --- Feedback step (step 4) ---
+// Generic 1–4 score field — every rated item in the project uses this scale
+// (report, coop-center process, LO/competency), no exceptions since G3/G4.
+const fourLevelScoreSchema = z
+  .string()
+  .min(1, "required")
+  .refine((v) => {
+    const n = Number(v);
+    return Number.isInteger(n) && n >= 1 && n <= 4;
+  }, "score_range");
+
+// --- Feedback step (step 5 in the new 6-part structure, G6) ---
+// Expanded in G5: what used to be its own open-ended "process" step (G5's
+// `expected_competencies` free-text field was cut entirely; its
+// `process_evaluation` free-text field became these 2 rated questions,
+// shared verbatim with the advisor form via lib/coop-center-copy.ts) plus
+// `other_comments`, moved here as the form's last section.
 export const feedbackStepSchema = z.object({
   strengths: z.string().min(1, "required").max(2000, "length"),
   improvements: z.string().min(1, "required").max(2000, "length"),
@@ -83,20 +98,17 @@ export const feedbackStepSchema = z.object({
     .string()
     .min(1, "required")
     .refine((v) => Number.isInteger(Number(v)) && Number(v) >= 0, "non_negative"),
+  "center-0": fourLevelScoreSchema,
+  "center-1": fourLevelScoreSchema,
+  other_comments: z.string().max(2000, "length").optional(),
 });
 
-// --- Report step (step 3) — five fixed items, scores 1–4 (20 points total) ---
+// --- Report step — five fixed items, scores 1–4 (20 points total) ---
 // Was 1–5 (25 points) — narrowed to match every other scale in the project
 // (G4, goal.md, 2026-09-11). See migrations/019_convert_report_scale_5_to_4.mjs
 // for the one-time conversion of previously-submitted c_score values.
 export const REPORT_ITEM_COUNT = 5;
-export const reportItemSchema = z
-  .string()
-  .min(1, "required")
-  .refine((v) => {
-    const n = Number(v);
-    return Number.isInteger(n) && n >= 1 && n <= 4;
-  }, "score_range");
+export const reportItemSchema = fourLevelScoreSchema;
 
 export const reportStepSchema = z.object({
   "c-0": reportItemSchema,
@@ -139,6 +151,46 @@ export function buildCompetencySchema(config: {
   return z.object(shape);
 }
 
+// --- Skill-expectation step (G2) — 16 skills, each an optional checkbox
+// ("skill-1".."skill-16", value "1" when checked) with a required 2–5
+// necessity level ("skill-1-level".."skill-16-level") once checked.
+// Unchecked items send neither field. Level 1 ("ไม่จำเป็น") is never a
+// valid submission — the UI disables it (RatingCard disabledValues) since
+// ticking the skill at all means it's already relevant; this re-asserts
+// that range server-side. Not scored into lo_score/c_score — see G2's
+// "การนำคะแนนไปใช้" in goal.md — so this schema only validates shape, it
+// doesn't feed the scoring loop in actions.ts.
+export const SKILL_COUNT = 16;
+
+function skillExpectationShape() {
+  const shape: Record<string, z.ZodOptional<z.ZodString>> = {};
+  for (let i = 1; i <= SKILL_COUNT; i++) {
+    shape[`skill-${i}`] = z.string().optional();
+    shape[`skill-${i}-level`] = z.string().optional();
+  }
+  return shape;
+}
+
+export const skillExpectationStepSchema = z.object(skillExpectationShape()).superRefine((data, ctx) => {
+  const checked: number[] = [];
+  for (let i = 1; i <= SKILL_COUNT; i++) {
+    if (data[`skill-${i}`]) checked.push(i);
+  }
+  if (checked.length === 0) {
+    // Not tied to any one checkbox — goal.md's own criterion is "jump back
+    // to the skills step", not "focus a specific field".
+    ctx.addIssue({ code: "custom", message: "skills_min_one", path: ["skills"] });
+    return;
+  }
+  for (const i of checked) {
+    const level = data[`skill-${i}-level`];
+    const n = Number(level);
+    if (!level || !Number.isInteger(n) || n < 2 || n > 5) {
+      ctx.addIssue({ code: "custom", message: "skills_level_required", path: [`skill-${i}-level`] });
+    }
+  }
+});
+
 // --- Full submission envelope (hidden fields + all steps) ---
 // The server action validates the envelope then runs step-specific checks.
 export const submissionEnvelopeSchema = z.object({
@@ -162,7 +214,9 @@ export type ErrorKey =
   | "uuid"
   | "length"
   | "score_range"
-  | "non_negative";
+  | "non_negative"
+  | "skills_min_one"
+  | "skills_level_required";
 
 export const ERROR_MESSAGES: Record<"th" | "en", Record<ErrorKey, string>> = {
   th: {
@@ -177,6 +231,8 @@ export const ERROR_MESSAGES: Record<"th" | "en", Record<ErrorKey, string>> = {
     length: "ข้อมูลยาวเกินไป กรุณากรอกให้สั้นลง",
     score_range: "คะแนนไม่ถูกต้อง กรุณาเลือกจากตัวเลือกที่กำหนด",
     non_negative: "กรุณากรอกจำนวนเป็นตัวเลขที่ไม่ติดลบ",
+    skills_min_one: "กรุณาเลือกทักษะที่สถานประกอบการคาดหวังอย่างน้อย 1 ข้อ",
+    skills_level_required: "กรุณาเลือกระดับความจำเป็นของทักษะที่เลือกไว้",
   },
   en: {
     required: "This field is required.",
@@ -190,6 +246,8 @@ export const ERROR_MESSAGES: Record<"th" | "en", Record<ErrorKey, string>> = {
     length: "The value is too long. Please shorten it.",
     score_range: "The score is invalid. Please choose from the available options.",
     non_negative: "Please enter a non-negative whole number.",
+    skills_min_one: "Please select at least one skill expected by the employer.",
+    skills_level_required: "Please select a necessity level for each skill you selected.",
   },
 };
 
@@ -252,6 +310,13 @@ export function validateFeedbackStep(
   return result.success ? {} : flattenZodToKeys(result.error);
 }
 
+export function validateSkillExpectationStep(
+  data: Record<string, string>,
+): Record<string, string> {
+  const result = skillExpectationStepSchema.safeParse(data);
+  return result.success ? {} : flattenZodToKeys(result.error);
+}
+
 export function validateCompetencyStep(
   data: Record<string, string>,
   config: { requiredQuestionIds: string[]; allowedScoresByQuestion: Map<string, Set<number>> },
@@ -266,5 +331,18 @@ export function validateCompetencyStep(
 export type FieldErrors = Record<string, string>;
 
 export type SubmitResult =
-  | { success: true; id: string; loScore: number; loCount: number; loMax: number; cScore: number; cCount: number }
+  | {
+      success: true;
+      id: string;
+      loScore: number;
+      loCount: number;
+      loMax: number;
+      cScore: number;
+      cCount: number;
+      // Coop-center questions (G5) — kept separate from cScore/cCount
+      // (report score) on purpose: these evaluate the center's process,
+      // not the student, and must never inflate the student's score.
+      centerScore: number;
+      centerCount: number;
+    }
   | { success: false; error: string; fieldErrors?: FieldErrors };

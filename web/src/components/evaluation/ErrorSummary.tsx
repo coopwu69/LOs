@@ -64,7 +64,21 @@ export function ErrorSummary({ fieldErrors, locale, onFieldFocus }: ErrorSummary
       <p className="mt-1 text-sm text-error-text">{copy.errorSummaryHelp}</p>
       <ul className="mt-3 space-y-1.5">
         {entries.map(([field, message]) => {
-          const label = labels[field] ?? (field.startsWith("lo-") ? copy.competencyQuestions : field.startsWith("c-") ? copy.reportItems[Number(field.slice(2))] : field);
+          const label =
+            labels[field] ??
+            (field.startsWith("lo-")
+              ? copy.competencyQuestions
+              : field.startsWith("c-")
+                ? copy.reportItems[Number(field.slice(2))]
+                : field.startsWith("center-")
+                  ? copy.centerItems[Number(field.slice(7))]
+                  : field === "skills"
+                    ? copy.steps[1][0]
+                    : field.startsWith("skill-") && field.endsWith("-level")
+                      ? copy.skills[Number(field.slice(6, -6)) - 1]
+                      : field.startsWith("skill-")
+                        ? copy.skills[Number(field.slice(6)) - 1]
+                        : field);
           return <li key={field}>
             <a
               href={`#${field}`}

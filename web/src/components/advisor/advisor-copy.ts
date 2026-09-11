@@ -1,4 +1,5 @@
 import type { Locale } from "@/lib/i18n";
+import { COOP_CENTER_COPY } from "@/lib/coop-center-copy";
 
 // Localized copy for advisor-form sections 4-6 (report / comments /
 // center + workplace), in the G9 display order.
@@ -20,9 +21,10 @@ import type { Locale } from "@/lib/i18n";
 //   wizard header already renders the section number; embedding one here
 //   would show a stale number on every reorder (default until Q13 is
 //   answered).
-// TODO(Q14): centerItems/centerTitle should eventually import from
-//   lib/coop-center-copy.ts (the shared module owned by the company-form
-//   agent) instead of keeping a second copy here.
+// centerItems/centerTitle come from lib/coop-center-copy.ts (Q14, resolved
+// 2026-09-12) — that module is now the single source for these 2 questions,
+// shared with the company form's feedback step (G5) and, eventually, the
+// student form (G10).
 // Language rule: `th` values must contain no Latin letters, `en` values
 // must contain no Thai characters.
 
@@ -43,7 +45,7 @@ export type AdvisorCopy = {
   improvementsHelp: string;
   // Section 6 — cooperative education center + workplace
   centerTitle: string;
-  centerItems: [string, string];
+  centerItems: readonly [string, string];
   workplaceTitle: string;
   workplaceItems: [string, string, string, string, string];
   premiumWorkplace: string;
@@ -80,11 +82,8 @@ export const ADVISOR_COPY: Record<Locale, AdvisorCopy> = {
     strengthsHelp: "",
     improvements: "ข้อควรปรับปรุงของนักศึกษา",
     improvementsHelp: "",
-    centerTitle: "ประเมินกระบวนการดำเนินงานของศูนย์สหกิจศึกษาและพัฒนาอาชีพ",
-    centerItems: [
-      "การดำเนินงานของศูนย์สหกิจศึกษาฯ เช่น การประสานงานกับสถานประกอบการ การคัดเลือกนักศึกษา การนัดหมายนิเทศงาน โดยใช้เวลาเหมาะสมและเพียงพอ และสื่อสารชัดเจน",
-      "ความสะดวกรวดเร็ว ความพร้อมในการประสานงานและการบริการของศูนย์สหกิจศึกษาฯ",
-    ],
+    centerTitle: COOP_CENTER_COPY.th.title,
+    centerItems: COOP_CENTER_COPY.th.items,
     workplaceTitle: "ความเข้าใจเรื่องสหกิจศึกษาและการสนับสนุนจากสถานประกอบการ",
     workplaceItems: [
       "ความพร้อมและความร่วมมือของสถานประกอบการ การประสานงานกับมหาวิทยาลัย การจัดสิ่งอำนวยความสะดวกในการปฏิบัติงาน",
@@ -125,11 +124,8 @@ export const ADVISOR_COPY: Record<Locale, AdvisorCopy> = {
     strengthsHelp: "",
     improvements: "Improvement of the student",
     improvementsHelp: "",
-    centerTitle: "Evaluation of the working process of the Center for Cooperative Education and Career Development",
-    centerItems: [
-      "Cooperative education procedures (i.e. matching, work site visit arrangement and communication)",
-      "The convenience, promptness, and readiness of the Center for Cooperative Education and Career Development staff",
-    ],
+    centerTitle: COOP_CENTER_COPY.en.title,
+    centerItems: COOP_CENTER_COPY.en.items,
     workplaceTitle: "Comprehension of the cooperative education concept and support from the workplace",
     workplaceItems: [
       "The readiness and cooperation of the workplace",

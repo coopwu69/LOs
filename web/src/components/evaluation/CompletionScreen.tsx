@@ -11,6 +11,8 @@ type CompletionScreenProps = {
   loMax: number;
   cScore: number;
   cCount: number;
+  centerScore: number;
+  centerCount: number;
   locale: Locale;
 };
 
@@ -31,6 +33,8 @@ export function CompletionScreen({
   loMax,
   cScore,
   cCount,
+  centerScore,
+  centerCount,
   locale,
 }: CompletionScreenProps) {
   const copy = COPY[locale];
@@ -52,7 +56,7 @@ export function CompletionScreen({
         </p>
       </div>
 
-      <dl className="mt-6 grid gap-4 rounded-xl border border-border-default bg-raised p-6 sm:grid-cols-3">
+      <dl className="mt-6 grid gap-4 rounded-xl border border-border-default bg-raised p-6 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <dt className="text-sm text-secondary">{copy.completionScore}</dt>
           <dd className="mt-1 text-2xl font-semibold text-primary">
@@ -71,6 +75,13 @@ export function CompletionScreen({
             {cScore}
             {/* Report scale is 1–4, not 1–5 (G4, goal.md) — divisor must match or this shows e.g. "16 / 25" for a full 20. */}
             <span className="text-base font-normal text-secondary"> / {cCount * 4}</span>
+          </dd>
+        </div>
+        <div>
+          <dt className="text-sm text-secondary">{copy.completionCenter}</dt>
+          <dd className="mt-1 text-2xl font-semibold text-primary">
+            {centerScore}
+            <span className="text-base font-normal text-secondary"> / {centerCount * 4}</span>
           </dd>
         </div>
       </dl>

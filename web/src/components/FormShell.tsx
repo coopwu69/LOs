@@ -43,7 +43,7 @@ function ChoiceRow({ label, choices }: { label: string; choices: string[] }) {
   );
 }
 
-function PrintRating({ labels }: { labels: string[] }) {
+function PrintRating({ labels }: { labels: readonly string[] }) {
   return (
     <div
       className="mt-4 grid gap-2 [grid-template-columns:repeat(var(--option-count),minmax(0,1fr))]"
@@ -138,20 +138,37 @@ export function FormShell({
         </div>
       </StepSection>
 
+      <StepSection locale={locale} step={2} title={copy.steps[1][1]} description={copy.steps[1][2]} newPage>
+        <div className="space-y-5">
+          <p className="text-sm text-secondary">{copy.skillsInstructions}</p>
+          {copy.skills.map((skill, index) => (
+            <div key={skill} className="print-break-avoid">
+              <div className="flex items-center gap-3">
+                <span className="h-5 w-5 shrink-0 rounded border-2 border-border-strong" aria-hidden="true" />
+                <p className="text-sm font-medium text-primary">{index + 1}. {skill}</p>
+              </div>
+              <div className="mt-2 pl-8">
+                <PrintRating labels={copy.skillNecessity} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </StepSection>
+
       {children}
 
-      <StepSection locale={locale} step={4} title={copy.steps[3][1]} description={copy.steps[3][2]} newPage>
+      <StepSection locale={locale} step={5} title={copy.steps[4][1]} description={copy.steps[4][2]} newPage>
         <div className="space-y-8">
           {copy.reportItems.map((item, index) => (
             <fieldset key={item} className="print-break-avoid">
               <legend className="text-base font-medium leading-relaxed text-primary">{index + 1}. {item}</legend>
-              <PrintRating labels={copy.rating} />
+              <PrintRating labels={copy.reportRating} />
             </fieldset>
           ))}
         </div>
       </StepSection>
 
-      <StepSection locale={locale} step={5} title={copy.steps[4][1]} description={copy.steps[4][2]} newPage>
+      <StepSection locale={locale} step={6} title={copy.steps[5][1]} description={copy.steps[5][2]} newPage>
         <div className="space-y-8">
           <BlankArea label={copy.strengths} helper={copy.strengthsHelp} />
           <BlankArea label={copy.improvements} helper={copy.improvementsHelp} />
@@ -160,14 +177,18 @@ export function FormShell({
           </div>
           <ChoiceRow label={copy.nextYear} choices={[copy.willing, copy.unavailable]} />
           <BlankLine label={copy.nextYearCount} />
-        </div>
-      </StepSection>
-
-      <StepSection locale={locale} step={6} title={copy.steps[5][1]} description={copy.steps[5][2]} newPage>
-        <div className="space-y-7">
-          <div className="rounded-lg border border-info-border bg-info-bg px-4 py-3 text-sm text-info-text">{copy.processNotice}</div>
-          <BlankArea label={copy.processEvaluation} />
-          <BlankArea label={copy.expectedCompetencies} />
+          <div className="border-t border-border-default pt-7">
+            <div className="rounded-lg border border-info-border bg-info-bg px-4 py-3 text-sm text-info-text">{copy.processNotice}</div>
+            <h3 className="mt-5 text-base font-semibold text-primary">{copy.centerTitle}</h3>
+            <div className="mt-4 space-y-8">
+              {copy.centerItems.map((item, index) => (
+                <fieldset key={item} className="print-break-avoid">
+                  <legend className="text-base font-medium leading-relaxed text-primary">{index + 1}. {item}</legend>
+                  <PrintRating labels={copy.centerRating} />
+                </fieldset>
+              ))}
+            </div>
+          </div>
           <BlankArea label={copy.otherComments} />
         </div>
       </StepSection>

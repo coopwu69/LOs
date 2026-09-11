@@ -7,7 +7,9 @@ import {
   generalStepSchema,
   feedbackStepSchema,
   reportStepSchema,
+  skillExpectationStepSchema,
   REPORT_ITEM_COUNT,
+  SKILL_COUNT,
   flattenZodToKeys,
   localizeFieldErrors,
   localizeError,
@@ -121,13 +123,18 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
     };
   }
 
-  // --- Step 4: Feedback validation ---
+  // --- Feedback validation (expanded in G5: strengths/improvements/hiring/
+  // next-year, plus the 2 coop-center questions and other_comments that used
+  // to belong to the now-removed "process" step) ---
   const feedbackResult = feedbackStepSchema.safeParse({
     strengths: raw.strengths,
     improvements: raw.improvements,
     hiring_interest: raw.hiring_interest,
     coop_next_year: raw.coop_next_year,
     next_year_count: raw.next_year_count,
+    "center-0": raw["center-0"],
+    "center-1": raw["center-1"],
+    other_comments: raw.other_comments,
   });
   if (!feedbackResult.success) {
     const fieldErrors = localizeFieldErrors(flattenZodToKeys(feedbackResult.error), locale);
@@ -138,7 +145,26 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
     };
   }
 
-  // --- Step 3: Report validation ---
+  // --- Skill-expectation validation (G2) — at least one skill checked,
+  // each checked skill has a 2–5 necessity level. Not scored: this captures
+  // what the employer expects, not what the student achieved, so it's kept
+  // entirely out of the loScore/cScore computation below. ---
+  const skillFields: Record<string, string> = {};
+  for (let i = 1; i <= SKILL_COUNT; i++) {
+    if (raw[`skill-${i}`] != null) skillFields[`skill-${i}`] = String(raw[`skill-${i}`]);
+    if (raw[`skill-${i}-level`] != null) skillFields[`skill-${i}-level`] = String(raw[`skill-${i}-level`]);
+  }
+  const skillResult = skillExpectationStepSchema.safeParse(skillFields);
+  if (!skillResult.success) {
+    const fieldErrors = localizeFieldErrors(flattenZodToKeys(skillResult.error), locale);
+    return {
+      success: false,
+      error: message("กรุณาเลือกทักษะที่สถานประกอบการคาดหวังอย่างน้อย 1 ข้อ พร้อมระบุระดับความจำเป็น", "Please select at least one expected skill and its necessity level."),
+      fieldErrors,
+    };
+  }
+
+  // --- Report validation ---
   const reportResult = reportStepSchema.safeParse({
     "c-0": raw["c-0"],
     "c-1": raw["c-1"],
@@ -172,6 +198,14 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
       created_at timestamptz DEFAULT now()
     )
   `);
+  // G5: coop-center questions moved into this form's feedback step, scored
+  // separately from c_score/c_count (report) so they never inflate the
+  // student's score — same shape as advisor_submissions.center_score.
+  await pool.query(`
+    ALTER TABLE evaluation_submissions
+      ADD COLUMN IF NOT EXISTS center_score int,
+      ADD COLUMN IF NOT EXISTS center_count int
+  `);
 
   try {
     let loScore = 0;
@@ -179,6 +213,8 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
     let loMax = 0;
     let cScore = 0;
     let cCount = 0;
+    let centerScore = 0;
+    let centerCount = 0;
 
     // --- Step 1 & 2: Competency scoring (preserved from original) ---
     const optionResult = await pool.query(
@@ -245,6 +281,15 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
         cScore += score;
         cCount++;
       }
+      if (key.startsWith("center-")) {
+        const score = parseInt(String(value), 10);
+        if (!Number.isInteger(score) || score < 1 || score > 4) {
+          // Already validated by Zod, but keep the guard for safety.
+          continue;
+        }
+        centerScore += score;
+        centerCount++;
+      }
     }
 
     if (Object.keys(competencyFieldErrors).length > 0) {
@@ -268,10 +313,10 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
     try {
       await client.query("BEGIN");
       const result = await client.query(
-        `INSERT INTO evaluation_submissions (program_id, template_id, payload_json, lo_score, lo_count, lo_max, c_score, c_count)
-         VALUES ($1, $2, $3::jsonb, $4, $5, $6, $7, $8)
+        `INSERT INTO evaluation_submissions (program_id, template_id, payload_json, lo_score, lo_count, lo_max, c_score, c_count, center_score, center_count)
+         VALUES ($1, $2, $3::jsonb, $4, $5, $6, $7, $8, $9, $10)
          RETURNING id`,
-        [programId, templateId, payload, loScore, loCount, loMax, cScore, cCount]
+        [programId, templateId, payload, loScore, loCount, loMax, cScore, cCount, centerScore, centerCount]
       );
       if (UUID_PATTERN.test(draftToken)) {
         await client.query(
@@ -281,7 +326,7 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
         );
       }
       await client.query("COMMIT");
-      return { success: true, id: result.rows[0].id, loScore, loCount, loMax, cScore, cCount };
+      return { success: true, id: result.rows[0].id, loScore, loCount, loMax, cScore, cCount, centerScore, centerCount };
     } catch (error) {
       await client.query("ROLLBACK");
       throw error;

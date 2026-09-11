@@ -60,7 +60,15 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
         name={name}
         type={type}
         placeholder={placeholder}
-        required={required}
+        // Not native `required`: this input can be hidden (inside a
+        // not-yet-visited wizard step, `hidden` on the ancestor div) when
+        // the last step's submit button fires. A required-but-unfocusable
+        // control makes Chromium silently abort the whole form submission
+        // ("An invalid form control ... is not focusable" in the console) —
+        // no error shown, nothing sent. Requiredness is fully enforced by
+        // handleSubmit's own Zod-backed validation (and again server-side),
+        // so the native attribute was redundant even when it worked.
+        aria-required={required || undefined}
         pattern={pattern}
         inputMode={inputMode}
         readOnly={readOnly}
@@ -102,7 +110,7 @@ export function SelectField({ label, name, options, placeholder, required, error
       <select
         id={name}
         name={name}
-        required={required}
+        aria-required={required || undefined}
         defaultValue=""
         onChange={onChange}
         autoComplete="off"
@@ -154,7 +162,7 @@ export function TextAreaField({ label, name, required, helper, error }: TextArea
       <textarea
         id={name}
         name={name}
-        required={required}
+        aria-required={required || undefined}
         rows={5}
         autoComplete="off"
         aria-invalid={error ? "true" : undefined}

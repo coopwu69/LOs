@@ -297,11 +297,59 @@ export function ReportStep({
   );
 }
 
-// --- Step 4: Feedback ---
-export function FeedbackStep({ locale, errors }: { locale: Locale; errors?: FieldErrors }) {
+// --- Step 5 (last): Feedback, future placement, and the coop-education
+// center ---
+//
+// Expanded in G5 to absorb what used to be its own "process" step: the
+// center's 2 rated questions (shared with the advisor form via
+// lib/coop-center-copy.ts — same questions, different respondent, an
+// intentional duplication, not drift), `other_comments`, and the
+// "review before submitting" summary box that used to sit at the very end
+// of the form and still does. The old open-ended `expected_competencies`
+// field was cut entirely (G5) — it had no defined use.
+export function FeedbackStep({
+  locale,
+  errors,
+  formVersion,
+  answered,
+  total,
+}: {
+  locale: Locale;
+  errors?: FieldErrors;
+  formVersion: number;
+  answered: number;
+  total: number;
+}) {
   const copy = COPY[locale];
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [ratings, setRatings] = useState<Record<number, number | undefined>>({});
+
+  const levels: RatingLevel[] = copy.centerRating
+    .map((label, i) => ({ value: i + 1, label }))
+    .reverse();
+
+  useEffect(() => {
+    const form = containerRef.current?.closest("form");
+    if (!form) return;
+    const next: Record<number, number | undefined> = {};
+    for (let i = 0; i < copy.centerItems.length; i++) {
+      const group = form.elements.namedItem(`center-${i}`);
+      if (group instanceof RadioNodeList) {
+        for (const radio of group) {
+          if (radio instanceof HTMLInputElement && radio.checked) {
+            next[i] = Number(radio.value);
+            break;
+          }
+        }
+      } else if (group instanceof HTMLInputElement && group.checked) {
+        next[i] = Number(group.value);
+      }
+    }
+    setRatings(next);
+  }, [formVersion, copy.centerItems.length]);
+
   return (
-    <div className="space-y-8">
+    <div ref={containerRef} className="space-y-8">
       <TextAreaField label={copy.strengths} name="strengths" helper={copy.strengthsHelp} required error={errors?.strengths} />
       <TextAreaField label={copy.improvements} name="improvements" helper={copy.improvementsHelp} required error={errors?.improvements} />
       <div className="border-t border-border-default pt-8">
@@ -335,29 +383,40 @@ export function FeedbackStep({ locale, errors }: { locale: Locale; errors?: Fiel
         locale={locale}
         error={errors?.next_year_count}
       />
-    </div>
-  );
-}
 
-// --- Step 5: Process ---
-export function ProcessStep({
-  answered,
-  total,
-  locale,
-}: {
-  answered: number;
-  total: number;
-  locale: Locale;
-}) {
-  const copy = COPY[locale];
-  return (
-    <div className="space-y-8">
-      <div className="rounded-lg border border-info-border bg-info-bg px-4 py-3 text-sm leading-relaxed text-info-text">
-        {copy.processNotice}
+      <div className="border-t border-border-default pt-8">
+        <div className="rounded-lg border border-info-border bg-info-bg px-4 py-3 text-sm leading-relaxed text-info-text">
+          {copy.processNotice}
+        </div>
+        <h3 className="mt-6 text-lg font-semibold text-primary">{copy.centerTitle}</h3>
+        <div className="divide-y divide-border-default">
+          {copy.centerItems.map((item, index) => {
+            const fieldName = `center-${index}`;
+            return (
+              <fieldset key={item} className="py-7 first:pt-6 last:pb-0">
+                <legend className="w-full text-base font-medium leading-relaxed text-primary">
+                  {index + 1}. {item}
+                  <Required />
+                </legend>
+                <div className="mt-4">
+                  <RatingCard
+                    levels={levels}
+                    value={ratings[index]}
+                    onChange={(v) => setRatings((prev) => ({ ...prev, [index]: v }))}
+                    name={fieldName}
+                    required
+                    error={errors?.[fieldName]}
+                    aria-label={`${index + 1}. ${item}`}
+                  />
+                </div>
+              </fieldset>
+            );
+          })}
+        </div>
       </div>
-      <TextAreaField label={copy.processEvaluation} name="process_evaluation" />
-      <TextAreaField label={copy.expectedCompetencies} name="expected_competencies" />
+
       <TextAreaField label={copy.otherComments} name="other_comments" />
+
       <div className="border-t border-border-default pt-7">
         <h3 className="text-lg font-semibold text-primary">{copy.review}</h3>
         <dl className="mt-4 grid gap-3 rounded-lg bg-sunken p-4 text-sm sm:grid-cols-2">

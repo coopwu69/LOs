@@ -85,7 +85,7 @@ function SectionView({ section, locale }: { section: SectionRow; locale: Locale 
   );
 }
 
-function CompetencyPart({ step, sections, locale }: { step: 2 | 3; sections: SectionRow[]; locale: Locale }) {
+function CompetencyPart({ step, sections, locale }: { step: 3 | 4; sections: SectionRow[]; locale: Locale }) {
   const copy = COPY[locale];
   return (
     <section className="print-step print-break-before-page rounded-xl border border-border-default bg-raised">
@@ -116,8 +116,8 @@ export function AssessmentDocument({ doc, locale }: { doc: TemplateDoc; locale: 
       courseCodes={doc.course_codes}
       locale={locale}
     >
-      <CompetencyPart step={2} sections={primary} locale={locale} />
-      <CompetencyPart step={3} sections={secondary} locale={locale} />
+      <CompetencyPart step={3} sections={primary} locale={locale} />
+      <CompetencyPart step={4} sections={secondary} locale={locale} />
     </FormShell>
   );
 }

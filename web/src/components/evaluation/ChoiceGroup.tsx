@@ -29,8 +29,9 @@ export function ChoiceGroup({ legend, name, options, required = true, error }: C
         style={{ "--option-count": options.length } as React.CSSProperties}
         aria-invalid={error ? "true" : undefined}
         aria-describedby={errorId}
+        aria-required={required || undefined}
       >
-        {options.map((option, index) => (
+        {options.map((option) => (
           <label
             key={option.value}
             className="flex min-h-12 min-w-0 cursor-pointer items-center gap-3 rounded-lg border border-border-strong bg-raised px-4 py-3 text-sm text-primary transition-colors hover:border-border-focus hover:bg-hover focus-within:shadow-[var(--shadow-focus-ring)] has-[:checked]:border-action has-[:checked]:bg-info-bg"
@@ -39,7 +40,8 @@ export function ChoiceGroup({ legend, name, options, required = true, error }: C
               type="radio"
               name={name}
               value={option.value}
-              required={required && index === 0}
+              // Not native `required` — see fields.tsx for why (hidden
+              // wizard steps + native required silently breaks submit).
               aria-describedby={errorId}
               aria-controls={option.controlsId}
               className="h-5 w-5 shrink-0 accent-action"

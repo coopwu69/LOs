@@ -15,7 +15,7 @@ import {
   CompetencyStep,
   ReportStep,
   FeedbackStep,
-  ProcessStep,
+  SkillExpectationGroup,
 } from "@/components/evaluation";
 import type { WizardCopy } from "@/components/evaluation";
 import {
@@ -23,11 +23,26 @@ import {
   validateCompetencyStep,
   validateReportStep,
   validateFeedbackStep,
+  validateSkillExpectationStep,
   localizeFieldErrors,
   REPORT_ITEM_COUNT,
+  SKILL_COUNT,
   type FieldErrors,
   type SubmitResult,
 } from "@/lib/evaluation-schema";
+
+// Named step indexes (G6, goal.md) — the 6-part company-form structure.
+// Was raw numeric literals scattered through this file; that's exactly what
+// broke when G6 inserted SKILLS between GENERAL and PRIMARY, so it doesn't
+// happen again next time a section moves.
+const STEP = {
+  GENERAL: 0,
+  SKILLS: 1,
+  PRIMARY: 2,
+  SECONDARY: 3,
+  REPORT: 4,
+  FEEDBACK: 5,
+} as const;
 
 type QuestionWithOptions = Question & { options: Option[] };
 type Props = {
@@ -70,34 +85,42 @@ function hasStepData(
   primaryQuestions: QuestionWithOptions[],
   secondaryQuestions: QuestionWithOptions[],
 ): boolean {
-  if (step === 0) return Boolean(data.evaluator_email && data.student_code && data.student_name);
-  if (step === 1 || step === 2) {
-    const stepQuestions = step === 1 ? primaryQuestions : secondaryQuestions;
+  if (step === STEP.GENERAL) return Boolean(data.evaluator_email && data.student_code && data.student_name);
+  if (step === STEP.SKILLS)
+    return Array.from({ length: SKILL_COUNT }, (_, i) => data[`skill-${i + 1}`]).some(Boolean);
+  if (step === STEP.PRIMARY || step === STEP.SECONDARY) {
+    const stepQuestions = step === STEP.PRIMARY ? primaryQuestions : secondaryQuestions;
     const required = stepQuestions.filter((q) => q.is_required);
     return required.every((q) => data[`lo-${q.id}`]);
   }
-  if (step === 3)
+  if (step === STEP.REPORT)
     return Array.from({ length: REPORT_ITEM_COUNT }, (_, i) => data[`c-${i}`]).every(Boolean);
-  if (step === 4)
+  if (step === STEP.FEEDBACK)
     return Boolean(
       data.strengths &&
         data.improvements &&
         data.hiring_interest &&
         data.coop_next_year &&
-        data.next_year_count != null,
+        data.next_year_count != null &&
+        data["center-0"] &&
+        data["center-1"],
     );
-  if (step === 5) return false; // process step is optional
   return false;
 }
 
 function fieldStep(fieldName: string, primaryQuestions: QuestionWithOptions[], secondaryQuestions: QuestionWithOptions[]): number {
-  if (fieldName.startsWith("c-")) return 3;
-  if (["strengths", "improvements", "hiring_interest", "coop_next_year", "next_year_count"].includes(fieldName)) return 4;
+  if (fieldName.startsWith("skill-") || fieldName === "skills") return STEP.SKILLS;
+  if (fieldName.startsWith("c-")) return STEP.REPORT;
+  if (
+    fieldName.startsWith("center-") ||
+    ["strengths", "improvements", "hiring_interest", "coop_next_year", "next_year_count", "other_comments"].includes(fieldName)
+  )
+    return STEP.FEEDBACK;
   if (fieldName.startsWith("lo-")) {
     const questionId = fieldName.slice(3);
-    return primaryQuestions.some((question) => question.id === questionId) ? 1 : secondaryQuestions.some((question) => question.id === questionId) ? 2 : 1;
+    return primaryQuestions.some((question) => question.id === questionId) ? STEP.PRIMARY : secondaryQuestions.some((question) => question.id === questionId) ? STEP.SECONDARY : STEP.PRIMARY;
   }
-  return 0;
+  return STEP.GENERAL;
 }
 
 function namedControl(form: HTMLFormElement, fieldName: string): HTMLElement | null {
@@ -215,23 +238,24 @@ export function EvaluationWizard({ program, template, sections, questions, local
   const validateStep = useCallback(
     (step: number, data: Record<string, string>): FieldErrors => {
       let rawErrors: FieldErrors = {};
-      if (step === 0) rawErrors = validateGeneralStep(data);
-      else if (step === 1)
+      if (step === STEP.GENERAL) rawErrors = validateGeneralStep(data);
+      else if (step === STEP.SKILLS) rawErrors = validateSkillExpectationStep(data);
+      else if (step === STEP.PRIMARY)
         rawErrors = validateCompetencyStep(data, {
           requiredQuestionIds: competencyConfig.requiredQuestionIds.filter((id) =>
             primaryQuestions.some((q) => q.id === id),
           ),
           allowedScoresByQuestion: competencyConfig.allowedScoresByQuestion,
         });
-      else if (step === 2)
+      else if (step === STEP.SECONDARY)
         rawErrors = validateCompetencyStep(data, {
           requiredQuestionIds: competencyConfig.requiredQuestionIds.filter((id) =>
             secondaryQuestions.some((q) => q.id === id),
           ),
           allowedScoresByQuestion: competencyConfig.allowedScoresByQuestion,
         });
-      else if (step === 3) rawErrors = validateReportStep(data);
-      else if (step === 4) rawErrors = validateFeedbackStep(data);
+      else if (step === STEP.REPORT) rawErrors = validateReportStep(data);
+      else if (step === STEP.FEEDBACK) rawErrors = validateFeedbackStep(data);
       return localizeFieldErrors(rawErrors, locale);
     },
     [competencyConfig, locale, primaryQuestions, secondaryQuestions],
@@ -300,9 +324,11 @@ export function EvaluationWizard({ program, template, sections, questions, local
       if (!formRef.current) return;
       const data = formDataToRecord(formRef.current);
       const allErrors: FieldErrors = {};
+      // Every step validates at submit now — the old "process" step (index
+      // 5) used to be skipped here because it was optional; G5 folded its
+      // required content into FEEDBACK and cut the rest, so there's no
+      // longer an optional step to skip.
       for (let i = 0; i < copy.steps.length; i++) {
-        // Step 5 (process) is optional — skip.
-        if (i === 5) continue;
         const stepErrors = validateStep(i, data);
         Object.assign(allErrors, stepErrors);
       }
@@ -362,6 +388,8 @@ export function EvaluationWizard({ program, template, sections, questions, local
         loMax={state.loMax}
         cScore={state.cScore}
         cCount={state.cCount}
+        centerScore={state.centerScore}
+        centerCount={state.centerCount}
         locale={locale}
       />
     );
@@ -409,23 +437,23 @@ export function EvaluationWizard({ program, template, sections, questions, local
         </header>
 
         <div className="px-5 py-7 sm:px-8 sm:py-9">
-          <div hidden={currentStep !== 0}>
+          <div hidden={currentStep !== STEP.GENERAL}>
             <GeneralStep program={program} locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
           </div>
-          <div hidden={currentStep !== 1}>
+          <div hidden={currentStep !== STEP.SKILLS}>
+            <SkillExpectationGroup locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
+          </div>
+          <div hidden={currentStep !== STEP.PRIMARY}>
             <CompetencyStep sections={primarySections} questions={primaryQuestions} locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
           </div>
-          <div hidden={currentStep !== 2}>
+          <div hidden={currentStep !== STEP.SECONDARY}>
             <CompetencyStep sections={secondarySections} questions={secondaryQuestions} locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
           </div>
-          <div hidden={currentStep !== 3}>
+          <div hidden={currentStep !== STEP.REPORT}>
             <ReportStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
           </div>
-          <div hidden={currentStep !== 4}>
-            <FeedbackStep locale={locale} errors={effectiveFieldErrors} />
-          </div>
-          <div hidden={currentStep !== 5}>
-            <ProcessStep answered={answered} total={questions.length} locale={locale} />
+          <div hidden={currentStep !== STEP.FEEDBACK}>
+            <FeedbackStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} answered={answered} total={questions.length} />
           </div>
         </div>
 

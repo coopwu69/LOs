@@ -13,7 +13,7 @@ export {
   CompetencyStep,
   ReportStep,
   FeedbackStep,
-  ProcessStep,
 } from "./steps";
+export { SkillExpectationGroup } from "./SkillExpectationGroup";
 export { WIZARD_COPY, PRIMARY_DOMAINS, ENGLISH_SCORE_LABELS, questionText, sectionTitle, optionLabel } from "./copy";
 export type { WizardCopy } from "./copy";

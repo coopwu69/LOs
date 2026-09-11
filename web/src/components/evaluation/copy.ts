@@ -1,5 +1,6 @@
 import { splitBilingual, type Locale } from "@/lib/i18n";
 import { FORM_NAMES } from "@/lib/form-names";
+import { COOP_CENTER_COPY } from "@/lib/coop-center-copy";
 
 // Localized copy for the evaluation wizard.
 // Extracted from the original monolithic EvaluationWizard so focused
@@ -52,10 +53,22 @@ export type WizardCopy = {
   unavailable: string;
   nextYearCount: string;
   processNotice: string;
-  processEvaluation: string;
-  expectedCompetencies: string;
   otherComments: string;
   review: string;
+  // Skill-expectation step (G2) — 16 skills the employer expects, each with
+  // an optional necessity level once checked.
+  skillsInstructions: string;
+  skillsMinOneHint: string;
+  skills: [string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string];
+  /** 5-level necessity scale, ordered low -> high (value 1..5). Level 1 is disabled in the UI — ticking a skill already implies it's relevant. */
+  skillNecessity: [string, string, string, string, string];
+  skillNecessityDisabledHint: string;
+  // Coop-center questions (G5) — moved into the feedback step from the
+  // company form's own "process" step; same questions & scale as the
+  // advisor form, sourced from lib/coop-center-copy.ts.
+  centerTitle: string;
+  centerItems: readonly [string, string];
+  centerRating: readonly [string, string, string, string];
   competencyQuestions: string;
   answered: string;
   of: string;
@@ -91,6 +104,7 @@ export type WizardCopy = {
   completionScore: string;
   completionQuestions: string;
   completionReport: string;
+  completionCenter: string;
   completionClose: string;
   completionCloseHref: string;
 };
@@ -99,11 +113,11 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
   th: {
     steps: [
       ["ข้อมูลทั่วไป", "ข้อมูลผู้ประเมินและนักศึกษา", "กรอกข้อมูลสำหรับติดต่อและตรวจสอบหลักสูตรของนักศึกษา"],
+      ["ทักษะที่คาดหวัง", "เลือกทักษะที่สถานประกอบการคาดหวังจากนักศึกษา", "เลือกทักษะที่เกี่ยวข้อง แล้วระบุระดับความจำเป็นของแต่ละข้อ — ไม่รวมในคะแนนนักศึกษา"],
       ["ความรู้และทักษะ", "สมรรถนะด้านความรู้และทักษะ", "ประเมินจากการปฏิบัติงานจริงของนักศึกษาในสถานประกอบการ"],
       ["จริยธรรมและบุคลิก", "สมรรถนะด้านจริยธรรมและลักษณะบุคคล", "ประเมินพฤติกรรม ความรับผิดชอบ และการทำงานร่วมกับผู้อื่น"],
       ["รายงาน/โครงงาน", "รายงานหรือโครงงานสหกิจศึกษา", "ประเมินคุณภาพงานและการรายงานความก้าวหน้า"],
-      ["ข้อเสนอแนะ", "ข้อเสนอแนะและการรับนักศึกษา", "สะท้อนจุดเด่น สิ่งที่ควรพัฒนา และความต้องการรับนักศึกษาในอนาคต"],
-      ["กระบวนการ", "ประเมินกระบวนการดำเนินงาน", "ส่วนนี้ไม่รวมในคะแนนนักศึกษา ตรวจสอบข้อมูลแล้วจึงส่งแบบประเมิน"],
+      ["ข้อเสนอแนะ", "ข้อเสนอแนะ การรับนักศึกษา และศูนย์สหกิจศึกษาฯ", "สะท้อนจุดเด่น สิ่งที่ควรพัฒนา ความต้องการรับนักศึกษาในอนาคต และประเมินกระบวนการของศูนย์สหกิจศึกษาฯ"],
     ],
     evaluatorInfo: "ข้อมูลผู้ประเมิน",
     email: "อีเมล",
@@ -149,11 +163,34 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     willing: "ยินดี",
     unavailable: "ไม่สะดวก",
     nextYearCount: "ปีการศึกษาหน้าต้องการรับนักศึกษากี่คน",
-    processNotice: "คำตอบในส่วนนี้ใช้พัฒนากระบวนการสหกิจศึกษา และไม่นำไปรวมกับคะแนนของนักศึกษา",
-    processEvaluation: "ประเมินกระบวนการดำเนินงานสหกิจศึกษา",
-    expectedCompetencies: "สมรรถนะที่คาดหวังจากนักศึกษาสหกิจศึกษา",
+    processNotice: "คำตอบในส่วนของศูนย์สหกิจศึกษาฯ ด้านล่างใช้พัฒนากระบวนการสหกิจศึกษา และไม่นำไปรวมกับคะแนนของนักศึกษา",
     otherComments: "ข้อคิดเห็นอื่น ๆ เพิ่มเติม",
     review: "ตรวจสอบก่อนส่ง",
+    skillsInstructions: "ติ๊กทักษะที่สถานประกอบการคาดหวังจากนักศึกษาสหกิจศึกษา (เลือกได้มากกว่า 1 ข้อ) แล้วระบุระดับความจำเป็นของแต่ละข้อที่เลือก",
+    skillsMinOneHint: "เลือกอย่างน้อย 1 ข้อ",
+    skills: [
+      "ภาวะผู้นำและผู้เปลี่ยนแปลงทางสังคม",
+      "การทำงานร่วมกับผู้อื่น",
+      "การคิดวิเคราะห์และการคิดอย่างมีวิจารณญาณ",
+      "การแก้ไขปัญหาเชิงซับซ้อน",
+      "การสื่อสารอย่างมีประสิทธิภาพ",
+      "ความคิดสร้างสรรค์",
+      "ความซื่อสัตย์",
+      "ความกตัญญู",
+      "ทักษะดิจิทัล",
+      "มีวินัย",
+      "ใจอาสา",
+      "การเป็นผู้ประกอบการ",
+      "ทักษะใฝ่เรียนรู้",
+      "มีสุขภาวะ",
+      "ทักษะภาษาอังกฤษ",
+      "แนวคิดแบบเติบโต",
+    ],
+    skillNecessity: ["ไม่จำเป็น / ไม่เกี่ยวข้อง", "จำเป็นเล็กน้อย", "จำเป็นปานกลาง", "จำเป็นมาก", "จำเป็นมากที่สุด"],
+    skillNecessityDisabledHint: "เลือกระดับนี้ไม่ได้ — การติ๊กทักษะข้อนี้ หมายความว่าทักษะนี้จำเป็นอยู่แล้ว",
+    centerTitle: COOP_CENTER_COPY.th.title,
+    centerItems: COOP_CENTER_COPY.th.items,
+    centerRating: COOP_CENTER_COPY.th.rating,
     competencyQuestions: "คำถามสมรรถนะ",
     answered: "ตอบแล้ว",
     of: "จาก",
@@ -182,6 +219,7 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     completionScore: "คะแนนสมรรถนะ",
     completionQuestions: "จำนวนข้อที่ประเมิน",
     completionReport: "คะแนนรายงาน/โครงงาน",
+    completionCenter: "คะแนนศูนย์สหกิจศึกษาฯ",
     completionClose: "กลับหน้าแรก",
     completionCloseHref: "/",
     domains: { knowledge: "ความรู้", skills: "ทักษะ", knowledge_skills: "ความรู้และทักษะ", social_skills: "ทักษะทางสังคม", ethics: "จริยธรรม", character: "ลักษณะบุคคล", general: "ทั่วไป" },
@@ -193,11 +231,11 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
   en: {
     steps: [
       ["General information", "Evaluator and student information", "Provide contact details and confirm the student's program."],
+      ["Expected skills", "Select the skills expected by the employer", "Select the relevant skills, then rate how necessary each one is — not included in the student's score."],
       ["Knowledge and skills", "Knowledge and skills competencies", "Evaluate the student's performance in the workplace."],
       ["Ethics and character", "Ethics and personal competencies", "Evaluate responsibility, conduct, and collaboration."],
       ["Report / project", "Cooperative education report or project", "Evaluate work quality and progress reporting."],
-      ["Feedback", "Feedback and future placement", "Highlight strengths, development areas, and future recruitment needs."],
-      ["Process", "Cooperative education process", "This section does not affect the student's score. Review the information before submitting."],
+      ["Feedback", "Feedback, future placement, and the coop-education center", "Highlight strengths, development areas, future recruitment needs, and evaluate the cooperative education center's process."],
     ],
     evaluatorInfo: "Evaluator information",
     email: "Email",
@@ -243,11 +281,34 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     willing: "Yes",
     unavailable: "Not available",
     nextYearCount: "How many students could you accept next academic year?",
-    processNotice: "Responses in this section help improve the cooperative education process and do not affect the student's score.",
-    processEvaluation: "Evaluation of the cooperative education process",
-    expectedCompetencies: "Expected competencies of cooperative education students",
+    processNotice: "Responses in the coop-education center section below help improve the cooperative education process and do not affect the student's score.",
     otherComments: "Additional comments",
     review: "Review before submitting",
+    skillsInstructions: "Select the skills your organization expects from cooperative education students (you may select more than one), then rate how necessary each selected skill is.",
+    skillsMinOneHint: "Select at least one",
+    skills: [
+      "Leadership and Social Change",
+      "Working with others",
+      "Analytical and Critical Thinking",
+      "Solving complex problems",
+      "Effective communication",
+      "Creativity",
+      "Honesty",
+      "Gratitude",
+      "Digital Skills",
+      "Disciplined",
+      "Volunteer",
+      "Entrepreneurship",
+      "Learning Skills",
+      "Have good health",
+      "English Skills",
+      "Growth Mindset",
+    ],
+    skillNecessity: ["Not required / Not relevant", "Slightly required", "Moderately required", "Highly required", "Most required"],
+    skillNecessityDisabledHint: "This level can't be selected — ticking this skill already means it's relevant.",
+    centerTitle: COOP_CENTER_COPY.en.title,
+    centerItems: COOP_CENTER_COPY.en.items,
+    centerRating: COOP_CENTER_COPY.en.rating,
     competencyQuestions: "Competency questions",
     answered: "Answered",
     of: "of",
@@ -276,6 +337,7 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     completionScore: "Competency score",
     completionQuestions: "Questions answered",
     completionReport: "Report / project score",
+    completionCenter: "Coop-education center score",
     completionClose: "Back to home",
     completionCloseHref: "/",
     domains: { knowledge: "Knowledge", skills: "Skills", knowledge_skills: "Knowledge and skills", social_skills: "Social skills", ethics: "Ethics", character: "Personal attributes", general: "General" },
