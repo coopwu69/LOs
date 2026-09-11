@@ -132,11 +132,17 @@ export function RatingCard({
                 className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
               />
               <span className="text-lg font-semibold leading-none">{level.value}</span>
-              <span className="text-xs font-medium leading-tight">{level.label}</span>
-              {level.description && (
+              {level.description ? (
+                // Rubric description present → replaces the level label (G3,
+                // goal.md): the card shows number + description, not number +
+                // label + description. Items without a description (e.g. the
+                // report/project scale, which has none by design) fall back
+                // to the label below so the card is never left number-only.
                 <span className={`text-xs leading-snug ${isSelected ? "text-primary-foreground" : "text-tertiary"}`}>
                   {level.description}
                 </span>
+              ) : (
+                <span className="text-xs font-medium leading-tight">{level.label}</span>
               )}
             </label>
           );
