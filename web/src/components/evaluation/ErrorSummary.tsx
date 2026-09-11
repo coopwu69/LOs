@@ -8,6 +8,8 @@ type ErrorSummaryProps = {
   fieldErrors: Record<string, string>;
   locale: Locale;
   onFieldFocus?: (fieldName: string) => void;
+  /** Extra field-name -> label entries, merged over the built-in company-form map. For forms (e.g. the student survey) with their own field names this component doesn't otherwise know. */
+  extraLabels?: Record<string, string>;
 };
 
 // Accessible error summary shown above the form footer when validation
@@ -20,7 +22,7 @@ type ErrorSummaryProps = {
 //
 // The fieldErrors map values are already-localized messages (not keys).
 // The field name in the href is used to locate the input via getElementById.
-export function ErrorSummary({ fieldErrors, locale, onFieldFocus }: ErrorSummaryProps) {
+export function ErrorSummary({ fieldErrors, locale, onFieldFocus, extraLabels }: ErrorSummaryProps) {
   const copy = COPY[locale];
   const ref = useRef<HTMLDivElement>(null);
   const entries = Object.entries(fieldErrors);
@@ -41,6 +43,7 @@ export function ErrorSummary({ fieldErrors, locale, onFieldFocus }: ErrorSummary
     hiring_interest: copy.hiring,
     coop_next_year: copy.nextYear,
     next_year_count: copy.nextYearCount,
+    ...extraLabels,
   };
 
   // Focus the summary on mount so screen readers announce it.

@@ -17,6 +17,7 @@ export type ProgramSummary = {
   href: string;
   companyHref: string;
   advisorHref: string;
+  studentHref: string;
   form_status: "submitted" | "pending";
 };
 
@@ -34,7 +35,8 @@ const COPY = {
     forms: "แบบฟอร์ม",
     formCompany: "หน่วยงาน",
     formAdvisor: "อาจารย์นิเทศ",
-    pickerHint: `คลิกหลักสูตรเพื่อเลือกระหว่าง${FORM_NAMES.th.company}และ${FORM_NAMES.th.advisor}`,
+    formStudent: "นักศึกษา",
+    pickerHint: `คลิกหลักสูตรเพื่อเลือกระหว่าง${FORM_NAMES.th.company}, ${FORM_NAMES.th.advisor} และ${FORM_NAMES.th.student}`,
     openPicker: "เลือกแบบฟอร์ม",
     noResults: "ไม่พบหลักสูตรที่ตรงกับการค้นหา",
     noResultsHelp: "ลองเปลี่ยนคำค้นหาหรือตัวกรอง",
@@ -52,7 +54,8 @@ const COPY = {
     forms: "Forms",
     formCompany: "Workplace",
     formAdvisor: "Advisor",
-    pickerHint: `Select a program, then choose between the "${FORM_NAMES.en.company}" and "${FORM_NAMES.en.advisor}" forms.`,
+    formStudent: "Student",
+    pickerHint: `Select a program, then choose between the "${FORM_NAMES.en.company}", "${FORM_NAMES.en.advisor}", and "${FORM_NAMES.en.student}" forms.`,
     openPicker: "Choose a form",
     noResults: "No programs match your search",
     noResultsHelp: "Try adjusting your search or filter",
@@ -164,6 +167,7 @@ export function ProgramsList({ programs, locale }: { programs: ProgramSummary[];
     <>
       <Badge variant="neutral">{c.formCompany}</Badge>
       <Badge variant="neutral">{c.formAdvisor}</Badge>
+      <Badge variant="neutral">{c.formStudent}</Badge>
     </>
   );
 

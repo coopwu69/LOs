@@ -1,8 +1,8 @@
 import { withLocale, type Locale } from "@/lib/i18n";
 
-export type FormRole = "company" | "advisor";
+export type FormRole = "company" | "advisor" | "student";
 
-export const FORM_ROLES: readonly FormRole[] = ["company", "advisor"] as const;
+export const FORM_ROLES: readonly FormRole[] = ["company", "advisor", "student"] as const;
 
 export function isFormRole(v: string): v is FormRole {
   return FORM_ROLES.includes(v as FormRole);

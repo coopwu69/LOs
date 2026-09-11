@@ -34,6 +34,7 @@ export default async function SchoolPage({ params, searchParams }: PageProps<"/s
     const programKey = getProgramRouteKey(program);
     const companyHref = formPath(canonicalSlug, programKey, "company", locale);
     const advisorHref = formPath(canonicalSlug, programKey, "advisor", locale);
+    const studentHref = formPath(canonicalSlug, programKey, "student", locale);
     return {
       id: program.id,
       key: programKey,
@@ -42,6 +43,7 @@ export default async function SchoolPage({ params, searchParams }: PageProps<"/s
       href: companyHref,
       companyHref,
       advisorHref,
+      studentHref,
       form_status: program.form_status,
     };
   });

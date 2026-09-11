@@ -17,6 +17,7 @@ import { PrintButton } from "@/components/PrintButton";
 import { ViewEditToggle } from "@/components/ViewEditToggle";
 import { EvaluationWizard } from "../../../../programs/[programId]/EvaluationWizard";
 import { AdvisorWizard } from "../../advisor/AdvisorWizard";
+import { StudentWizard } from "../../student/StudentWizard";
 
 export const dynamic = "force-dynamic";
 
@@ -144,6 +145,23 @@ export default async function FormPage({
         {header}
         <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-6xl scroll-mt-6 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
           <EvaluationWizard
+            program={programRow}
+            template={template}
+            sections={sections}
+            questions={dedupeByLoCode(questions as QuestionWithOptions[])}
+            locale={locale}
+          />
+        </main>
+      </div>
+    );
+  }
+
+  if (role === "student") {
+    return (
+      <div className="flex-1">
+        {header}
+        <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-6xl scroll-mt-6 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+          <StudentWizard
             program={programRow}
             template={template}
             sections={sections}

@@ -13,6 +13,8 @@ const COPY = {
     companyDesc: "กรอกโดยหน่วยงานหรือพี่เลี้ยงที่ดูแลนักศึกษาระหว่างปฏิบัติงาน",
     advisorName: FORM_NAMES.th.advisor,
     advisorDesc: "กรอกโดยอาจารย์นิเทศที่ติดตามและประเมินนักศึกษา",
+    studentName: FORM_NAMES.th.student,
+    studentDesc: "กรอกโดยนักศึกษาหลังกลับจากการปฏิบัติงานสหกิจศึกษา",
     copyLink: "คัดลอกลิงก์",
     linkCopied: "คัดลอกแล้ว",
     close: "ปิด",
@@ -23,6 +25,8 @@ const COPY = {
     companyDesc: "Filled in by the host company or the on-site supervisor",
     advisorName: FORM_NAMES.en.advisor,
     advisorDesc: "Filled in by the faculty advisor who supervises the student",
+    studentName: FORM_NAMES.en.student,
+    studentDesc: "Filled in by the student after returning from their placement",
     copyLink: "Copy link",
     linkCopied: "Copied!",
     close: "Close",
@@ -35,6 +39,10 @@ function WorkplaceIcon() {
 
 function AdvisorIcon() {
   return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 9l10-4 10 4-10 4z" /><path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5" /><path d="M22 9v5" /></svg>;
+}
+
+function StudentIcon() {
+  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 10v6" /><path d="M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5" /></svg>;
 }
 
 function ArrowRightIcon() {
@@ -224,6 +232,15 @@ export function FormPickerDialog({ program, locale, onClose, onNavigate }: { pro
               icon={<AdvisorIcon />}
               name={c.advisorName}
               description={c.advisorDesc}
+              copyLabel={c.copyLink}
+              copiedLabel={c.linkCopied}
+              onNavigate={onNavigate}
+            />
+            <FormOption
+              href={program.studentHref}
+              icon={<StudentIcon />}
+              name={c.studentName}
+              description={c.studentDesc}
               copyLabel={c.copyLink}
               copiedLabel={c.linkCopied}
               onNavigate={onNavigate}
