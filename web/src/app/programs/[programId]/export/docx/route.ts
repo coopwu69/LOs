@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
 import {
   Document,
@@ -42,6 +44,23 @@ const FONT = { ascii: FONT_NAME, hAnsi: FONT_NAME, cs: FONT_NAME, eastAsia: FONT
 const SIZE_BODY = 32; // 16pt — เนื้อหาทั้งหมด
 const SIZE_HEADING = 36; // 18pt — หัวข้อ
 const SIZE_TITLE = 40; // 20pt — ชื่อเอกสาร
+
+// ฝังฟอนต์ไว้ในไฟล์ .docx เพื่อให้แสดงผลถูกต้องแม้เครื่องปลายทางไม่ได้ติดตั้ง TH Sarabun New
+// (ฝังเฉพาะน้ำหนักปกติ — docx รองรับ embedRegular เท่านั้น ตัวหนา Word จะสังเคราะห์ให้)
+const FONT_FILE = path.join(process.cwd(), "src", "assets", "fonts", "THSarabunNew.ttf");
+let fontData: Buffer | null | undefined;
+
+function getEmbeddedFont(): Buffer | null {
+  if (fontData === undefined) {
+    try {
+      fontData = readFileSync(FONT_FILE);
+    } catch {
+      // ไม่พบไฟล์ฟอนต์ → ไม่ฝัง แล้วปล่อยให้ Word ใช้ฟอนต์ที่ติดตั้งในเครื่องแทน
+      fontData = null;
+    }
+  }
+  return fontData;
+}
 
 const noBorder = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
 const dashedBorder = { style: BorderStyle.DASHED, size: 6, color: "000000" };
@@ -346,10 +365,13 @@ function buildDocx(doc: TemplateDoc): Document {
   children.push(p(""));
   children.push(p("ลงชื่อผู้ประเมิน: ____________________   ตำแหน่ง: ____________________   วันที่: ____________________"));
 
+  const embeddedFont = getEmbeddedFont();
+
   return new Document({
     creator: "ระบบแบบประเมิน LOs รายวิชาสหกิจศึกษา",
     title: doc.title ?? "แบบประเมิน LOs",
     description: `แบบประเมิน LOs สำหรับ ${doc.program.name_th}`,
+    ...(embeddedFont ? { fonts: [{ name: FONT_NAME, data: embeddedFont }] } : {}),
     styles: {
       default: {
         document: {
