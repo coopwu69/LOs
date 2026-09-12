@@ -35,6 +35,7 @@ export default async function SchoolPage({ params, searchParams }: PageProps<"/s
     const companyHref = formPath(canonicalSlug, programKey, "company", locale);
     const advisorHref = formPath(canonicalSlug, programKey, "advisor", locale);
     const studentHref = formPath(canonicalSlug, programKey, "student", locale);
+    const reviewHref = withLocale(`/programs/${programKey}/review`, locale);
     return {
       id: program.id,
       key: programKey,
@@ -44,6 +45,7 @@ export default async function SchoolPage({ params, searchParams }: PageProps<"/s
       companyHref,
       advisorHref,
       studentHref,
+      reviewHref,
       form_status: program.form_status,
     };
   });

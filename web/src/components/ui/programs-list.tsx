@@ -18,6 +18,7 @@ export type ProgramSummary = {
   companyHref: string;
   advisorHref: string;
   studentHref: string;
+  reviewHref: string;
   form_status: "submitted" | "pending";
 };
 
@@ -42,6 +43,7 @@ const COPY = {
     noResultsHelp: "ลองเปลี่ยนคำค้นหาหรือตัวกรอง",
     availableLabel: "ส่งแล้ว",
     pendingLabel: "ยังไม่ส่ง",
+    review: "ตรวจสอบความครบถ้วน",
   },
   en: {
     searchPlaceholder: "Search by code or program name…",
@@ -61,6 +63,7 @@ const COPY = {
     noResultsHelp: "Try adjusting your search or filter",
     availableLabel: "Available",
     pendingLabel: "Not available",
+    review: "Review completeness",
   },
 };
 
