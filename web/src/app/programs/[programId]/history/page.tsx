@@ -115,6 +115,13 @@ export default async function HistoryPage({
                             )}
                           </div>
                           <p className="mt-1.5 text-sm text-primary">{rev.note ?? "ไม่มีรายละเอียดเพิ่มเติม"}</p>
+                          {rev.reviewer_name && (
+                            <p className="mt-1 text-xs text-secondary">
+                              <span className="font-medium text-primary">ผู้ตรวจทาน:</span> {rev.reviewer_name}
+                              {rev.reviewer_email ? ` · ${rev.reviewer_email}` : null}
+                              {rev.reviewer_phone ? ` · ${rev.reviewer_phone}` : null}
+                            </p>
+                          )}
                           <time dateTime={rev.created_at} className="mt-1 block text-xs text-tertiary">{formatDate(rev.created_at)}</time>
                         </div>
                         {!isLatest && !isFixtureMode() && (

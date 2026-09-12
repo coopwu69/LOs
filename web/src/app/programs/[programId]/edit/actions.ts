@@ -4,6 +4,16 @@ import { revalidatePath } from "next/cache";
 import { getPool } from "@/lib/db";
 import type { ScaleStatus } from "@/lib/types";
 
+// Reviewer identity collected by the Q11 confirmation dialog before a Save is
+// allowed to fire. Persisted into template_revisions so /history can show who
+// reviewed each edit.
+export type ReviewerInfo = {
+  name: string;
+  email: string;
+  phone: string;
+  confirmed: boolean;
+};
+
 // Shape sent from the editor client. Mirrors TemplateDoc but with mutable ids
 // (client-generated temp ids prefixed with "new-" for unsaved rows).
 export type EditPayload = {
@@ -79,9 +89,23 @@ async function snapshotCurrent(templateId: string): Promise<unknown> {
   return rows[0] ?? null;
 }
 
-export async function saveTemplate(payload: EditPayload): Promise<{ ok: true } | { ok: false; error: string }> {
+export async function saveTemplate(
+  payload: EditPayload,
+  reviewer: ReviewerInfo
+): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!isExistingId(payload.templateId) || !isExistingId(payload.programId)) {
     return { ok: false, error: "ไม่พบแบบประเมินหรือหลักสูตร กรุณารีเฟรชหน้าแล้วลองอีกครั้ง" };
+  }
+  // Q11: the editor must confirm their identity and tick "ตรวจสอบแล้ว" before
+  // a Save is allowed to persist. The dialog enforces this on the client; this
+  // server-side guard is the trust boundary.
+  if (
+    !reviewer.confirmed ||
+    !reviewer.name.trim() ||
+    !reviewer.email.trim() ||
+    !reviewer.phone.trim()
+  ) {
+    return { ok: false, error: "กรุณายืนยันตัวตนและติ๊กยืนยันว่าตรวจสอบแล้วก่อนบันทึก" };
   }
   const pool = getPool();
   const client = await pool.connect();
@@ -91,9 +115,18 @@ export async function saveTemplate(payload: EditPayload): Promise<{ ok: true } |
     // 1. Snapshot current state into template_revisions BEFORE mutating.
     const snapshot = await snapshotCurrent(payload.templateId);
     await client.query(
-      `INSERT INTO template_revisions (template_id, kind, snapshot_json, note, created_at)
-       VALUES ($1, 'edit', $2::jsonb, $3, now())`,
-      [payload.templateId, JSON.stringify(snapshot), "แก้ไขแบบประเมินผ่านเว็บ"]
+      `INSERT INTO template_revisions
+         (template_id, kind, snapshot_json, note, reviewer_name, reviewer_email, reviewer_phone, reviewer_confirmed, created_at)
+       VALUES ($1, 'edit', $2::jsonb, $3, $4, $5, $6, $7, now())`,
+      [
+        payload.templateId,
+        JSON.stringify(snapshot),
+        `แก้ไขแบบประเมินผ่านเว็บ — ตรวจสอบโดย ${reviewer.name.trim()}`,
+        reviewer.name.trim(),
+        reviewer.email.trim(),
+        reviewer.phone.trim(),
+        reviewer.confirmed,
+      ]
     );
 
     // 2. Update template-level fields.
@@ -327,7 +360,8 @@ export async function restoreRevision(
   }
 }
 
-// useActionState-compatible wrapper: parses the JSON payload from a hidden form field.
+// useActionState-compatible wrapper: parses the JSON payload and reviewer
+// identity from hidden form fields populated by the Q11 confirmation dialog.
 export async function saveTemplateAction(
   _prevState: unknown,
   formData: FormData
@@ -340,5 +374,11 @@ export async function saveTemplateAction(
   } catch {
     return { ok: false, error: "ข้อมูลไม่ถูกต้อง" };
   }
-  return saveTemplate(payload);
+  const reviewer: ReviewerInfo = {
+    name: String(formData.get("reviewer_name") ?? ""),
+    email: String(formData.get("reviewer_email") ?? ""),
+    phone: String(formData.get("reviewer_phone") ?? ""),
+    confirmed: formData.get("reviewer_confirmed") === "true",
+  };
+  return saveTemplate(payload, reviewer);
 }

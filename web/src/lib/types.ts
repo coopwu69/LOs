@@ -67,4 +67,10 @@ export type RevisionRow = {
   kind: 'import' | 'edit' | 'restore';
   note: string | null;
   created_at: string;
+  // Q11: reviewer identity for 'edit' revisions (nullable for older rows and
+  // 'restore' revisions which have no reviewer).
+  reviewer_name?: string | null;
+  reviewer_email?: string | null;
+  reviewer_phone?: string | null;
+  reviewer_confirmed?: boolean | null;
 };

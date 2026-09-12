@@ -595,7 +595,9 @@ export async function hasEditorSchema(): Promise<boolean> {
 
 export async function getRevisions(templateId: string): Promise<RevisionRow[]> {
   const { rows } = await getPool().query(
-    `SELECT id::text AS id, kind, note, to_char(created_at AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD"T"HH24:MI:SS') AS created_at
+    `SELECT id::text AS id, kind, note,
+            reviewer_name, reviewer_email, reviewer_phone, reviewer_confirmed,
+            to_char(created_at AT TIME ZONE 'Asia/Bangkok', 'YYYY-MM-DD"T"HH24:MI:SS') AS created_at
      FROM template_revisions
      WHERE template_id = $1
      ORDER BY created_at DESC`,

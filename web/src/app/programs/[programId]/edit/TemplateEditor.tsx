@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useReducer, useState } from "react";
+import { useActionState, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import Link from "next/link";
 import type { TemplateDoc, ScaleStatus, Domain } from "@/lib/types";
 import { saveTemplateAction } from "./actions";
@@ -355,6 +355,55 @@ export function TemplateEditor({ doc, programKey }: { doc: TemplateDoc; programK
   const lastError = saveState && !saveState.ok ? saveState.error : null;
   const savedOk = saveState?.ok === true;
 
+  // Q11: reviewer confirmation dialog. Opens on Save click (after edits),
+  // requires name/email/phone + "ตรวจสอบแล้ว" before the form actually submits.
+  const formRef = useRef<HTMLFormElement>(null);
+  const reviewerDialogRef = useRef<HTMLDialogElement>(null);
+  const reviewerNameRef = useRef<HTMLInputElement>(null);
+  const [reviewerName, setReviewerName] = useState("");
+  const [reviewerEmail, setReviewerEmail] = useState("");
+  const [reviewerPhone, setReviewerPhone] = useState("");
+  const [reviewerConfirmed, setReviewerConfirmed] = useState(false);
+  const [reviewerError, setReviewerError] = useState<string | null>(null);
+  const reviewerTitleId = "reviewer-dialog-title";
+
+  const openReviewerDialog = () => {
+    setReviewerError(null);
+    reviewerDialogRef.current?.showModal();
+    // Focus first field on open (native <dialog> moves focus into the dialog).
+    setTimeout(() => reviewerNameRef.current?.focus(), 0);
+  };
+
+  const closeReviewerDialog = () => {
+    reviewerDialogRef.current?.close();
+  };
+
+  const handleReviewerConfirm = () => {
+    if (!reviewerName.trim() || !reviewerEmail.trim() || !reviewerPhone.trim()) {
+      setReviewerError("กรุณากรอกชื่อ-สกุล อีเมล และเบอร์โทรให้ครบ");
+      return;
+    }
+    if (!reviewerConfirmed) {
+      setReviewerError("กรุณาติ๊กยืนยันว่าตรวจสอบแล้ว");
+      return;
+    }
+    setReviewerError(null);
+    closeReviewerDialog();
+    // requestSubmit triggers the form's action (saveTemplateAction) which
+    // reads the reviewer_* fields from the dialog's named inputs below.
+    formRef.current?.requestSubmit();
+  };
+
+  const handleReviewerBackdrop = (event: React.MouseEvent<HTMLDialogElement>) => {
+    const dialog = reviewerDialogRef.current;
+    if (!dialog) return;
+    const rect = dialog.getBoundingClientRect();
+    const inside =
+      event.clientX >= rect.left && event.clientX <= rect.right &&
+      event.clientY >= rect.top && event.clientY <= rect.bottom;
+    if (!inside) dialog.close();
+  };
+
   useEffect(() => {
     if (!hasChanges) return;
     const warnBeforeUnload = (event: BeforeUnloadEvent) => event.preventDefault();
@@ -364,11 +413,18 @@ export function TemplateEditor({ doc, programKey }: { doc: TemplateDoc; programK
 
   return (
     <form
+      ref={formRef}
       action={formAction}
       className="space-y-8"
       onSubmit={() => {
         setHasChanges(false);
         setConfirmLeave(false);
+        // Reset reviewer fields so the next edit re-confirms identity.
+        setReviewerName("");
+        setReviewerEmail("");
+        setReviewerPhone("");
+        setReviewerConfirmed(false);
+        setReviewerError(null);
       }}
       onInvalid={(event) => {
         let parent = (event.target as HTMLElement).closest("details");
@@ -421,7 +477,12 @@ export function TemplateEditor({ doc, programKey }: { doc: TemplateDoc; programK
               ยกเลิก
             </Link>
           )}
-          <button type="submit" disabled={pending || (!hasChanges && !lastError)} className={btnPrimary}>
+          <button
+            type="button"
+            disabled={pending || (!hasChanges && !lastError)}
+            className={btnPrimary}
+            onClick={openReviewerDialog}
+          >
             {pending ? "กำลังบันทึก…" : hasChanges || lastError ? "บันทึกการเปลี่ยนแปลง" : "บันทึกแล้ว"}
           </button>
         </div>
@@ -769,6 +830,93 @@ export function TemplateEditor({ doc, programKey }: { doc: TemplateDoc; programK
           + เพิ่มหมวด (ตอนที่ 2)
         </button>
       </div>
+
+      {/* Q11: reviewer confirmation dialog — opens on Save click, blocks the
+          save until name/email/phone + "ตรวจสอบแล้ว" are all provided. The named
+          inputs below are part of this <form>, so requestSubmit() submits them
+          to saveTemplateAction alongside the hidden payload field. */}
+      <dialog
+        ref={reviewerDialogRef}
+        aria-labelledby={reviewerTitleId}
+        aria-modal="true"
+        className="fixed inset-0 m-auto max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-border-default bg-raised p-0 text-primary shadow-xl backdrop:bg-overlay backdrop:backdrop-blur-sm max-sm:top-auto max-sm:m-0 max-sm:max-h-[85dvh] max-sm:max-w-none max-sm:rounded-b-none"
+        onClick={handleReviewerBackdrop}
+      >
+        <div className="flex flex-col gap-4 p-5 sm:p-6">
+          <div>
+            <h2 id={reviewerTitleId} className="text-lg font-semibold leading-snug text-primary">
+              ยืนยันตัวตนก่อนบันทึก
+            </h2>
+            <p className="mt-1 text-sm text-secondary">
+              กรุณากรอกข้อมูลผู้ตรวจทานและยืนยันว่าตรวจสอบความถูกต้องของชุดคำถามแล้ว ข้อมูลนี้จะบันทึกลงประวัติการแก้ไข
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="reviewer_name" className={labelClass}>ชื่อ-สกุล <span className="text-error-text">*</span></label>
+              <input
+                ref={reviewerNameRef}
+                id="reviewer_name"
+                name="reviewer_name"
+                type="text"
+                className={inputClass}
+                value={reviewerName}
+                onChange={(e) => setReviewerName(e.target.value)}
+                autoComplete="name"
+              />
+            </div>
+            <div>
+              <label htmlFor="reviewer_email" className={labelClass}>อีเมล <span className="text-error-text">*</span></label>
+              <input
+                id="reviewer_email"
+                name="reviewer_email"
+                type="email"
+                className={inputClass}
+                value={reviewerEmail}
+                onChange={(e) => setReviewerEmail(e.target.value)}
+                autoComplete="email"
+              />
+            </div>
+            <div>
+              <label htmlFor="reviewer_phone" className={labelClass}>เบอร์โทรศัพท์ <span className="text-error-text">*</span></label>
+              <input
+                id="reviewer_phone"
+                name="reviewer_phone"
+                type="tel"
+                className={inputClass}
+                value={reviewerPhone}
+                onChange={(e) => setReviewerPhone(e.target.value)}
+                autoComplete="tel"
+              />
+            </div>
+            <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border border-border-default bg-sunken p-3">
+              <input
+                type="checkbox"
+                name="reviewer_confirmed"
+                value="true"
+                className="mt-0.5 size-5 accent-[var(--action-primary)]"
+                checked={reviewerConfirmed}
+                onChange={(e) => setReviewerConfirmed(e.target.checked)}
+              />
+              <span className="text-sm text-primary">ตรวจสอบชุดคำถามและตัวเลือกคะแนนเรียบร้อยแล้ว ยืนยันบันทึกการเปลี่ยนแปลง</span>
+            </label>
+          </div>
+
+          {reviewerError && (
+            <p className="text-sm text-error-text" role="alert">{reviewerError}</p>
+          )}
+
+          <div className="flex flex-wrap justify-end gap-2">
+            <button type="button" className={btn} onClick={closeReviewerDialog}>
+              ยกเลิก
+            </button>
+            <button type="button" className={btnPrimary} onClick={handleReviewerConfirm}>
+              ยืนยันและบันทึก
+            </button>
+          </div>
+        </div>
+      </dialog>
     </form>
   );
 }
