@@ -15,5 +15,6 @@ export {
   FeedbackStep,
 } from "./steps";
 export { SkillExpectationGroup } from "./SkillExpectationGroup";
+export { LiveScoreBar } from "./LiveScoreBar";
 export { WIZARD_COPY, PRIMARY_DOMAINS, ENGLISH_SCORE_LABELS, questionText, sectionTitle, optionLabel } from "./copy";
 export type { WizardCopy } from "./copy";

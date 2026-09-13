@@ -16,6 +16,7 @@ import {
   ReportStep,
   FeedbackStep,
   SkillExpectationGroup,
+  LiveScoreBar,
 } from "@/components/evaluation";
 import type { WizardCopy } from "@/components/evaluation";
 import {
@@ -75,6 +76,66 @@ function formDataToRecord(form: HTMLFormElement): Record<string, string> {
   const record: Record<string, string> = {};
   for (const [key, value] of data.entries()) record[key] = String(value);
   return record;
+}
+
+// Compute the live LO + report sub-scores from the form's current DOM state
+// for the sticky score bar (G7, goal.md). Mirrors the server-side scoring in
+// actions.ts (loScore/loCount/loMax, cScore/cCount) and the post-submission
+// display in CompletionScreen.tsx — including the report divisor of 4 (not
+// 5, per G4). Unanswered questions/items are excluded from the denominator
+// so the bar shows "current pace", not a score assuming zeros. Called from
+// event handlers (handleChange) and the draft-restore effect, never during
+// render — reading formRef.current during render is forbidden by the
+// react-hooks/refs lint rule.
+function computeLiveScores(
+  form: HTMLFormElement,
+  loQuestions: QuestionWithOptions[],
+): { loScore: number; loMax: number; reportScore: number; reportMax: number; totalWeighted: number } {
+  const data = new FormData(form);
+
+  // Per-question max score across all competency questions, mirroring the
+  // server's `loMax` (max option score, fallback 4 when no DB options).
+  let loMaxPerQuestion = 0;
+  let anyOptions = false;
+  for (const q of loQuestions) {
+    if (q.options.length > 0) anyOptions = true;
+    for (const opt of q.options) {
+      if (opt.score > loMaxPerQuestion) loMaxPerQuestion = opt.score;
+    }
+  }
+  if (!anyOptions) loMaxPerQuestion = 4;
+
+  let loScore = 0;
+  let loCount = 0;
+  for (const q of loQuestions) {
+    const val = data.get(`lo-${q.id}`);
+    if (val == null || val === "") continue;
+    const score = parseInt(String(val), 10);
+    if (Number.isNaN(score)) continue;
+    loScore += score;
+    loCount++;
+  }
+  const loMax = loCount * loMaxPerQuestion;
+
+  // Report items c-0..c-4, scale 1–4 (G4) — divisor is 4, not 5.
+  let reportScore = 0;
+  let reportCount = 0;
+  for (let i = 0; i < REPORT_ITEM_COUNT; i++) {
+    const val = data.get(`c-${i}`);
+    if (val == null || val === "") continue;
+    const score = parseInt(String(val), 10);
+    if (Number.isNaN(score)) continue;
+    reportScore += score;
+    reportCount++;
+  }
+  const reportMax = reportCount * 4;
+
+  // Weighted combination out of 60 (company's full share: LOs 35 + Report 25).
+  const loWeighted = loMax > 0 ? (loScore / loMax) * 35 : 0;
+  const reportWeighted = reportMax > 0 ? (reportScore / reportMax) * 25 : 0;
+  const totalWeighted = loWeighted + reportWeighted;
+
+  return { loScore, loMax, reportScore, reportMax, totalWeighted };
 }
 
 // Check that a step has at least the minimum required data (not just valid).
@@ -172,6 +233,19 @@ export function EvaluationWizard({ program, template, sections, questions, local
     [questions],
   );
 
+  // --- Live score bar (G7, goal.md) ---
+  // Live LO + report sub-scores for the sticky summary bar. Updated in
+  // `handleChange` (every input change) and the draft-restore effect — never
+  // computed during render, since reading formRef.current during render is
+  // forbidden by the react-hooks/refs lint rule. The computation itself lives
+  // in the module-level `computeLiveScores` helper and mirrors the
+  // server-side scoring in actions.ts (loScore/loCount/loMax, cScore/cCount)
+  // plus the post-submission display in CompletionScreen.tsx — including the
+  // report divisor of 4 (not 5, per G4). Unanswered questions/items are
+  // excluded from the denominator so the bar shows "current pace", not a
+  // score assuming zeros.
+  const [liveScores, setLiveScores] = useState({ loScore: 0, loMax: 0, reportScore: 0, reportMax: 0, totalWeighted: 0 });
+
   // --- Draft load on mount ---
   useEffect(() => {
     if (!template) return;
@@ -188,6 +262,7 @@ export function EvaluationWizard({ program, template, sections, questions, local
         setMaxVisited(Math.min(draft.currentStep, copy.steps.length - 1));
         const data = new FormData(formRef.current);
         setAnswered(questions.filter((question) => data.has(`lo-${question.id}`)).length);
+        setLiveScores(computeLiveScores(formRef.current, questions));
         setFormVersion((version) => version + 1);
         setSaveState("restored");
       } else setSaveState("ready");
@@ -228,6 +303,7 @@ export function EvaluationWizard({ program, template, sections, questions, local
     if (formRef.current) {
       const data = new FormData(formRef.current);
       setAnswered(questions.filter((question) => data.has(`lo-${question.id}`)).length);
+      setLiveScores(computeLiveScores(formRef.current, questions));
       setFormVersion((version) => version + 1);
     }
     if (saveTimer.current) clearTimeout(saveTimer.current);
@@ -411,6 +487,15 @@ export function EvaluationWizard({ program, template, sections, questions, local
       <input type="hidden" name="templateId" value={template?.id ?? ""} />
       <input type="hidden" name="draftToken" defaultValue="" />
       <input type="hidden" name="locale" value={locale} />
+
+      <LiveScoreBar
+        locale={locale}
+        loScore={liveScores.loScore}
+        loMax={liveScores.loMax}
+        reportScore={liveScores.reportScore}
+        reportMax={liveScores.reportMax}
+        totalWeighted={liveScores.totalWeighted}
+      />
 
       <StepProgressBar
         currentStep={currentStep}
