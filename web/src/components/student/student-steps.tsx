@@ -11,6 +11,7 @@ import {
   ChoiceGroup,
   RatingCard,
   Required,
+  StudentAutocomplete,
   WIZARD_COPY,
   type RatingLevel,
 } from "@/components/evaluation";
@@ -74,8 +75,8 @@ export function StudentGeneralStep({
       <fieldset>
         <legend className="text-lg font-semibold text-primary">{copy.studentInfo}</legend>
         <div className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
+          <StudentAutocomplete label={copy.studentName} name="student_name" programId={program.id} placeholder={copy.studentNamePlaceholder} required locale={locale} error={errors?.student_name} />
           <Field label={copy.studentCode} name="student_code" inputMode="numeric" placeholder={copy.studentCodePlaceholder} pattern="[0-9]{8}" helper={copy.studentCodeHelp} autoComplete="off" spellCheck={false} required locale={locale} error={errors?.student_code} />
-          <Field label={copy.studentName} name="student_name" autoComplete="name" required locale={locale} error={errors?.student_name} />
           <Field label={copy.school} name="school" defaultValue={schoolDisplayName(program.school ?? "", locale)} readOnly locale={locale} />
           <Field label={copy.program} name="program" defaultValue={programName} readOnly locale={locale} />
           <SelectField label={copy.academicYear} name="academic_year" options={academicYearOptions} placeholder={copy.selectAcademicYear} required error={errors?.academic_year} onChange={handleYearChange} />

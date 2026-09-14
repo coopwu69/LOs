@@ -25,6 +25,10 @@ export type WizardCopy = {
   studentCodePlaceholder: string;
   studentCodeHelp: string;
   studentName: string;
+  studentNamePlaceholder: string;
+  studentSearchLoading: string;
+  studentSearchEmpty: string;
+  studentSearchListLabel: string;
   school: string;
   program: string;
   noQuestions: string;
@@ -134,8 +138,12 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     studentInfo: "ข้อมูลนักศึกษา",
     studentCode: "รหัสนักศึกษา",
     studentCodePlaceholder: "ตัวเลข 8 หลัก",
-    studentCodeHelp: "กรอกรหัสนักศึกษา 8 หลัก ขณะนี้ระบบยังไม่มีฐานข้อมูลสำหรับค้นหาชื่ออัตโนมัติ",
+    studentCodeHelp: "รหัสนักศึกษา 8 หลัก — เติมอัตโนมัติเมื่อเลือกชื่อจากรายการ หรือกรอกเองได้",
     studentName: "ชื่อ–สกุลนักศึกษา",
+    studentNamePlaceholder: "พิมพ์ชื่อ–นามสกุลเพื่อค้นหา",
+    studentSearchLoading: "กำลังค้นหา…",
+    studentSearchEmpty: "ไม่พบชื่อที่ตรงกันในหลักสูตรนี้ — กรอกชื่อเองได้ตามปกติ",
+    studentSearchListLabel: "รายชื่อนักศึกษาที่ตรงกัน",
     school: "สำนักวิชา",
     program: "หลักสูตร",
     noQuestions: "หลักสูตรนี้ยังไม่มีคำถามในหมวดนี้",
@@ -252,8 +260,12 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     studentInfo: "Student information",
     studentCode: "Student ID",
     studentCodePlaceholder: "8-digit number",
-    studentCodeHelp: "Enter the 8-digit student ID. Automatic student lookup is not available yet.",
+    studentCodeHelp: "8-digit student ID — auto-filled when you pick a name from the list, or type it yourself.",
     studentName: "Student's full name",
+    studentNamePlaceholder: "Type a name to search",
+    studentSearchLoading: "Searching…",
+    studentSearchEmpty: "No matches in this program — you can still type the name.",
+    studentSearchListLabel: "Matching students",
     school: "School",
     program: "Program",
     noQuestions: "No questions are available in this category yet.",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { Option, Question, Section } from "@/lib/db";
+import type { Option, Program, Question, Section } from "@/lib/db";
 import { type Locale } from "@/lib/i18n";
 import {
   WIZARD_COPY as COPY,
@@ -10,7 +10,7 @@ import {
   questionText,
   sectionTitle,
 } from "@/components/evaluation/copy";
-import { Field, SelectField, Required } from "@/components/evaluation";
+import { Field, SelectField, Required, StudentAutocomplete } from "@/components/evaluation";
 import { RatingCard, type RatingLevel } from "@/components/evaluation";
 import type { ChangeEvent } from "react";
 import { ACADEMIC_TERMS, semestersForYear } from "@/lib/evaluation-schema";
@@ -84,10 +84,12 @@ export const ADVISOR_GENERAL_FIELDS = [
 
 // --- Step 0: General information ---
 export function AdvisorGeneralStep({
+  program,
   locale,
   errors,
   formVersion,
 }: {
+  program: Program;
   locale: Locale;
   errors?: FieldErrors;
   formVersion: number;
@@ -151,6 +153,17 @@ export function AdvisorGeneralStep({
             error={errors?.semester}
           />
           <div className="sm:col-span-2">
+            <StudentAutocomplete
+              label={copy.studentName}
+              name="student_name"
+              programId={program.id}
+              placeholder={copy.studentNamePlaceholder}
+              required
+              locale={locale}
+              error={errors?.student_name}
+            />
+          </div>
+          <div className="sm:col-span-2">
             <Field
               label={copy.studentCode}
               name="student_code"
@@ -163,16 +176,6 @@ export function AdvisorGeneralStep({
               required
               locale={locale}
               error={errors?.student_code}
-            />
-          </div>
-          <div className="sm:col-span-2">
-            <Field
-              label={copy.studentName}
-              name="student_name"
-              autoComplete="name"
-              required
-              locale={locale}
-              error={errors?.student_name}
             />
           </div>
           <Field

@@ -12,6 +12,7 @@ import {
   sectionTitle,
 } from "./copy";
 import { Field, SelectField, TextAreaField, Required } from "./fields";
+import { StudentAutocomplete } from "./StudentAutocomplete";
 import { RatingCard, type RatingLevel } from "./RatingCard";
 import { ChoiceGroup } from "./ChoiceGroup";
 import { ACADEMIC_TERMS, semestersForYear } from "@/lib/evaluation-schema";
@@ -90,10 +91,10 @@ export function GeneralStep({
         <legend className="text-lg font-semibold text-primary">{copy.studentInfo}</legend>
         <div className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <Field label={copy.studentCode} name="student_code" inputMode="numeric" placeholder={copy.studentCodePlaceholder} pattern="[0-9]{8}" helper={copy.studentCodeHelp} autoComplete="off" spellCheck={false} required locale={locale} error={errors?.student_code} />
+            <StudentAutocomplete label={copy.studentName} name="student_name" programId={program.id} placeholder={copy.studentNamePlaceholder} required locale={locale} error={errors?.student_name} />
           </div>
           <div className="sm:col-span-2">
-            <Field label={copy.studentName} name="student_name" autoComplete="name" required locale={locale} error={errors?.student_name} />
+            <Field label={copy.studentCode} name="student_code" inputMode="numeric" placeholder={copy.studentCodePlaceholder} pattern="[0-9]{8}" helper={copy.studentCodeHelp} autoComplete="off" spellCheck={false} required locale={locale} error={errors?.student_code} />
           </div>
           <Field label={copy.school} name="school" defaultValue={schoolDisplayName(program.school ?? "", locale)} readOnly locale={locale} />
           <Field label={copy.program} name="program" defaultValue={programName} readOnly locale={locale} />

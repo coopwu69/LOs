@@ -451,7 +451,7 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
 
         <div className="px-5 py-7 sm:px-8 sm:py-9">
           <div hidden={currentStep !== ADVISOR_STEP.GENERAL}>
-            <AdvisorGeneralStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
+            <AdvisorGeneralStep program={program} locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
           </div>
           <div hidden={currentStep !== ADVISOR_STEP.KNOWLEDGE}>
             <AdvisorCompetencyStep

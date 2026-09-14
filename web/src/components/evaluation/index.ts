@@ -8,6 +8,7 @@ export { ErrorSummary } from "./ErrorSummary";
 export { AutosaveStatus } from "./AutosaveStatus";
 export { CompletionScreen } from "./CompletionScreen";
 export { Field, SelectField, TextAreaField, Required } from "./fields";
+export { StudentAutocomplete } from "./StudentAutocomplete";
 export {
   GeneralStep,
   CompetencyStep,
