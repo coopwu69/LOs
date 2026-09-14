@@ -338,6 +338,15 @@
   color: var(--primary-foreground);
 }
 
+/* Global scale-up: 16px → 20px root font-size. Tailwind v4's rem-based
+   type scale and spacing scale cascade from <html>, so this single rule
+   proportionally enlarges nearly every text/spacing/radius utility across
+   the whole system (~25%). Pixel-locked values (SVG icon attrs, the
+   DOCX/print export point-sizes) are unaffected by design. */
+html {
+  font-size: 125%;
+}
+
 body {
   background: var(--surface-page);
   color: var(--text-primary);
