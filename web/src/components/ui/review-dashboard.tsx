@@ -31,8 +31,10 @@ const COPY = {
     formHeader: "แบบฟอร์ม",
     statusHeader: "สถานะ",
     actionsHeader: "การดำเนินการ",
-    view: "ดูแบบฟอร์ม",
-    download: "ดาวน์โหลด Word",
+    view: "ดู",
+    copyLink: "คัดลอกลิงก์",
+    linkCopied: "คัดลอกแล้ว",
+    download: "ดาวน์โหลด",
     confirm: "ยืนยันว่าตรวจสอบแล้ว",
     reconfirm: "ตรวจซ้ำ",
     reviewed: "ตรวจแล้ว",
@@ -45,8 +47,10 @@ const COPY = {
     formHeader: "Form",
     statusHeader: "Status",
     actionsHeader: "Actions",
-    view: "View form",
-    download: "Download Word",
+    view: "View",
+    copyLink: "Copy link",
+    linkCopied: "Copied!",
+    download: "Download",
     confirm: "Confirm reviewed",
     reconfirm: "Review again",
     reviewed: "Reviewed",
@@ -55,6 +59,22 @@ const COPY = {
     at: "at",
   },
 };
+
+function EyeIcon() {
+  return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>;
+}
+
+function CopyIcon() {
+  return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>;
+}
+
+function CheckIcon() {
+  return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>;
+}
+
+function DownloadIcon() {
+  return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="M7 10l5 5 5-5" /><path d="M12 15V3" /></svg>;
+}
 
 function formatTimestamp(iso: string, locale: Locale): string {
   // iso is "YYYY-MM-DDTHH:MM:SS" in Asia/Bangkok (see review-confirmations.ts).
@@ -82,7 +102,7 @@ export function ReviewDashboard({ programId, programName, programCode, forms, lo
             <tr className="text-left">
               <th className="px-4 py-3 text-sm font-semibold text-secondary">{c.formHeader}</th>
               <th className="px-4 py-3 text-sm font-semibold text-secondary">{c.statusHeader}</th>
-              <th className="w-72 px-4 py-3 text-sm font-semibold text-secondary">{c.actionsHeader}</th>
+              <th className="w-80 px-4 py-3 text-sm font-semibold text-secondary">{c.actionsHeader}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border-default">
@@ -138,12 +158,44 @@ function StatusCell({ form, locale, c }: { form: ReviewFormRow; locale: Locale; 
   );
 }
 
+// Compact icon+label button used in the top row of the actions column. Three
+// of these (View / Copy link / Download) share one line via flex-1.
+const compactBtn = "inline-flex min-h-9 min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-border-default bg-raised px-2 py-1.5 text-xs font-medium text-primary transition-colors hover:border-border-focus hover:bg-hover";
+
 function ActionButtons({ form, c, secondary, primary, onConfirm }: { form: ReviewFormRow; c: RowCopy; secondary: string; primary: string; onConfirm: () => void }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    const url = `${window.location.origin}${form.viewHref}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }).catch(() => {});
+  };
+
   return (
-    <div className="flex flex-wrap gap-2">
-      <Link href={form.viewHref} className={secondary}>{c.view}</Link>
-      <Link href={form.downloadHref} className={secondary} download>{c.download}</Link>
-      <button type="button" className={form.confirmation ? secondary : primary} onClick={onConfirm}>
+    <div className="flex flex-col gap-2">
+      <div className="flex gap-1.5">
+        <Link href={form.viewHref} className={compactBtn} aria-label={c.view}>
+          <EyeIcon />
+          {c.view}
+        </Link>
+        <button
+          type="button"
+          onClick={handleCopy}
+          aria-label={c.copyLink}
+          title={c.copyLink}
+          className={copied ? `${compactBtn} text-success-text` : compactBtn}
+        >
+          {copied ? <CheckIcon /> : <CopyIcon />}
+          {copied ? c.linkCopied : c.copyLink}
+        </button>
+        <Link href={form.downloadHref} className={compactBtn} download aria-label={c.download}>
+          <DownloadIcon />
+          {c.download}
+        </Link>
+      </div>
+      <button type="button" className={`${form.confirmation ? secondary : primary} w-full`} onClick={onConfirm}>
         {form.confirmation ? c.reconfirm : c.confirm}
       </button>
     </div>

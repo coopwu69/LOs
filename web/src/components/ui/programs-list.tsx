@@ -1,13 +1,11 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 import { Badge, StatusDot } from "./badge";
-import { FormPickerDialog } from "./form-picker-dialog";
 import { Input } from "./input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table";
 import type { Locale } from "@/lib/i18n";
-import { FORM_NAMES } from "@/lib/form-names";
 
 export type ProgramSummary = {
   id: string;
@@ -37,8 +35,7 @@ const COPY = {
     formCompany: "หน่วยงาน",
     formAdvisor: "อาจารย์นิเทศ",
     formStudent: "นักศึกษา",
-    pickerHint: `คลิกหลักสูตรเพื่อเลือกระหว่าง${FORM_NAMES.th.company}, ${FORM_NAMES.th.advisor} และ${FORM_NAMES.th.student}`,
-    openPicker: "เลือกแบบฟอร์ม",
+    pickerHint: "คลิกหลักสูตรเพื่อเปิดหน้าตรวจสอบความครบถ้วนของแบบประเมินทั้ง 3 ฟอร์ม",
     noResults: "ไม่พบหลักสูตรที่ตรงกับการค้นหา",
     noResultsHelp: "ลองเปลี่ยนคำค้นหาหรือตัวกรอง",
     availableLabel: "ส่งแล้ว",
@@ -57,8 +54,7 @@ const COPY = {
     formCompany: "Workplace",
     formAdvisor: "Advisor",
     formStudent: "Student",
-    pickerHint: `Select a program, then choose between the "${FORM_NAMES.en.company}", "${FORM_NAMES.en.advisor}", and "${FORM_NAMES.en.student}" forms.`,
-    openPicker: "Choose a form",
+    pickerHint: "Click a program to open its review page for all 3 forms",
     noResults: "No programs match your search",
     noResultsHelp: "Try adjusting your search or filter",
     availableLabel: "Available",
@@ -94,60 +90,8 @@ function FilterTab({ active, onClick, children, count }: { active: boolean; onCl
 export function ProgramsList({ programs, locale }: { programs: ProgramSummary[]; locale: Locale }) {
   const c = COPY[locale];
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<FilterKey>("all");
-
-  // The `pick` search param is the dialog's single source of truth: rows only
-  // navigate the URL, and the dialog opens/closes in reaction to it. That makes
-  // /schools/{slug}?pick={programKey} a shareable deep link and lets the
-  // browser back button dismiss the dialog instead of leaving the page.
-  const pickKey = searchParams.get("pick");
-  const pickedProgram = useMemo(() => programs.find((p) => p.key === pickKey) ?? null, [programs, pickKey]);
-  // Tracks whether this session pushed the `pick` entry — if so, closing pops
-  // it via router.back(); if the user deep-linked straight here, the param is
-  // stripped with router.replace() instead so back can't resurrect the dialog.
-  const pushedPickRef = useRef(false);
-  const navigatingToFormRef = useRef(false);
-
-  const urlWith = useCallback((mutate: (params: URLSearchParams) => void) => {
-    const params = new URLSearchParams(window.location.search);
-    mutate(params);
-    const qs = params.toString();
-    return qs ? `${pathname}?${qs}` : pathname;
-  }, [pathname]);
-
-  const openPicker = useCallback((program: ProgramSummary, trigger: HTMLElement) => {
-    // Clicking a focusable row doesn't reliably move focus on every browser;
-    // focus it so the dialog can hand focus back here on close.
-    trigger.focus();
-    pushedPickRef.current = true;
-    router.push(urlWith((params) => params.set("pick", program.key)), { scroll: false });
-  }, [router, urlWith]);
-
-  const closePicker = useCallback(() => {
-    // Leaving for a form page is a forward navigation, not a dismissal — never
-    // answer it with history.back().
-    if (navigatingToFormRef.current) {
-      navigatingToFormRef.current = false;
-      pushedPickRef.current = false;
-      return;
-    }
-    // The dialog also reaches this through its `close` event after the URL
-    // already lost `pick` (browser back/forward) — only touch history when the
-    // URL still carries it.
-    if (!new URLSearchParams(window.location.search).has("pick")) {
-      pushedPickRef.current = false;
-      return;
-    }
-    if (pushedPickRef.current) {
-      pushedPickRef.current = false;
-      router.back();
-    } else {
-      router.replace(urlWith((params) => params.delete("pick")), { scroll: false });
-    }
-  }, [router, urlWith]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -224,16 +168,12 @@ export function ProgramsList({ programs, locale }: { programs: ProgramSummary[];
                     className="group relative cursor-pointer focus-visible:outline-none focus-visible:shadow-[var(--shadow-focus-ring)]"
                     role="button"
                     tabIndex={0}
-                    aria-haspopup="dialog"
-                    aria-label={`${program.name} — ${c.openPicker}`}
-                    onClick={(event) => {
-                      if ((event.target as HTMLElement).closest("a, button")) return;
-                      openPicker(program, event.currentTarget);
-                    }}
+                    aria-label={`${program.name} — ${c.review}`}
+                    onClick={() => router.push(program.reviewHref)}
                     onKeyDown={(event) => {
                       if (event.key !== "Enter" && event.key !== " ") return;
                       event.preventDefault();
-                      openPicker(program, event.currentTarget);
+                      router.push(program.reviewHref);
                     }}
                   >
                     <TableCell className="font-mono text-xs text-secondary whitespace-nowrap">{program.code}</TableCell>
@@ -264,8 +204,7 @@ export function ProgramsList({ programs, locale }: { programs: ProgramSummary[];
                 <button
                   key={program.id}
                   type="button"
-                  aria-haspopup="dialog"
-                  onClick={(event) => openPicker(program, event.currentTarget)}
+                  onClick={() => router.push(program.reviewHref)}
                   className="block w-full rounded-lg border border-border-default bg-raised p-3.5 text-left transition-colors hover:border-border-focus hover:bg-hover"
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -288,13 +227,6 @@ export function ProgramsList({ programs, locale }: { programs: ProgramSummary[];
           </div>
         </>
       )}
-
-      <FormPickerDialog
-        program={pickedProgram}
-        locale={locale}
-        onClose={closePicker}
-        onNavigate={() => { navigatingToFormRef.current = true; }}
-      />
     </div>
   );
 }
