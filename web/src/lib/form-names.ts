@@ -28,6 +28,23 @@ export function formName(role: "company" | "advisor" | "student", locale: Locale
   return FORM_NAMES[locale][role];
 }
 
+// The single word/phrase inside each full form name that distinguishes who
+// fills it in — used to visually emphasize (bold + underline) that word on
+// the review dashboard so a reader scanning three near-identical long titles
+// can tell them apart at a glance instead of reading the whole sentence.
+export const FORM_NAME_HIGHLIGHT: Record<Locale, { company: string; advisor: string; student: string }> = {
+  th: {
+    company: "สถานประกอบการ",
+    advisor: "อาจารย์นิเทศ",
+    student: "นักศึกษา",
+  },
+  en: {
+    company: "Workplace",
+    advisor: "Faculty Advisor",
+    student: "Student",
+  },
+};
+
 // Title for the shared LO question template — used by the print preview and
 // the Word export, both of which show the underlying LO question set that
 // feeds *both* the company and advisor forms for a program, not one specific

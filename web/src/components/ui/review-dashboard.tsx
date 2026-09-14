@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Badge, StatusDot } from "./badge";
 import { ReviewConfirmDialog } from "./review-confirm-dialog";
+import { highlightKeyword } from "@/lib/highlight-keyword";
 import type { Locale } from "@/lib/i18n";
 import type { FormRole } from "@/lib/routes";
 import type { ReviewConfirmation } from "@/lib/review-confirmations";
@@ -11,6 +12,8 @@ import type { ReviewConfirmation } from "@/lib/review-confirmations";
 export type ReviewFormRow = {
   role: FormRole;
   name: string;
+  /** The word/phrase inside `name` to visually emphasize (bold + underline) — see FORM_NAME_HIGHLIGHT in lib/form-names.ts. */
+  nameHighlight: string;
   description: string;
   viewHref: string;
   downloadHref: string;
@@ -206,7 +209,7 @@ function FormRow({ form, locale, c, secondary, primary, onConfirm }: { form: Rev
   return (
     <tr>
       <td className="px-4 py-4 align-top">
-        <p className="text-sm font-semibold text-primary">{form.name}</p>
+        <p className="text-sm font-semibold text-primary">{highlightKeyword(form.name, form.nameHighlight)}</p>
         <p className="mt-0.5 text-xs leading-relaxed text-secondary">{form.description}</p>
       </td>
       <td className="px-4 py-4 align-top">
@@ -223,7 +226,7 @@ function FormCard({ form, locale, c, secondary, primary, onConfirm }: { form: Re
   return (
     <div className="flex flex-col gap-3 p-4">
       <div>
-        <p className="text-sm font-semibold text-primary">{form.name}</p>
+        <p className="text-sm font-semibold text-primary">{highlightKeyword(form.name, form.nameHighlight)}</p>
         <p className="mt-0.5 text-xs leading-relaxed text-secondary">{form.description}</p>
       </div>
       <StatusCell form={form} locale={locale} c={c} />

@@ -12,7 +12,7 @@ import {
   type Locale,
 } from "@/lib/i18n";
 import { formPath, FORM_ROLES, type FormRole } from "@/lib/routes";
-import { FORM_NAMES } from "@/lib/form-names";
+import { FORM_NAMES, FORM_NAME_HIGHLIGHT } from "@/lib/form-names";
 import { getLatestReviewConfirmations } from "@/lib/review-confirmations";
 import { PageHeader } from "@/components/PageHeader";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
@@ -82,6 +82,7 @@ export default async function ReviewPage({
   const forms: ReviewFormRow[] = FORM_ROLES.map((role) => ({
     role,
     name: FORM_NAMES[locale][role],
+    nameHighlight: FORM_NAME_HIGHLIGHT[locale][role],
     description: FORM_DESCRIPTIONS[locale][role],
     viewHref: formPath(schoolSlug, programKey, role, locale),
     downloadHref: withLocale(`/programs/${programKey}/review/export/${role}`, locale),
