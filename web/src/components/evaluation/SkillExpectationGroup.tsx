@@ -146,7 +146,7 @@ export function SkillExpectationGroup({
                 <span>{label}</span>
               </label>
               {isChecked && (
-                <div className="mt-2 pl-8 sm:max-w-md">
+                <div className="mt-2 pl-8">
                   <RatingCard
                     levels={necessityLevels}
                     value={levels[i]}
