@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getSchoolsWithProgress, type SchoolWithProgress } from "@/lib/db";
 import { isFixtureMode, getFixtureSchoolsWithProgress } from "@/lib/fixtures";
 import { resolveLocale, schoolDisplayName, uiCopy, withLocale } from "@/lib/i18n";
@@ -61,7 +62,17 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
           <span className="inline-flex items-center rounded-full bg-sunken px-3 py-1 text-secondary"><strong className="mr-1.5 text-primary">{schools.length}</strong>{copy.schools}</span>
           <span className="inline-flex items-center rounded-full bg-sunken px-3 py-1 text-secondary"><strong className="mr-1.5 text-primary">{totalPrograms}</strong>{copy.programs}</span>
         </div> : <span />}
-        <LanguageSwitch locale={locale} thHref="/?lang=th" enHref="/?lang=en" />
+        <div className="flex items-center gap-2">
+          <Link
+            href={withLocale("/help", locale)}
+            aria-label={copy.helpLink}
+            title={copy.helpLink}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border-strong bg-sunken text-sm font-semibold text-secondary transition-colors hover:border-border-focus hover:text-primary"
+          >
+            ?
+          </Link>
+          <LanguageSwitch locale={locale} thHref="/?lang=th" enHref="/?lang=en" />
+        </div>
       </div>
     </PageHeader>
 
@@ -70,10 +81,14 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         <h2 className="text-lg font-semibold text-error-text">{copy.loadError}</h2><p className="mt-2 text-sm text-secondary">{copy.loadErrorHelp}</p>
       </div> : schools.length === 0 ? <div className="py-16 text-center"><h2 className="text-xl font-semibold text-primary">{copy.noSchools}</h2><p className="mt-2 text-secondary">{copy.addPrograms}</p></div> : <>
         <div className="mb-8 grid gap-4 rounded-xl border border-border-default bg-raised p-5 sm:grid-cols-2"><ProgressBar value={totalSubmitted} max={totalPrograms} label={copy.submitted} /><ProgressBar value={totalStandard4} max={totalSubmitted} label={copy.standard4} /></div>
+        <p className="-mt-4 mb-8 text-sm text-secondary">
+          {copy.helpLeadIn}{" "}
+          <Link href={withLocale("/help", locale)} className="font-medium text-action underline-offset-4 hover:underline">{copy.helpLink}</Link>
+        </p>
         <SchoolsDashboard schools={summaries} locale={locale} />
       </>}
     </main>
 
-    <footer className="mt-auto border-t border-border-default bg-sunken"><div className="mx-auto max-w-6xl px-4 py-6 text-center text-sm text-tertiary sm:px-6 lg:px-8"><p>{copy.footer}</p></div></footer>
+    <footer className="mt-auto border-t border-border-default bg-sunken"><div className="mx-auto max-w-6xl px-4 py-6 text-center text-sm text-tertiary sm:px-6 lg:px-8"><p>{copy.footer}</p><p className="mt-2"><Link href={withLocale("/help", locale)} className="text-action underline-offset-4 hover:underline">{copy.helpLink}</Link></p></div></footer>
   </div>;
 }

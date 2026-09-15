@@ -28,6 +28,8 @@ __pycache__/
 *.docx
 *.pdf
 *.xlsx
+# Generated guide PDFs are app assets served by /help — ASCII names, safe for Linux builds
+!web/public/help/*.pdf
 
 # OS
 Thumbs.db

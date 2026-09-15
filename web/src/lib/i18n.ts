@@ -97,6 +97,8 @@ export const uiCopy = {
     history: "ประวัติการแก้ไข",
     previewSubtitle: "ตัวอย่างหน้าตาแบบประเมิน — ยังไม่มีชุดคำถามเฉพาะหลักสูตร",
     tools: "เครื่องมือแบบประเมิน",
+    helpLink: "คู่มือการใช้งานระบบ",
+    helpLeadIn: "ไม่เคยใช้ระบบนี้มาก่อน?",
   },
   en: {
     home: "Home",
@@ -126,5 +128,7 @@ export const uiCopy = {
     history: "Edit history",
     previewSubtitle: "Evaluation preview — program-specific questions are not available yet",
     tools: "Evaluation tools",
+    helpLink: "User Guide",
+    helpLeadIn: "New to this system?",
   },
 } as const;
