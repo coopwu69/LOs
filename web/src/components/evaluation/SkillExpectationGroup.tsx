@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { Locale } from "@/lib/i18n";
 import { WIZARD_COPY as COPY } from "./copy";
-import { RatingCard, type RatingLevel } from "./RatingCard";
 
 type FieldErrors = Record<string, string>;
 
@@ -12,15 +11,17 @@ const SKILL_INDEXES = Array.from({ length: SKILL_COUNT }, (_, i) => i + 1);
 
 // --- Step 1 (G2): skills the employer expects from the student ---
 //
-// 16 checkboxes; ticking one reveals a 5-level "how necessary" RatingCard
-// for it (progressive disclosure) with level 1 disabled — ticking the skill
-// at all already means it's relevant, so "not required" isn't a real
-// choice (RatingCard's disabledValues, see G2 in goal.md). Not scored into
-// the student's competency total: this captures what the *employer*
-// expects, not what the *student* achieved.
+// 16 rows in a compact table: checkbox + skill name + a native <select> for
+// the "how necessary" level (1..5). Level 1 ("not required") is never a
+// real choice once a skill is ticked at all — ticking it already implies
+// relevance — so the select's option list only offers 2..5 (see disabledHint
+// copy shown as a footnote instead of an inline per-card message, since a
+// native select can't show a disabled-option tooltip the way RatingCard did).
+// Not scored into the student's competency total: this captures what the
+// *employer* expects, not what the *student* achieved.
 //
 // Uncontrolled form + draft restore (same bridge pattern as CompetencyStep/
-// ReportStep): DOM checkbox/radio state is read into React on every
+// ReportStep): DOM checkbox/select state is read into React on every
 // `formVersion` bump so restored drafts render correctly.
 export function SkillExpectationGroup({
   locale,
@@ -35,6 +36,7 @@ export function SkillExpectationGroup({
   const containerRef = useRef<HTMLDivElement>(null);
   const [checked, setChecked] = useState<Record<number, boolean>>({});
   const [levels, setLevels] = useState<Record<number, number | undefined>>({});
+  const instructionsId = useId();
 
   useEffect(() => {
     const form = containerRef.current?.closest("form");
@@ -44,16 +46,9 @@ export function SkillExpectationGroup({
     for (const i of SKILL_INDEXES) {
       const box = form.elements.namedItem(`skill-${i}`);
       nextChecked[i] = box instanceof HTMLInputElement && box.checked;
-      const group = form.elements.namedItem(`skill-${i}-level`);
-      if (group instanceof RadioNodeList) {
-        for (const radio of group) {
-          if (radio instanceof HTMLInputElement && radio.checked) {
-            nextLevels[i] = Number(radio.value);
-            break;
-          }
-        }
-      } else if (group instanceof HTMLInputElement && group.checked) {
-        nextLevels[i] = Number(group.value);
+      const select = form.elements.namedItem(`skill-${i}-level`);
+      if (select instanceof HTMLSelectElement && select.value) {
+        nextLevels[i] = Number(select.value);
       }
     }
     setChecked(nextChecked);
@@ -61,74 +56,88 @@ export function SkillExpectationGroup({
   }, [formVersion]);
 
   // A skill just unticked must not leave a stale level value riding along
-  // in the submitted payload — clear its radio group in the DOM directly
+  // in the submitted payload — reset its <select> in the DOM directly
   // (the form is uncontrolled; FormData reads from the DOM, not React state).
   const handleUncheck = (i: number) => {
     setChecked((prev) => ({ ...prev, [i]: false }));
     setLevels((prev) => ({ ...prev, [i]: undefined }));
     const form = containerRef.current?.closest("form");
-    const group = form?.elements.namedItem(`skill-${i}-level`);
-    if (group instanceof RadioNodeList) {
-      for (const radio of group) if (radio instanceof HTMLInputElement) radio.checked = false;
-    } else if (group instanceof HTMLInputElement) {
-      group.checked = false;
-    }
+    const select = form?.elements.namedItem(`skill-${i}-level`);
+    if (select instanceof HTMLSelectElement) select.value = "";
   };
 
-  const necessityLevels: RatingLevel[] = copy.skillNecessity
-    .map((label, i) => ({ value: i + 1, label }))
+  // Level 1 is intentionally excluded — see the header comment above.
+  const levelOptions = copy.skillNecessity
+    .map((label, idx) => ({ value: idx + 1, label }))
+    .filter((opt) => opt.value !== 1)
     .reverse();
 
   const minOneError = errors?.skills;
 
   return (
-    <div ref={containerRef} className="space-y-6">
-      <p className="text-sm leading-relaxed text-secondary">{copy.skillsInstructions}</p>
+    <div ref={containerRef} className="space-y-4">
+      <p id={instructionsId} className="text-sm leading-relaxed text-secondary">
+        {copy.skillsInstructions}
+      </p>
       {minOneError && (
         <p role="alert" className="rounded-lg border border-error-border bg-error-bg px-4 py-3 text-sm text-error-text">
           {minOneError}
         </p>
       )}
-      <div className="grid gap-x-8 gap-y-2 sm:grid-cols-2">
+      <div className="divide-y divide-border-default">
         {SKILL_INDEXES.map((i) => {
           const label = copy.skills[i - 1];
           const isChecked = checked[i] ?? false;
           const fieldName = `skill-${i}`;
+          const levelFieldName = `skill-${i}-level`;
+          const levelError = errors?.[levelFieldName];
           return (
-            <div key={i} className="border-b border-border-default py-3 sm:border-none sm:py-2">
-              <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm text-primary">
+            <div key={i} className="flex flex-wrap items-center justify-between gap-3 py-3">
+              <label className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 text-sm text-primary">
                 <input
                   type="checkbox"
                   name={fieldName}
                   value="1"
                   checked={isChecked}
+                  aria-describedby={instructionsId}
                   onChange={(e) => {
                     if (e.target.checked) setChecked((prev) => ({ ...prev, [i]: true }));
                     else handleUncheck(i);
                   }}
                   className="h-5 w-5 shrink-0 accent-action"
                 />
-                <span>{label}</span>
+                <span className={isChecked ? "" : "text-secondary"}>{label}</span>
               </label>
-              {isChecked && (
-                <div className="mt-3 pl-8">
-                  <RatingCard
-                    levels={necessityLevels}
-                    value={levels[i]}
-                    onChange={(v) => setLevels((prev) => ({ ...prev, [i]: v }))}
-                    name={`skill-${i}-level`}
-                    required
-                    error={errors?.[`skill-${i}-level`]}
-                    aria-label={label}
-                    disabledValues={[1]}
-                    disabledHint={copy.skillNecessityDisabledHint}
-                  />
-                </div>
+              {isChecked ? (
+                <select
+                  name={levelFieldName}
+                  value={levels[i] ?? ""}
+                  onChange={(e) => setLevels((prev) => ({ ...prev, [i]: e.target.value ? Number(e.target.value) : undefined }))}
+                  aria-label={label}
+                  aria-invalid={levelError ? "true" : undefined}
+                  className={`min-w-[180px] rounded-lg border bg-surface px-3 py-2 text-sm text-primary ${
+                    levelError ? "border-error-text" : "border-border-default"
+                  }`}
+                >
+                  <option value="" disabled>
+                    {copy.skillLevelPlaceholder}
+                  </option>
+                  {levelOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.value} — {opt.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <span className="min-w-[180px] text-right text-sm text-tertiary" aria-hidden="true">
+                  —
+                </span>
               )}
             </div>
           );
         })}
       </div>
+      <p className="text-xs text-tertiary">{copy.skillNecessityDisabledHint}</p>
     </div>
   );
 }
