@@ -124,13 +124,13 @@ export function SkillExpectationGroup({
           {minOneError}
         </p>
       )}
-      <div className="grid gap-x-8 gap-y-2 sm:grid-cols-2">
+      <div className="divide-y divide-border-default">
         {SKILL_INDEXES.map((i) => {
           const label = copy.skills[i - 1];
           const isChecked = checked[i] ?? false;
           const fieldName = `skill-${i}`;
           return (
-            <div key={i} className="border-b border-border-default py-3 sm:border-none sm:py-2">
+            <div key={i} className="py-3">
               <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm text-primary">
                 <input
                   type="checkbox"
@@ -146,7 +146,7 @@ export function SkillExpectationGroup({
                 <span>{label}</span>
               </label>
               {isChecked && (
-                <div className="mt-3 pl-8">
+                <div className="mt-2 pl-8 sm:max-w-md">
                   <RatingCard
                     levels={necessityLevels}
                     value={levels[i]}
@@ -157,6 +157,7 @@ export function SkillExpectationGroup({
                     aria-label={label}
                     disabledValues={[1]}
                     disabledHint={copy.skillNecessityDisabledHint}
+                    compact
                   />
                 </div>
               )}

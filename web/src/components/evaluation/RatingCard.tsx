@@ -31,6 +31,14 @@ export interface RatingCardProps {
   disabledValues?: number[];
   /** Shown as a `title` tooltip on each disabled card, and read via aria-describedby. */
   disabledHint?: string;
+  /**
+   * Render numbers only — no label/description text under each card. Use
+   * when the level meanings are already explained once elsewhere (e.g. a
+   * legend above a list of many identical rating groups, like the
+   * skill-expectation section, G2 in goal.md) so repeating the full label
+   * 16+ times doesn't recreate the clutter the legend was meant to remove.
+   */
+  compact?: boolean;
 }
 
 /**
@@ -57,6 +65,7 @@ export function RatingCard({
   "aria-label": ariaLabel,
   disabledValues,
   disabledHint,
+  compact = false,
 }: RatingCardProps) {
   const groupId = useId();
   const errorId = error ? `${groupId}-error` : undefined;
@@ -146,7 +155,8 @@ export function RatingCard({
               htmlFor={inputId}
               title={isDisabled ? disabledHint : undefined}
               className={[
-                "relative flex min-h-24 min-w-0 flex-col items-center justify-center gap-1.5 px-2 py-3 text-center transition-colors sm:px-4",
+                "relative flex min-w-0 flex-col items-center justify-center gap-1.5 px-2 text-center transition-colors sm:px-4",
+                compact ? "min-h-11 py-2" : "min-h-24 py-3",
                 isDisabled ? "cursor-not-allowed" : "cursor-pointer",
                 "focus-within:z-10 focus-within:shadow-[inset_0_0_0_2px_var(--border-focus)]",
                 isSelected
@@ -173,23 +183,24 @@ export function RatingCard({
                 className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
               />
               <span className="text-lg font-semibold leading-none">{level.value}</span>
-              {level.description ? (
-                // Rubric description present → replaces the level label (G3,
-                // goal.md): the card shows number + description, not number +
-                // label + description. Items without a description (e.g. the
-                // report/project scale, which has none by design) fall back
-                // to the label below so the card is never left number-only.
-                <span className={`text-xs leading-snug ${isSelected ? "text-primary-foreground" : "text-tertiary"}`}>
-                  {level.description}
-                </span>
-              ) : (
-                <span className="text-xs font-medium leading-tight">{level.label}</span>
-              )}
+              {!compact &&
+                (level.description ? (
+                  // Rubric description present → replaces the level label (G3,
+                  // goal.md): the card shows number + description, not number +
+                  // label + description. Items without a description (e.g. the
+                  // report/project scale, which has none by design) fall back
+                  // to the label below so the card is never left number-only.
+                  <span className={`text-xs leading-snug ${isSelected ? "text-primary-foreground" : "text-tertiary"}`}>
+                    {level.description}
+                  </span>
+                ) : (
+                  <span className="text-xs font-medium leading-tight">{level.label}</span>
+                ))}
             </label>
           );
         })}
       </div>
-      {disabledHint && (
+      {disabledHint && !compact && (
         <p id={disabledHintId} className="mt-1.5 text-xs text-tertiary">
           {disabledHint}
         </p>
