@@ -67,8 +67,12 @@ export type WizardCopy = {
   /** 5-level necessity scale, ordered low -> high (value 1..5). Level 1 is disabled in the UI — ticking a skill already implies it's relevant. */
   skillNecessity: [string, string, string, string, string];
   skillNecessityDisabledHint: string;
-  /** Placeholder shown in the level <select> before a level is chosen. */
-  skillLevelPlaceholder: string;
+  /** Short wording for the one-line legend above the skill list (low -> high, matches skillNecessity order). */
+  skillNecessityShort: [string, string, string, string, string];
+  /** Legend row label, e.g. "ระดับความจำเป็น:" */
+  skillLegendLabel: string;
+  /** Suffix appended next to level 1 in the legend, e.g. "(เลือกไม่ได้)" */
+  skillLevelUnavailableNote: string;
   // Coop-center questions (G5) — moved into the feedback step from the
   // company form's own "process" step; same questions & scale as the
   // advisor form, sourced from lib/coop-center-copy.ts.
@@ -198,7 +202,9 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     ],
     skillNecessity: ["ไม่จำเป็น / ไม่เกี่ยวข้อง", "จำเป็นเล็กน้อย", "จำเป็นปานกลาง", "จำเป็นมาก", "จำเป็นมากที่สุด"],
     skillNecessityDisabledHint: "เลือกระดับนี้ไม่ได้ — การติ๊กทักษะข้อนี้ หมายความว่าทักษะนี้จำเป็นอยู่แล้ว",
-    skillLevelPlaceholder: "เลือกระดับ",
+    skillNecessityShort: ["ไม่จำเป็น", "น้อย", "ปานกลาง", "มาก", "มากที่สุด"],
+    skillLegendLabel: "ระดับความจำเป็น:",
+    skillLevelUnavailableNote: "(เลือกไม่ได้)",
     centerTitle: COOP_CENTER_COPY.th.title,
     centerItems: COOP_CENTER_COPY.th.items,
     centerRating: COOP_CENTER_COPY.th.rating,
@@ -321,7 +327,9 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     ],
     skillNecessity: ["Not required / Not relevant", "Slightly required", "Moderately required", "Highly required", "Most required"],
     skillNecessityDisabledHint: "This level can't be selected — ticking this skill already means it's relevant.",
-    skillLevelPlaceholder: "Select level",
+    skillNecessityShort: ["Not required", "Slight", "Moderate", "High", "Most"],
+    skillLegendLabel: "Necessity level:",
+    skillLevelUnavailableNote: "(unavailable)",
     centerTitle: COOP_CENTER_COPY.en.title,
     centerItems: COOP_CENTER_COPY.en.items,
     centerRating: COOP_CENTER_COPY.en.rating,
