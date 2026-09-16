@@ -65,11 +65,10 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         <div className="flex items-center gap-2">
           <Link
             href={withLocale("/help", locale)}
-            aria-label={copy.helpLink}
             title={copy.helpLink}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border-strong bg-sunken text-sm font-semibold text-secondary transition-colors hover:border-border-focus hover:text-primary"
+            className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-full border border-border-strong bg-sunken px-3.5 text-sm font-semibold text-secondary transition-colors hover:border-border-focus hover:text-primary"
           >
-            ?
+            {copy.helpLink}
           </Link>
           <LanguageSwitch locale={locale} thHref="/?lang=th" enHref="/?lang=en" />
         </div>
