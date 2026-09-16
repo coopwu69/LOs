@@ -39,6 +39,16 @@ export interface RatingCardProps {
    * 16+ times doesn't recreate the clutter the legend was meant to remove.
    */
   compact?: boolean;
+  /**
+   * Small, non-full-width pills that flow inline next to a question's
+   * label instead of stacking in a full-width grid below it — each pill
+   * still shows the number AND a short label (unlike `compact`, which
+   * drops the label entirely). Use when the group sits at the end of a
+   * single-line row (e.g. SkillExpectationGroup, 2026-09) and a full-width
+   * card grid would push the scale onto its own line. Implies `compact`'s
+   * sizing but keeps `level.label` visible in a 2-line stack per pill.
+   */
+  inline?: boolean;
 }
 
 /**
@@ -66,6 +76,7 @@ export function RatingCard({
   disabledValues,
   disabledHint,
   compact = false,
+  inline = false,
 }: RatingCardProps) {
   const groupId = useId();
   const errorId = error ? `${groupId}-error` : undefined;
@@ -141,8 +152,12 @@ export function RatingCard({
       onKeyDown={handleKeyDown}
     >
       <div
-        className={`grid gap-px overflow-hidden rounded-xl border-2 bg-border ${error ? "border-error-text" : "border-border"}`}
-        style={{ gridTemplateColumns: `repeat(${levels.length}, minmax(0, 1fr))` }}
+        className={
+          inline
+            ? "flex gap-[3px]"
+            : `grid gap-px overflow-hidden rounded-xl border-2 bg-border ${error ? "border-error-text" : "border-border"}`
+        }
+        style={inline ? undefined : { gridTemplateColumns: `repeat(${levels.length}, minmax(0, 1fr))` }}
       >
         {levels.map((level, index) => {
           const isSelected = level.value === value;
@@ -154,17 +169,28 @@ export function RatingCard({
               key={level.value}
               htmlFor={inputId}
               title={isDisabled ? disabledHint : undefined}
-              className={[
-                "relative flex min-w-0 flex-col items-center justify-center gap-1.5 px-2 text-center transition-colors sm:px-4",
-                compact ? "min-h-11 py-2" : "min-h-24 py-3",
-                isDisabled ? "cursor-not-allowed" : "cursor-pointer",
-                "focus-within:z-10 focus-within:shadow-[inset_0_0_0_2px_var(--border-focus)]",
-                isSelected
-                  ? "bg-primary text-primary-foreground"
-                  : isDisabled
-                    ? "bg-sunken text-tertiary"
-                    : "bg-raised text-primary hover:bg-hover",
-              ].join(" ")}
+              className={
+                inline
+                  ? [
+                      "relative flex h-[38px] w-11 shrink-0 flex-col items-center justify-center gap-px rounded-lg border text-center transition-colors",
+                      isDisabled ? "cursor-not-allowed opacity-45" : "cursor-pointer",
+                      "focus-within:z-10 focus-within:shadow-[inset_0_0_0_2px_var(--border-focus)]",
+                      isSelected
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border-strong bg-raised text-primary hover:bg-hover",
+                    ].join(" ")
+                  : [
+                      "relative flex min-w-0 flex-col items-center justify-center gap-1.5 px-2 text-center transition-colors sm:px-4",
+                      compact ? "min-h-11 py-2" : "min-h-24 py-3",
+                      isDisabled ? "cursor-not-allowed" : "cursor-pointer",
+                      "focus-within:z-10 focus-within:shadow-[inset_0_0_0_2px_var(--border-focus)]",
+                      isSelected
+                        ? "bg-primary text-primary-foreground"
+                        : isDisabled
+                          ? "bg-sunken text-tertiary"
+                          : "bg-raised text-primary hover:bg-hover",
+                    ].join(" ")
+              }
             >
               <input
                 ref={setRef(index)}
@@ -182,20 +208,33 @@ export function RatingCard({
                 tabIndex={isSelected || (selectedIndex === -1 && index === firstEnabledIndex) ? 0 : -1}
                 className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
               />
-              <span className="text-lg font-semibold leading-none">{level.value}</span>
-              {!compact &&
-                (level.description ? (
-                  // Rubric description present → replaces the level label (G3,
-                  // goal.md): the card shows number + description, not number +
-                  // label + description. Items without a description (e.g. the
-                  // report/project scale, which has none by design) fall back
-                  // to the label below so the card is never left number-only.
-                  <span className={`text-xs leading-snug ${isSelected ? "text-primary-foreground" : "text-tertiary"}`}>
-                    {level.description}
+              {inline ? (
+                <>
+                  <span className="text-xs font-bold leading-none">{level.value}</span>
+                  <span
+                    className={`text-[9px] leading-tight whitespace-nowrap ${isSelected ? "text-primary-foreground" : "text-tertiary"}`}
+                  >
+                    {level.label}
                   </span>
-                ) : (
-                  <span className="text-xs font-medium leading-tight">{level.label}</span>
-                ))}
+                </>
+              ) : (
+                <>
+                  <span className="text-lg font-semibold leading-none">{level.value}</span>
+                  {!compact &&
+                    (level.description ? (
+                      // Rubric description present → replaces the level label (G3,
+                      // goal.md): the card shows number + description, not number +
+                      // label + description. Items without a description (e.g. the
+                      // report/project scale, which has none by design) fall back
+                      // to the label below so the card is never left number-only.
+                      <span className={`text-xs leading-snug ${isSelected ? "text-primary-foreground" : "text-tertiary"}`}>
+                        {level.description}
+                      </span>
+                    ) : (
+                      <span className="text-xs font-medium leading-tight">{level.label}</span>
+                    ))}
+                </>
+              )}
             </label>
           );
         })}

@@ -87,7 +87,9 @@ export function SkillExpectationGroup({
   };
 
   // High -> low, left to right (system-wide rule — see header comment).
-  const necessityLevels: RatingLevel[] = copy.skillNecessity
+  // Inline pills use the short wording (skillNecessityShort) — full labels
+  // ("จำเป็นปานกลาง" etc.) don't fit a 44px-wide pill.
+  const necessityLevels: RatingLevel[] = copy.skillNecessityShort
     .map((label, i) => ({ value: i + 1, label }))
     .reverse();
 
@@ -131,22 +133,22 @@ export function SkillExpectationGroup({
           const fieldName = `skill-${i}`;
           return (
             <div key={i} className="py-3">
-              <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm text-primary">
-                <input
-                  type="checkbox"
-                  name={fieldName}
-                  value="1"
-                  checked={isChecked}
-                  onChange={(e) => {
-                    if (e.target.checked) setChecked((prev) => ({ ...prev, [i]: true }));
-                    else handleUncheck(i);
-                  }}
-                  className="h-5 w-5 shrink-0 accent-action"
-                />
-                <span>{label}</span>
-              </label>
-              {isChecked && (
-                <div className="mt-2 pl-8">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                <label className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 text-sm text-primary">
+                  <input
+                    type="checkbox"
+                    name={fieldName}
+                    value="1"
+                    checked={isChecked}
+                    onChange={(e) => {
+                      if (e.target.checked) setChecked((prev) => ({ ...prev, [i]: true }));
+                      else handleUncheck(i);
+                    }}
+                    className="h-5 w-5 shrink-0 accent-action"
+                  />
+                  <span>{label}</span>
+                </label>
+                {isChecked && (
                   <RatingCard
                     levels={necessityLevels}
                     value={levels[i]}
@@ -157,10 +159,10 @@ export function SkillExpectationGroup({
                     aria-label={label}
                     disabledValues={[1]}
                     disabledHint={copy.skillNecessityDisabledHint}
-                    compact
+                    inline
                   />
-                </div>
-              )}
+                )}
+              </div>
             </div>
           );
         })}
