@@ -17,6 +17,7 @@ import { getLatestReviewConfirmations } from "@/lib/review-confirmations";
 import { PageHeader } from "@/components/PageHeader";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { ReviewDashboard, type ReviewFormRow } from "@/components/ui/review-dashboard";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -103,7 +104,14 @@ export default async function ReviewPage({
           { label: PAGE_TITLE[locale] },
         ]}
       >
-        <div className="mt-5 flex justify-end">
+        <div className="mt-5 flex items-center justify-end gap-2">
+          <Link
+            href={withLocale("/help", locale)}
+            title={copy.helpLink}
+            className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-full border border-border-strong bg-sunken px-3.5 text-sm font-semibold text-secondary transition-colors hover:border-border-focus hover:text-primary"
+          >
+            {copy.helpLink}
+          </Link>
           <LanguageSwitch
             locale={locale}
             thHref={withLocale(reviewPath, "th")}

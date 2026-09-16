@@ -7,6 +7,7 @@ import { isInternationalContext, programDisplayName, resolveLocale, schoolDispla
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { PageHeader } from "@/components/PageHeader";
 import { ProgramsList, type ProgramSummary } from "@/components/ui/programs-list";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -52,7 +53,16 @@ export default async function SchoolPage({ params, searchParams }: PageProps<"/s
 
   return <div className="flex-1">
     <PageHeader title={displaySchool} subtitle={`${programs.length} ${copy.programsInSchool}`} breadcrumbs={[{ label: copy.home, href: withLocale("/", locale) }, { label: displaySchool }]}>
-      <div className="mt-5 flex justify-end"><LanguageSwitch locale={locale} thHref={withLocale(path, "th")} enHref={withLocale(path, "en")} /></div>
+      <div className="mt-5 flex items-center justify-end gap-2">
+        <Link
+          href={withLocale("/help", locale)}
+          title={copy.helpLink}
+          className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-full border border-border-strong bg-sunken px-3.5 text-sm font-semibold text-secondary transition-colors hover:border-border-focus hover:text-primary"
+        >
+          {copy.helpLink}
+        </Link>
+        <LanguageSwitch locale={locale} thHref={withLocale(path, "th")} enHref={withLocale(path, "en")} />
+      </div>
     </PageHeader>
 
     <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
