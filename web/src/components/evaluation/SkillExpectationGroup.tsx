@@ -132,37 +132,35 @@ export function SkillExpectationGroup({
           const isChecked = checked[i] ?? false;
           const fieldName = `skill-${i}`;
           return (
-            <div key={i} className="py-3">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                <label className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 text-sm text-primary">
-                  <input
-                    type="checkbox"
-                    name={fieldName}
-                    value="1"
-                    checked={isChecked}
-                    onChange={(e) => {
-                      if (e.target.checked) setChecked((prev) => ({ ...prev, [i]: true }));
-                      else handleUncheck(i);
-                    }}
-                    className="h-5 w-5 shrink-0 accent-action"
-                  />
-                  <span>{label}</span>
-                </label>
-                {isChecked && (
-                  <RatingCard
-                    levels={necessityLevels}
-                    value={levels[i]}
-                    onChange={(v) => setLevels((prev) => ({ ...prev, [i]: v }))}
-                    name={`skill-${i}-level`}
-                    required
-                    error={errors?.[`skill-${i}-level`]}
-                    aria-label={label}
-                    disabledValues={[1]}
-                    disabledHint={copy.skillNecessityDisabledHint}
-                    inline
-                  />
-                )}
-              </div>
+            <div key={i} className="grid grid-cols-1 items-center gap-x-4 gap-y-2 py-3 sm:[grid-template-columns:1fr_320px]">
+              <label className="flex min-h-11 min-w-0 cursor-pointer items-center gap-3 text-sm text-primary">
+                <input
+                  type="checkbox"
+                  name={fieldName}
+                  value="1"
+                  checked={isChecked}
+                  onChange={(e) => {
+                    if (e.target.checked) setChecked((prev) => ({ ...prev, [i]: true }));
+                    else handleUncheck(i);
+                  }}
+                  className="h-5 w-5 shrink-0 accent-action"
+                />
+                <span>{label}</span>
+              </label>
+              {isChecked && (
+                <RatingCard
+                  levels={necessityLevels}
+                  value={levels[i]}
+                  onChange={(v) => setLevels((prev) => ({ ...prev, [i]: v }))}
+                  name={`skill-${i}-level`}
+                  required
+                  error={errors?.[`skill-${i}-level`]}
+                  aria-label={label}
+                  disabledValues={[1]}
+                  disabledHint={copy.skillNecessityDisabledHint}
+                  inline
+                />
+              )}
             </div>
           );
         })}

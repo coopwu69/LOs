@@ -152,11 +152,7 @@ export function RatingCard({
       onKeyDown={handleKeyDown}
     >
       <div
-        className={
-          inline
-            ? "flex gap-[3px]"
-            : `grid gap-px overflow-hidden rounded-xl border-2 bg-border ${error ? "border-error-text" : "border-border"}`
-        }
+        className={inline ? "flex gap-1" : `grid gap-px overflow-hidden rounded-xl border-2 bg-border ${error ? "border-error-text" : "border-border"}`}
         style={inline ? undefined : { gridTemplateColumns: `repeat(${levels.length}, minmax(0, 1fr))` }}
       >
         {levels.map((level, index) => {
@@ -172,7 +168,7 @@ export function RatingCard({
               className={
                 inline
                   ? [
-                      "relative flex h-[38px] w-11 shrink-0 flex-col items-center justify-center gap-px rounded-lg border text-center transition-colors",
+                      "relative flex h-[38px] flex-1 min-w-0 flex-col items-center justify-center gap-px rounded-lg border text-center transition-colors",
                       isDisabled ? "cursor-not-allowed opacity-45" : "cursor-pointer",
                       "focus-within:z-10 focus-within:shadow-[inset_0_0_0_2px_var(--border-focus)]",
                       isSelected
@@ -239,7 +235,7 @@ export function RatingCard({
           );
         })}
       </div>
-      {disabledHint && !compact && (
+      {disabledHint && !compact && !inline && (
         <p id={disabledHintId} className="mt-1.5 text-xs text-tertiary">
           {disabledHint}
         </p>
