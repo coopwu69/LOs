@@ -5,8 +5,13 @@ export type SchoolSlug = string;
 const SCHOOL_SLUGS: Record<string, SchoolSlug> = {
   // live schools (from DB)
   // Canonical name first so the reverse map returns it. Legacy alias below.
-  "วิทยาลัยนานาชาติ": "ic",
+  // DB stores this school under "ความร่วมมือต่างประเทศ" — must be listed
+  // first so the reverse map (SLUG_TO_NAME) resolves "ic" back to the name
+  // that actually exists in the programs table. "วิทยาลัยนานาชาติ" is the
+  // display alias only; putting it first broke getProgramsBySchool("ic")
+  // with a 404 (fixed 2026-09-22).
   "ความร่วมมือต่างประเทศ": "ic",
+  "วิทยาลัยนานาชาติ": "ic",
   "สำนักวิชาการจัดการ": "mgt",
   "สำนักวิชาการบัญชีและการเงิน": "accfin",
   "สำนักวิชานิติศาสตร์": "law",
