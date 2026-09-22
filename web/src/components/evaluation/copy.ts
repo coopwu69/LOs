@@ -180,7 +180,7 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     processNotice: "คำตอบในส่วนของศูนย์สหกิจศึกษาฯ ด้านล่างใช้พัฒนากระบวนการสหกิจศึกษา และไม่นำไปรวมกับคะแนนของนักศึกษา",
     otherComments: "ข้อคิดเห็นอื่น ๆ เพิ่มเติม",
     review: "ตรวจสอบก่อนส่ง",
-    skillsInstructions: "ติ๊กทักษะที่สถานประกอบการคาดหวังจากนักศึกษาสหกิจศึกษา (เลือกได้มากกว่า 1 ข้อ) แล้วระบุระดับความจำเป็นของแต่ละข้อที่เลือก",
+    skillsInstructions: "ติ๊กทักษะที่สถานประกอบการคาดหวังจากนักศึกษาสหกิจศึกษา (เลือกได้มากกว่า 1 ข้อ)",
     skillsMinOneHint: "เลือกอย่างน้อย 1 ข้อ",
     skills: [
       "ภาวะผู้นำและผู้เปลี่ยนแปลงทางสังคม",
@@ -305,7 +305,7 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
     processNotice: "Responses in the coop-education center section below help improve the cooperative education process and do not affect the student's score.",
     otherComments: "Additional comments",
     review: "Review before submitting",
-    skillsInstructions: "Select the skills your organization expects from cooperative education students (you may select more than one), then rate how necessary each selected skill is.",
+    skillsInstructions: "Select the skills your organization expects from cooperative education students (you may select more than one).",
     skillsMinOneHint: "Select at least one",
     skills: [
       "Leadership and Social Change",

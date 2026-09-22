@@ -145,24 +145,24 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
     };
   }
 
-  // --- Skill-expectation validation (G2) — at least one skill checked,
-  // each checked skill has a 2–5 necessity level. Not scored: this captures
-  // what the employer expects, not what the student achieved, so it's kept
-  // entirely out of the loScore/cScore computation below. ---
+  // --- Skill-expectation validation (G2) — at least one skill checked.
+  // Not scored: this captures what the employer expects, not what the
+  // student achieved, so it's kept entirely out of the loScore/cScore
+  // computation below. ---
   const skillFields: Record<string, string> = {};
   for (let i = 1; i <= SKILL_COUNT; i++) {
     if (raw[`skill-${i}`] != null) skillFields[`skill-${i}`] = String(raw[`skill-${i}`]);
-    if (raw[`skill-${i}-level`] != null) skillFields[`skill-${i}-level`] = String(raw[`skill-${i}-level`]);
   }
   const skillResult = skillExpectationStepSchema.safeParse(skillFields);
   if (!skillResult.success) {
     const fieldErrors = localizeFieldErrors(flattenZodToKeys(skillResult.error), locale);
     return {
       success: false,
-      error: message("กรุณาเลือกทักษะที่สถานประกอบการคาดหวังอย่างน้อย 1 ข้อ พร้อมระบุระดับความจำเป็น", "Please select at least one expected skill and its necessity level."),
+      error: message("กรุณาเลือกทักษะที่สถานประกอบการคาดหวังอย่างน้อย 1 ข้อ", "Please select at least one expected skill."),
       fieldErrors,
     };
   }
+
 
   // --- Report validation ---
   const reportResult = reportStepSchema.safeParse({

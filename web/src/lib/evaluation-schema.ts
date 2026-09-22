@@ -152,21 +152,15 @@ export function buildCompetencySchema(config: {
 }
 
 // --- Skill-expectation step (G2) — 16 skills, each an optional checkbox
-// ("skill-1".."skill-16", value "1" when checked) with a required 2–5
-// necessity level ("skill-1-level".."skill-16-level") once checked.
-// Unchecked items send neither field. Level 1 ("ไม่จำเป็น") is never a
-// valid submission — the UI disables it (RatingCard disabledValues) since
-// ticking the skill at all means it's already relevant; this re-asserts
-// that range server-side. Not scored into lo_score/c_score — see G2's
-// "การนำคะแนนไปใช้" in goal.md — so this schema only validates shape, it
-// doesn't feed the scoring loop in actions.ts.
+// ("skill-1".."skill-16", value "1" when checked). Necessity-level rating
+// (skill-N-level) removed 2026-09-22 per user request: tick-only now.
+// Unchecked items send neither field.
 export const SKILL_COUNT = 16;
 
 function skillExpectationShape() {
   const shape: Record<string, z.ZodOptional<z.ZodString>> = {};
   for (let i = 1; i <= SKILL_COUNT; i++) {
     shape[`skill-${i}`] = z.string().optional();
-    shape[`skill-${i}-level`] = z.string().optional();
   }
   return shape;
 }
@@ -180,16 +174,9 @@ export const skillExpectationStepSchema = z.object(skillExpectationShape()).supe
     // Not tied to any one checkbox — goal.md's own criterion is "jump back
     // to the skills step", not "focus a specific field".
     ctx.addIssue({ code: "custom", message: "skills_min_one", path: ["skills"] });
-    return;
-  }
-  for (const i of checked) {
-    const level = data[`skill-${i}-level`];
-    const n = Number(level);
-    if (!level || !Number.isInteger(n) || n < 2 || n > 5) {
-      ctx.addIssue({ code: "custom", message: "skills_level_required", path: [`skill-${i}-level`] });
-    }
   }
 });
+
 
 // --- Full submission envelope (hidden fields + all steps) ---
 // The server action validates the envelope then runs step-specific checks.
