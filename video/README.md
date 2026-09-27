@@ -11,8 +11,19 @@ never from the live site, so demo edits and confirmations never touch production
 | 2. Capture screens | `npm run capture` | `public/shots/*.png` (2× DPR), `src/shots.json` (click/zoom target boxes) |
 | 3. Voice | `npm run voice` | `public/audio/<id>.wav`, `src/audio-durations.json` |
 | 4. Preview in studio | `npm run studio` | — |
-| 5. Render | `npm run render:preview` | `out/preview.mp4` |
-| 6. Subtitles | `node scripts/make-srt.mjs out/preview.srt 2,3 863` | `out/*.srt` |
+| 5. Render | `npm run render:full` (or `render:preview`) | `out/tutorial.mp4` + `out/tutorial.srt` |
+
+Compositions: `Tutorial` (full), `Scene1`…`Scene7` (one scene each, for review), `Preview`, `VoiceSample`.
+
+| Scene | Content | Source of screens |
+|---|---|---|
+| 1 | Intro: pilot 2/2569, in use 2570 | graphics |
+| 2 | Open school link, search, pick program | replica |
+| 3 | Review page, 3 forms, "ดู", checklist | replica |
+| 4 | "แก้ไข" → fix a demo typo → save dialog → saved; shared LOs; save ≠ confirm | replica (save done on local copy) |
+| 5 | "ดาวน์โหลด" → real Word file rendered | replica + LibreOffice |
+| 6 | "ยืนยันว่าตรวจสอบแล้ว" dialog → "ตรวจแล้ว" | replica (confirm done on local copy) |
+| 7 | Summary | graphics |
 
 ## Where to edit
 
@@ -27,11 +38,18 @@ The current voice is Meta MMS-TTS Thai (offline, via sherpa-onnx) — a draft. T
 professional TTS recording: save one WAV per narration id into `public/audio/` (same ids), then run
 `python3 narration/synth.py --measure-only` to refresh durations. Timing, captions and SRT follow.
 
+## Capture prerequisites
+
+`libreoffice-writer` and the TH Sarabun New font (`web/src/assets/fonts/THSarabunNew*.ttf` copied
+into `/usr/local/share/fonts` + `fc-cache -f`) so the Word page renders as it does in Word;
+`pip install pymupdf` for the PDF → PNG step.
+
 ## Local replica
 
 ```bash
 # Postgres 16 on :5433 with SSL (the app forces SSL), schema from migrations/neon + 004–024
-python3 video/replica/seed.py            # 4 programs of สำนักวิชาการจัดการ; LOG = production rubric snapshot
+video/replica/setup-db.sh                # Postgres 16 on :5433 + schema + seed
+python3 video/replica/seed.py --typo     # (capture.mjs re-runs this) 4 programs of สำนักวิชาการจัดการ; LOG = production rubric snapshot
 cd web && DATABASE_URL=postgresql://postgres@127.0.0.1:5433/los npx next dev -p 3100
 ```
 
