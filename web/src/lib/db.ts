@@ -94,8 +94,18 @@ export type SchoolWithProgress = {
   standard_4_count: number;
   legacy_5_count: number;
   needs_descriptions_count: number;
+  confirmed_forms: number;
+  fully_confirmed_count: number;
   programs: ProgramRow[];
 };
+
+// Distinct roles with at least one curriculum_review_confirmations row (G12).
+const CONFIRMED_ROLES_LATERAL = `
+  LEFT JOIN LATERAL (
+    SELECT array_agg(DISTINCT crc.role ORDER BY crc.role) AS roles
+    FROM curriculum_review_confirmations crc
+    WHERE crc.program_id = p.id
+  ) c ON true`;
 
 // ---------- Helpers ----------
 
@@ -346,6 +356,8 @@ export async function getSchoolsWithProgress(): Promise<SchoolWithProgress[]> {
     standard_4_count: number;
     legacy_5_count: number;
     needs_descriptions_count: number;
+    confirmed_forms: number;
+    fully_confirmed_count: number;
     programs: ProgramRow[];
   }>(`
     SELECT
@@ -356,6 +368,8 @@ export async function getSchoolsWithProgress(): Promise<SchoolWithProgress[]> {
       COUNT(*) FILTER (WHERE t.max_score = 4)::int AS standard_4_count,
       COUNT(*) FILTER (WHERE t.max_score >= 5)::int AS legacy_5_count,
       COUNT(*) FILTER (WHERE t.id IS NOT NULL AND NOT t.descriptions_complete)::int AS needs_descriptions_count,
+      COALESCE(SUM(cardinality(c.roles)), 0)::int AS confirmed_forms,
+      COUNT(*) FILTER (WHERE cardinality(c.roles) = 3)::int AS fully_confirmed_count,
       json_agg(
         json_build_object(
           'id', p.id::text,
@@ -365,7 +379,8 @@ export async function getSchoolsWithProgress(): Promise<SchoolWithProgress[]> {
           'school', p.school,
           'slug', p.slug,
           'revision_label', NULL,
-          'form_status', CASE WHEN t.id IS NULL THEN 'pending' ELSE 'submitted' END
+          'form_status', CASE WHEN t.id IS NULL THEN 'pending' ELSE 'submitted' END,
+          'confirmed_roles', COALESCE(c.roles, ARRAY[]::text[])
         ) ORDER BY p.code
       ) AS programs
     FROM programs p
@@ -385,6 +400,7 @@ export async function getSchoolsWithProgress(): Promise<SchoolWithProgress[]> {
       ORDER BY et.created_at DESC
       LIMIT 1
     ) t ON true
+    ${CONFIRMED_ROLES_LATERAL}
     WHERE p.school IS NOT NULL AND p.is_active = true
     GROUP BY p.school
     ORDER BY p.school
@@ -528,7 +544,8 @@ export async function getProgramsBySchool(schoolName: string): Promise<ProgramRo
     `SELECT
        p.id::text AS id, p.code, p.name_th, p.name_en, p.school, p.slug,
        NULL::text AS revision_label,
-       CASE WHEN t.id IS NULL THEN 'pending' ELSE 'submitted' END AS form_status
+       CASE WHEN t.id IS NULL THEN 'pending' ELSE 'submitted' END AS form_status,
+       COALESCE(c.roles, ARRAY[]::text[]) AS confirmed_roles
      FROM programs p
      LEFT JOIN LATERAL (
        SELECT et.id
@@ -537,6 +554,7 @@ export async function getProgramsBySchool(schoolName: string): Promise<ProgramRo
        ORDER BY et.created_at DESC
        LIMIT 1
      ) t ON true
+     ${CONFIRMED_ROLES_LATERAL}
      WHERE p.school = $1 AND p.is_active = true
      ORDER BY p.code`,
     [schoolName]

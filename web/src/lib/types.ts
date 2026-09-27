@@ -49,6 +49,7 @@ export type ProgramRow = {
   slug: string | null;
   revision_label: string | null;
   form_status: 'submitted' | 'pending';
+  confirmed_roles?: ('company' | 'advisor' | 'student')[];
 };
 
 export type TemplateDoc = {

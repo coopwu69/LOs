@@ -6,6 +6,7 @@ import { Badge, StatusDot } from "./badge";
 import { Input } from "./input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table";
 import type { Locale } from "@/lib/i18n";
+import type { FormRole } from "@/lib/routes";
 
 export type ProgramSummary = {
   id: string;
@@ -18,6 +19,7 @@ export type ProgramSummary = {
   studentHref: string;
   reviewHref: string;
   form_status: "submitted" | "pending";
+  confirmed_roles: FormRole[];
 };
 
 type FilterKey = "all" | "available" | "pending";
@@ -31,7 +33,7 @@ const COPY = {
     code: "รหัส",
     program: "หลักสูตร",
     status: "สถานะ",
-    forms: "แบบฟอร์ม",
+    forms: "ยืนยันตรวจสอบแล้ว",
     formCompany: "หน่วยงาน",
     formAdvisor: "อาจารย์นิเทศ",
     formStudent: "นักศึกษา",
@@ -41,6 +43,9 @@ const COPY = {
     availableLabel: "ส่งแล้ว",
     pendingLabel: "ยังไม่ส่ง",
     review: "ตรวจสอบความครบถ้วน",
+    confirmedLegend: "เครื่องหมาย ✓ = แบบฟอร์มนั้นยืนยันตรวจสอบแล้ว",
+    roleConfirmed: "ยืนยันตรวจสอบแล้ว",
+    roleNotConfirmed: "ยังไม่ยืนยัน",
   },
   en: {
     searchPlaceholder: "Search by code or program name…",
@@ -50,7 +55,7 @@ const COPY = {
     code: "Code",
     program: "Program",
     status: "Status",
-    forms: "Forms",
+    forms: "Review confirmed",
     formCompany: "Workplace",
     formAdvisor: "Advisor",
     formStudent: "Student",
@@ -60,6 +65,9 @@ const COPY = {
     availableLabel: "Available",
     pendingLabel: "Not available",
     review: "Review completeness",
+    confirmedLegend: "✓ = this form has been reviewed and confirmed",
+    roleConfirmed: "Confirmed",
+    roleNotConfirmed: "Not yet confirmed",
   },
 };
 
@@ -110,11 +118,23 @@ export function ProgramsList({ programs, locale }: { programs: ProgramSummary[];
     pending: programs.filter((p) => p.form_status === "pending").length,
   }), [programs]);
 
-  const formChips = (
+  const roleLabels: Record<FormRole, string> = { company: c.formCompany, advisor: c.formAdvisor, student: c.formStudent };
+  const formChips = (program: ProgramSummary) => (
     <>
-      <Badge variant="neutral">{c.formCompany}</Badge>
-      <Badge variant="neutral">{c.formAdvisor}</Badge>
-      <Badge variant="neutral">{c.formStudent}</Badge>
+      {(["company", "advisor", "student"] as const).map((role) => {
+        const confirmed = program.confirmed_roles.includes(role);
+        return (
+          <Badge
+            key={role}
+            variant={confirmed ? "success" : "neutral"}
+            title={`${roleLabels[role]} — ${confirmed ? c.roleConfirmed : c.roleNotConfirmed}`}
+          >
+            {confirmed ? <span aria-hidden="true">✓</span> : <StatusDot variant="neutral" />}
+            {roleLabels[role]}
+            <span className="sr-only">{` — ${confirmed ? c.roleConfirmed : c.roleNotConfirmed}`}</span>
+          </Badge>
+        );
+      })}
     </>
   );
 
@@ -139,7 +159,7 @@ export function ProgramsList({ programs, locale }: { programs: ProgramSummary[];
           <FilterTab active={filter === "pending"} onClick={() => setFilter("pending")} count={counts.pending}>{c.pending}</FilterTab>
         </div>
       </div>
-      <p className="text-sm text-tertiary">{c.pickerHint}</p>
+      <p className="text-sm text-tertiary">{c.pickerHint} · {c.confirmedLegend}</p>
 
       {filtered.length === 0 ? (
         <div className="rounded-lg border border-border-default bg-raised px-6 py-12 text-center">
@@ -155,7 +175,7 @@ export function ProgramsList({ programs, locale }: { programs: ProgramSummary[];
                 <TableHead className="w-40">{c.code}</TableHead>
                 <TableHead>{c.program}</TableHead>
                 <TableHead className="w-32">{c.status}</TableHead>
-                <TableHead className="w-52">{c.forms}</TableHead>
+                <TableHead className="w-80">{c.forms}</TableHead>
                 <TableHead className="w-10" />
               </TableRow>
             </TableHeader>
@@ -187,7 +207,7 @@ export function ProgramsList({ programs, locale }: { programs: ProgramSummary[];
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <div className="flex flex-wrap gap-1">{formChips}</div>
+                      <div className="flex flex-wrap gap-1">{formChips(program)}</div>
                     </TableCell>
                     <TableCell className="text-tertiary" aria-hidden="true"><ArrowRightIcon /></TableCell>
                   </TableRow>
@@ -219,7 +239,7 @@ export function ProgramsList({ programs, locale }: { programs: ProgramSummary[];
                       <StatusDot variant={isAvailable ? "success" : "warning"} />
                       {isAvailable ? c.availableLabel : c.pendingLabel}
                     </Badge>
-                    {formChips}
+                    {formChips(program)}
                   </div>
                 </button>
               );

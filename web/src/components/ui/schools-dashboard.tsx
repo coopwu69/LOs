@@ -18,9 +18,17 @@ export type SchoolSummary = {
   standard_4_count: number;
   legacy_5_count: number;
   needs_descriptions_count: number;
+  confirmed_forms: number;
+  fully_confirmed_count: number;
 };
 
-type FilterKey = "all" | "needs_attention" | "ready";
+type FilterKey = "all" | "needs_attention" | "ready" | "awaiting_confirmation" | "confirmed";
+
+const FORMS_PER_PROGRAM = 3;
+
+function isFullyConfirmed(s: SchoolSummary) {
+  return s.fully_confirmed_count === s.program_count;
+}
 
 const COPY = {
   th: {
@@ -39,6 +47,12 @@ const COPY = {
     legacy5: "5 ระดับเดิม",
     needsDesc: "ต้องเพิ่มคำอธิบาย",
     programsUnit: "หลักสูตร",
+    confirmation: "ยืนยันตรวจสอบ",
+    confirmedAll: "ครบแล้ว",
+    confirmedNone: "ยังไม่ยืนยัน",
+    formsUnit: "ฟอร์ม",
+    awaitingConfirmation: "รอยืนยัน",
+    confirmedTab: "ยืนยันครบ",
   },
   en: {
     searchPlaceholder: "Search schools…",
@@ -56,6 +70,12 @@ const COPY = {
     legacy5: "Legacy 5-level",
     needsDesc: "Needs descriptions",
     programsUnit: "programs",
+    confirmation: "Review confirmed",
+    confirmedAll: "Complete",
+    confirmedNone: "Not yet",
+    formsUnit: "forms",
+    awaitingConfirmation: "Awaiting confirmation",
+    confirmedTab: "Confirmed",
   },
 };
 
@@ -95,6 +115,29 @@ function ScaleBadges({ school, c }: { school: SchoolSummary; c: typeof COPY.th }
   );
 }
 
+function ConfirmationStatus({ school, c }: { school: SchoolSummary; c: typeof COPY.th }) {
+  const done = school.fully_confirmed_count;
+  const total = school.program_count;
+  const totalForms = total * FORMS_PER_PROGRAM;
+  const variant = isFullyConfirmed(school) ? "success" : school.confirmed_forms > 0 ? "warning" : "neutral";
+  const title = `${done}/${total} ${c.programsUnit} · ${school.confirmed_forms}/${totalForms} ${c.formsUnit}`;
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      <Badge variant={variant} title={title}>
+        <StatusDot variant={variant} />
+        {isFullyConfirmed(school)
+          ? `${c.confirmedAll} ${done}/${total}`
+          : school.confirmed_forms === 0
+            ? c.confirmedNone
+            : `${done}/${total} ${c.programsUnit}`}
+      </Badge>
+      {school.confirmed_forms > 0 && !isFullyConfirmed(school) && (
+        <span className="text-xs tabular-nums text-tertiary">{c.formsUnit} {school.confirmed_forms}/{totalForms}</span>
+      )}
+    </div>
+  );
+}
+
 export function SchoolsDashboard({ schools, locale }: { schools: SchoolSummary[]; locale: Locale }) {
   const c = COPY[locale];
   const router = useRouter();
@@ -108,6 +151,8 @@ export function SchoolsDashboard({ schools, locale }: { schools: SchoolSummary[]
       if (!matchesQuery) return false;
       if (filter === "needs_attention") return s.pending_count > 0 || s.legacy_5_count > 0 || s.needs_descriptions_count > 0;
       if (filter === "ready") return s.pending_count === 0 && s.legacy_5_count === 0 && s.needs_descriptions_count === 0;
+      if (filter === "awaiting_confirmation") return !isFullyConfirmed(s);
+      if (filter === "confirmed") return isFullyConfirmed(s);
       return true;
     });
   }, [schools, query, filter]);
@@ -116,6 +161,8 @@ export function SchoolsDashboard({ schools, locale }: { schools: SchoolSummary[]
     all: schools.length,
     needs_attention: schools.filter((s) => s.pending_count > 0 || s.legacy_5_count > 0 || s.needs_descriptions_count > 0).length,
     ready: schools.filter((s) => s.pending_count === 0 && s.legacy_5_count === 0 && s.needs_descriptions_count === 0).length,
+    awaiting_confirmation: schools.filter((s) => !isFullyConfirmed(s)).length,
+    confirmed: schools.filter(isFullyConfirmed).length,
   }), [schools]);
 
   return (
@@ -138,6 +185,8 @@ export function SchoolsDashboard({ schools, locale }: { schools: SchoolSummary[]
           <FilterTab active={filter === "all"} onClick={() => setFilter("all")} count={counts.all}>{c.all}</FilterTab>
           <FilterTab active={filter === "needs_attention"} onClick={() => setFilter("needs_attention")} count={counts.needs_attention}>{c.needsAttention}</FilterTab>
           <FilterTab active={filter === "ready"} onClick={() => setFilter("ready")} count={counts.ready}>{c.ready}</FilterTab>
+          <FilterTab active={filter === "awaiting_confirmation"} onClick={() => setFilter("awaiting_confirmation")} count={counts.awaiting_confirmation}>{c.awaitingConfirmation}</FilterTab>
+          <FilterTab active={filter === "confirmed"} onClick={() => setFilter("confirmed")} count={counts.confirmed}>{c.confirmedTab}</FilterTab>
         </div>
       </div>
 
@@ -157,6 +206,7 @@ export function SchoolsDashboard({ schools, locale }: { schools: SchoolSummary[]
                 <TableHead className="text-right">{c.available}</TableHead>
                 <TableHead className="text-right">{c.pending}</TableHead>
                 <TableHead>{c.scaleStatus}</TableHead>
+                <TableHead>{c.confirmation}</TableHead>
                 <TableHead className="w-10" />
               </TableRow>
             </TableHeader>
@@ -204,6 +254,7 @@ export function SchoolsDashboard({ schools, locale }: { schools: SchoolSummary[]
                       ) : <span className="text-tertiary">0</span>}
                     </TableCell>
                     <TableCell><ScaleBadges school={school} c={c} /></TableCell>
+                    <TableCell><ConfirmationStatus school={school} c={c} /></TableCell>
                     <TableCell className="text-tertiary" aria-hidden="true"><ArrowRightIcon /></TableCell>
                   </TableRow>
                 );
@@ -229,6 +280,10 @@ export function SchoolsDashboard({ schools, locale }: { schools: SchoolSummary[]
                     <span><strong className="text-primary tabular-nums">{school.program_count}</strong> {c.programsUnit}</span>
                     <span className="inline-flex items-center gap-1.5"><StatusDot variant="success" /><span className="tabular-nums">{school.submitted_count}</span> {c.available}</span>
                     {school.pending_count > 0 && <span className="inline-flex items-center gap-1.5"><StatusDot variant={statusVariant} /><span className="tabular-nums">{school.pending_count}</span> {c.pending}</span>}
+                  </div>
+                  <div className="mt-2 flex items-center gap-2 text-xs text-secondary">
+                    <span className="whitespace-nowrap">{c.confirmation}</span>
+                    <ConfirmationStatus school={school} c={c} />
                   </div>
                   {(school.standard_4_count > 0 || school.legacy_5_count > 0 || school.needs_descriptions_count > 0) && (
                     <div className="mt-3 flex flex-wrap gap-1 border-t border-border-default pt-3">

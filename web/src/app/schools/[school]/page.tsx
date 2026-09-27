@@ -48,6 +48,7 @@ export default async function SchoolPage({ params, searchParams }: PageProps<"/s
       studentHref,
       reviewHref,
       form_status: program.form_status,
+      confirmed_roles: program.confirmed_roles ?? [],
     };
   });
 
