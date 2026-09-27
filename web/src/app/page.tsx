@@ -37,6 +37,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const totalPrograms = schools.reduce((sum, school) => sum + school.program_count, 0);
   const totalSubmitted = schools.reduce((sum, school) => sum + school.submitted_count, 0);
   const totalStandard4 = schools.reduce((sum, school) => sum + school.standard_4_count, 0);
+  const totalFullyConfirmed = schools.reduce((sum, school) => sum + school.fully_confirmed_count, 0);
 
   // Serialize for client component
   const summaries: SchoolSummary[] = schools.map((school) => {
@@ -52,6 +53,8 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       standard_4_count: school.standard_4_count,
       legacy_5_count: school.legacy_5_count,
       needs_descriptions_count: school.needs_descriptions_count,
+      confirmed_forms: school.confirmed_forms,
+      fully_confirmed_count: school.fully_confirmed_count,
     };
   });
 
@@ -79,7 +82,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       {hasError ? <div role="alert" className="rounded-xl border border-error-border bg-error-bg p-6">
         <h2 className="text-lg font-semibold text-error-text">{copy.loadError}</h2><p className="mt-2 text-sm text-secondary">{copy.loadErrorHelp}</p>
       </div> : schools.length === 0 ? <div className="py-16 text-center"><h2 className="text-xl font-semibold text-primary">{copy.noSchools}</h2><p className="mt-2 text-secondary">{copy.addPrograms}</p></div> : <>
-        <div className="mb-8 grid gap-4 rounded-xl border border-border-default bg-raised p-5 sm:grid-cols-2"><ProgressBar value={totalSubmitted} max={totalPrograms} label={copy.submitted} /><ProgressBar value={totalStandard4} max={totalSubmitted} label={copy.standard4} /></div>
+        <div className="mb-8 grid gap-4 rounded-xl border border-border-default bg-raised p-5 sm:grid-cols-2 lg:grid-cols-3"><ProgressBar value={totalSubmitted} max={totalPrograms} label={copy.submitted} /><ProgressBar value={totalStandard4} max={totalSubmitted} label={copy.standard4} /><ProgressBar value={totalFullyConfirmed} max={totalPrograms} label={copy.confirmedPrograms} /></div>
         <p className="-mt-4 mb-8 text-sm text-secondary">
           {copy.helpLeadIn}{" "}
           <Link href={withLocale("/help", locale)} className="font-medium text-action underline-offset-4 hover:underline">{copy.helpLink}</Link>

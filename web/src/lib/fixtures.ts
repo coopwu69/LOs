@@ -30,6 +30,7 @@ const programEngineering: ProgramRow = {
   slug: "computer-engineering",
   revision_label: "ฉบับร่าง 2567",
   form_status: "submitted",
+  confirmed_roles: ["advisor", "company", "student"],
 };
 
 const programNursing: ProgramRow = {
@@ -40,6 +41,7 @@ const programNursing: ProgramRow = {
   slug: "nursing",
   revision_label: "ฉบับร่าง 2565",
   form_status: "submitted",
+  confirmed_roles: ["company"],
 };
 
 const programLaw: ProgramRow = {
@@ -256,6 +258,8 @@ export function getFixtureSchoolsWithProgress() {
       needs_descriptions_count: templates.filter(
         (t) => t.scale_status === "needs_descriptions"
       ).length,
+      confirmed_forms: programs.reduce((sum, p) => sum + (p.confirmed_roles?.length ?? 0), 0),
+      fully_confirmed_count: programs.filter((p) => p.confirmed_roles?.length === 3).length,
       programs,
     };
   });
