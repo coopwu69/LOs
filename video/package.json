@@ -1,0 +1,26 @@
+{
+  "name": "los-tutorial-video",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Remotion tutorial: ระบบตรวจสอบแบบประเมินผลลัพธ์การเรียนรู้รายวิชาสหกิจศึกษา",
+  "scripts": {
+    "studio": "remotion studio",
+    "capture": "node replica/capture.mjs",
+    "voice": "python3 narration/synth.py",
+    "srt": "node scripts/make-srt.mjs",
+    "render:preview": "remotion render Preview out/preview.mp4",
+    "render:full": "remotion render Tutorial out/tutorial.mp4"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-sans-thai-looped": "^5.3.0",
+    "@remotion/cli": "4.0.529",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "remotion": "4.0.529"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "playwright": "^1.63.0",
+    "typescript": "^5"
+  }
+}
