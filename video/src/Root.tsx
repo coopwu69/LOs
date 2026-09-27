@@ -29,8 +29,12 @@ const Scenes23: React.FC = () => (
 // Preview (~29s): scene 2 + the start of scene 3 (review page, first form row).
 const PREVIEW_FRAMES = SCENES[2].duration + SCENES[3].lines["3b"].end + 12;
 
+// Voice sample (~16s): scene 2 up to the program click.
+const VOICE_SAMPLE_FRAMES = SCENES[2].lines["2d"].end + 15;
+
 export const Root: React.FC = () => (
   <>
+    <Composition id="VoiceSample" component={Scenes23} durationInFrames={VOICE_SAMPLE_FRAMES} fps={FPS} width={W} height={H} />
     <Composition id="Preview" component={Scenes23} durationInFrames={PREVIEW_FRAMES} fps={FPS} width={W} height={H} />
     <Composition id="Scenes23" component={Scenes23} durationInFrames={SCENES[2].duration + SCENES[3].duration} fps={FPS} width={W} height={H} />
   </>
