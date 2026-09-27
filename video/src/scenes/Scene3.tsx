@@ -4,6 +4,7 @@ import { Box, union } from "../components/camera";
 import { shotBox as sb } from "../components/Overlays";
 import { SceneConfig, SceneShell } from "../components/SceneShell";
 import { Checklist } from "../components/Checklist";
+import { Callout } from "../components/Graphics";
 
 const t = SCENES[3];
 const L = t.lines;
@@ -60,7 +61,7 @@ export const scene3: SceneConfig = {
     { from: L["3g"].start + 4, to: L["3g"].end + 12, box: union(sb("s3_step3", "q1"), sb("s3_step3", "q1Grid")), pad: 8 },
     { from: L["3i"].start + 10, to: L["3i"].end + 6, box: union(sb("s3_company", "title"), sb("s3_company", "formName")) },
     { from: L["3j"].start + 10, to: L["3j"].end + 6, box: union(sb("s3_step3", "q1"), sb("s3_step3", "q2")) },
-    { from: L["3k"].start + 10, to: L["3k"].end + 6, box: sb("s3_step3", "q1"), pad: 8 },
+    { from: L["3k"].start + 10, to: L["3k"].end + 6, box: sb("s3_step3", "typo"), pad: 6 },
     { from: L["3l"].start + 10, to: L["3l"].end + 10, box: sb("s3_step3", "q1Grid"), pad: 6 },
     ...[0, 1, 2].map((i) => ({
       from: L["3m"].start + i * 10,
@@ -77,7 +78,8 @@ export const scene3: SceneConfig = {
     { at: clickStep - 1, ...center(step3, 0.5, 0.3), dur: 1, click: true },
   ],
   cursorHideAfter: clickStep + 16,
-  extra: () => (
+  extra: (_f, cam) => (
+    <>
     <Checklist
       from={checklistIn}
       to={checklistOut}
@@ -88,6 +90,8 @@ export const scene3: SceneConfig = {
         { text: "ตัวเลือกคะแนนและคำอธิบายแต่ละระดับตรงตามเกณฑ์", at: L["3l"].start },
       ]}
     />
+    <Callout from={L["3k"].start + 14} to={L["3k"].end + 6} box={sb("s3_step3", "typo")} cam={cam} tone="red" align="end" text="พบคำสะกดผิด → แก้ในขั้นถัดไป" />
+    </>
   ),
 };
 

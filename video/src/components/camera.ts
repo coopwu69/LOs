@@ -13,6 +13,8 @@ export type CamKey = {
 };
 
 const FULL: Cam = { s: 1, tx: 0, ty: 0 };
+// Default zoom target keeps the caption band (bottom ~160px) free of focused content.
+export const SAFE: Box = { x: 0, y: 0, w: W, h: 910 };
 const ease = Easing.inOut(Easing.cubic);
 
 export function union(...boxes: Box[]): Box {
@@ -26,13 +28,17 @@ export function union(...boxes: Box[]): Box {
 function camFor(k: CamKey): Cam {
   if (!k.focus) return FULL;
   const pad = k.pad ?? 60;
-  const into = k.into ?? { x: 0, y: 0, w: W, h: H };
+  const into = k.into ?? SAFE;
   const f = k.focus;
   const s = Math.max(1, Math.min(into.w / (f.w + pad * 2), into.h / (f.h + pad * 2), k.maxZoom ?? 2.2));
   let tx = into.x + into.w / 2 - (f.x + f.w / 2) * s;
   let ty = into.y + into.h / 2 - (f.y + f.h / 2) * s;
-  tx = Math.min(0, Math.max(W - W * s, tx));
-  ty = Math.min(0, Math.max(H - H * s, ty));
+  // Keep the screenshot covering the frame, except when aiming at a sub-region
+  // (e.g. left of a side panel) where exact placement matters more.
+  if (!k.into) {
+    tx = Math.min(0, Math.max(W - W * s, tx));
+    ty = Math.min(0, Math.max(H - H * s, ty));
+  }
   return { s, tx, ty };
 }
 

@@ -6,6 +6,7 @@ Only for rendering tutorial screenshots locally; never points at production.
 """
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -18,6 +19,7 @@ PROGRAMS = [
     ("MKT", "การตลาดดิจิทัลและการสร้างแบรนด์", "หลักสูตรการตลาดดิจิทัลและการสร้างแบรนด์"),
     ("THM", "การจัดการการท่องเที่ยวและการโรงแรม", "หลักสูตรการจัดการการท่องเที่ยวและการโรงแรม"),
 ]
+TYPO_QUESTION = "8fe7646b-a5e1-4b6f-b624-2322945a20ca"
 SECTIONS = [
     ("knowledge", "ด้านความรู้ (Knowledge)"),
     ("skills", "ด้านทักษะ (Skills)"),
@@ -85,6 +87,10 @@ def main():
                 f"INSERT INTO assessment_options (id, question_id, label_th, description_th, score, sequence) VALUES "
                 f"('{o['option_id']}', '{qid}', {q(o['label_th'])}, {q(o['description_th_new'])}, {o['score']}, {5 - o['score']});"
             )
+
+    if "--typo" in sys.argv:
+        # Demo misspelling for the edit scene (local replica only): ปัญหา -> ปัณหา in LOG knowledge Q1.
+        sql.append(f"UPDATE evaluation_questions SET text = replace(text, 'แก้ปัญหา', 'แก้ปัณหา') WHERE id = '{TYPO_QUESTION}';")
 
     subprocess.run(PSQL, input="\n".join(sql), text=True, check=True)
     print(f"seeded {len(PROGRAMS)} programs, LOG questions={len(questions)} options={len(rows)}")
