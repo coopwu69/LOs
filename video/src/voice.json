@@ -1,0 +1,74 @@
+{
+  "voice": "th-TH-PremwadeeNeural",
+  "rate": "+5%",
+  "lines": {
+    "intro-0": {
+      "hash": "6fd1e3da2db5",
+      "seconds": 6.552
+    },
+    "whatis-0": {
+      "hash": "7eb29b2095b4",
+      "seconds": 7.296
+    },
+    "programs-0": {
+      "hash": "0781c12bdd7f",
+      "seconds": 4.152
+    },
+    "programs-1": {
+      "hash": "513846eff557",
+      "seconds": 4.992
+    },
+    "programs-2": {
+      "hash": "93ce57ba464b",
+      "seconds": 3.024
+    },
+    "review-0": {
+      "hash": "8e9ade41285d",
+      "seconds": 3.528
+    },
+    "review-1": {
+      "hash": "d0fd8ae772ff",
+      "seconds": 4.464
+    },
+    "view-0": {
+      "hash": "ee0b1809a389",
+      "seconds": 2.4
+    },
+    "view-1": {
+      "hash": "6ab280ff8d49",
+      "seconds": 4.296
+    },
+    "view-2": {
+      "hash": "c04ac2739d65",
+      "seconds": 3.768
+    },
+    "confirm-0": {
+      "hash": "eab9b6ff3d84",
+      "seconds": 3.096
+    },
+    "confirm-1": {
+      "hash": "4aab47b7c254",
+      "seconds": 3.432
+    },
+    "confirm-2": {
+      "hash": "984eba68dce4",
+      "seconds": 2.4
+    },
+    "confirm-3": {
+      "hash": "9217f68fef5a",
+      "seconds": 2.688
+    },
+    "all-0": {
+      "hash": "0af88aafae2a",
+      "seconds": 2.592
+    },
+    "errorflow-0": {
+      "hash": "ad958d7e4bd2",
+      "seconds": 5.736
+    },
+    "outro-0": {
+      "hash": "9322f6f4ae7e",
+      "seconds": 4.896
+    }
+  }
+}

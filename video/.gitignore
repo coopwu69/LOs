@@ -1,0 +1,4 @@
+﻿node_modules/
+out/
+# rendered videos are shared separately, not committed
+*.mp4

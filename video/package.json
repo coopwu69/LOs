@@ -1,0 +1,25 @@
+{
+  "name": "coop-review-tutorial-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "วิดีโอสอนการใช้งานระบบตรวจสอบแบบประเมินผลลัพธ์การเรียนรู้รายวิชาสหกิจศึกษา (Remotion)",
+  "scripts": {
+    "capture": "node scripts/capture.mjs",
+    "tts": "node scripts/tts.mjs",
+    "studio": "remotion studio",
+    "render": "remotion render Tutorial out/tutorial-th.mp4",
+    "still": "remotion still Tutorial out/still.png --frame=300"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.529",
+    "@remotion/google-fonts": "4.0.529",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "remotion": "4.0.529"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "playwright": "^1.63.0",
+    "typescript": "^5"
+  }
+}

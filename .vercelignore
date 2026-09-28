@@ -38,3 +38,6 @@ docs/
 # Exclude local DB helper scripts
 _check_neon.py
 _apply_neon_schema.py
+
+# Remotion tutorial-video project (not part of the web app)
+video/
