@@ -161,21 +161,13 @@ function companySections(doc: TemplateDoc | null, locale: Locale): FormDocSectio
     ],
   });
 
-  // 2. Expected skills (16 skills, each a checkbox + 5-level necessity; level 1 disabled)
-  const skillQs: FormDocQuestion[] = c.skills.map((skill, i) => ({
-    code: `${i + 1}`,
-    text: skill,
-    type: "checkbox",
-    scale: c.skillNecessity.map((label, idx) => ({
-      score: idx + 1,
-      label,
-      disabled: idx === 0,
-    })).reverse(),
-    helper: c.skillNecessityDisabledHint,
-  }));
+  // 2. Expected skills (16 skills, checkbox only)
+  const skillQs: FormDocQuestion[] = [
+    checkbox(c.skillsInstructions, c.skills.map((skill, i) => `${i + 1}. ${skill}`)),
+  ];
   sections.push({
     title: c.steps[1][0],
-    questions: [info(c.skillsInstructions), ...skillQs],
+    questions: skillQs,
   });
 
   // 3. Knowledge and skills (LO primary)

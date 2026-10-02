@@ -65,10 +65,6 @@ export type WizardCopy = {
   skillsMinOneHint: string;
   skills: [string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string];
   /** 5-level necessity scale, ordered low -> high (value 1..5). Level 1 is disabled in the UI — ticking a skill already implies it's relevant. */
-  skillNecessity: [string, string, string, string, string];
-  skillNecessityDisabledHint: string;
-  /** Short wording for the one-line legend above the skill list (low -> high, matches skillNecessity order). */
-  skillNecessityShort: [string, string, string, string, string];
   /** Legend row label, e.g. "ระดับความจำเป็น:" */
   skillLegendLabel: string;
   /** Suffix appended next to level 1 in the legend, e.g. "(เลือกไม่ได้)" */
@@ -200,9 +196,6 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
       "ทักษะภาษาอังกฤษ",
       "แนวคิดแบบเติบโต",
     ],
-    skillNecessity: ["ไม่จำเป็น / ไม่เกี่ยวข้อง", "จำเป็นเล็กน้อย", "จำเป็นปานกลาง", "จำเป็นมาก", "จำเป็นมากที่สุด"],
-    skillNecessityDisabledHint: "เลือกระดับนี้ไม่ได้ — การเลือกทักษะข้อนี้ หมายความว่าทักษะนี้จำเป็นอยู่แล้ว",
-    skillNecessityShort: ["ไม่จำเป็น", "น้อย", "ปานกลาง", "มาก", "มากที่สุด"],
     skillLegendLabel: "ระดับความจำเป็น:",
     skillLevelUnavailableNote: "(เลือกไม่ได้)",
     centerTitle: COOP_CENTER_COPY.th.title,
@@ -325,9 +318,6 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
       "English Skills",
       "Growth Mindset",
     ],
-    skillNecessity: ["Not required / Not relevant", "Slightly required", "Moderately required", "Highly required", "Most required"],
-    skillNecessityDisabledHint: "This level can't be selected — ticking this skill already means it's relevant.",
-    skillNecessityShort: ["Not required", "Slight", "Moderate", "High", "Most"],
     skillLegendLabel: "Necessity level:",
     skillLevelUnavailableNote: "(unavailable)",
     centerTitle: COOP_CENTER_COPY.en.title,

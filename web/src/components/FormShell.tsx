@@ -147,9 +147,6 @@ export function FormShell({
                 <span className="h-5 w-5 shrink-0 rounded border-2 border-border-strong" aria-hidden="true" />
                 <p className="text-sm font-medium text-primary">{index + 1}. {skill}</p>
               </div>
-              <div className="mt-2 pl-8">
-                <PrintRating labels={copy.skillNecessity} />
-              </div>
             </div>
           ))}
         </div>
