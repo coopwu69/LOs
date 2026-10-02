@@ -108,8 +108,11 @@ function rating4Levels(copy: AdvisorCopy): RatingLevel[] {
   return copy.rating4.map((label, i) => ({ value: i + 1, label })).reverse();
 }
 
-function reportLevels(copy: AdvisorCopy): RatingLevel[] {
-  return copy.reportRating.map((label, i) => ({ value: i + 1, label })).reverse();
+function reportLevels(copy: AdvisorCopy, index: number): RatingLevel[] {
+  const rubric = copy.reportRubric?.[index];
+  return copy.reportRating
+    .map((label, i) => ({ value: i + 1, label, description: rubric?.[i] }))
+    .reverse();
 }
 
 type RatingItemProps = {
@@ -338,7 +341,6 @@ export function AdvisorProcessStep({ locale, errors, formVersion }: StepProps) {
 // --- Section 4: Report appraisal ---
 export function AdvisorReportStep({ locale, errors, formVersion }: StepProps) {
   const copy = ADVISOR_COPY[locale];
-  const levels = reportLevels(copy);
   const { containerRef, ratings, setRatings } = useDomSyncedRatings(formVersion, REPORT_NAMES);
 
   return (
@@ -352,7 +354,7 @@ export function AdvisorReportStep({ locale, errors, formVersion }: StepProps) {
               name={name}
               index={index}
               label={item}
-              levels={levels}
+              levels={reportLevels(copy, index)}
               value={ratings[name]}
               onChange={(v) => setRatings((prev) => ({ ...prev, [name]: v }))}
               error={errors?.[name]}
