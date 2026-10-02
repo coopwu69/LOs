@@ -12,6 +12,7 @@ import { getSchoolSlug } from "@/lib/schools";
 import { isSafeReturnPath } from "@/lib/routes";
 import { PageHeader } from "@/components/PageHeader";
 import { RestoreButton } from "./RestoreButton";
+import { PreviewButton } from "./PreviewButton";
 
 export const dynamic = "force-dynamic";
 
@@ -124,8 +125,13 @@ export default async function HistoryPage({
                           )}
                           <time dateTime={rev.created_at} className="mt-1 block text-xs text-tertiary">{formatDate(rev.created_at)}</time>
                         </div>
-                        {!isLatest && !isFixtureMode() && (
-                          <RestoreButton revisionId={rev.id} programId={program.id} programKey={programKey} label="คืนค่าเวอร์ชันนี้" />
+                        {!isFixtureMode() && (
+                          <div className="flex flex-col items-end gap-2">
+                            <PreviewButton revisionId={rev.id} label="ดูตัวอย่างเวอร์ชันนี้" />
+                            {!isLatest && (
+                              <RestoreButton revisionId={rev.id} programId={program.id} programKey={programKey} label="คืนค่าเวอร์ชันนี้" />
+                            )}
+                          </div>
                         )}
                       </div>
                     </article>

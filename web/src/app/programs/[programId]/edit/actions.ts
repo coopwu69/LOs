@@ -268,6 +268,34 @@ export async function saveTemplate(
   }
 }
 
+// Read-only snapshot fetch for the history page's "ดูตัวอย่าง" preview dialog.
+// Returns the same JSON shape stored by snapshotCurrent() so the client can
+// render sections/questions/rubric without mutating anything.
+export async function getRevisionSnapshot(
+  revisionId: string
+): Promise<
+  | { ok: true; snapshot: unknown }
+  | { ok: false; error: string }
+> {
+  if (!isExistingId(revisionId)) {
+    return { ok: false, error: "ข้อมูลไม่ถูกต้อง" };
+  }
+  try {
+    const { rows } = await getPool().query(
+      `SELECT snapshot_json FROM template_revisions WHERE id = $1`,
+      [revisionId]
+    );
+    const row = rows[0] as { snapshot_json: unknown } | undefined;
+    if (!row) return { ok: false, error: "ไม่พบเวอร์ชันที่เลือก" };
+    return { ok: true, snapshot: row.snapshot_json };
+  } catch (e) {
+    return {
+      ok: false,
+      error: e instanceof Error ? e.message : "ไม่สามารถโหลดตัวอย่างได้ในขณะนี้",
+    };
+  }
+}
+
 export async function restoreRevision(
   revisionId: string,
   programId: string
