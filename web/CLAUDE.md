@@ -57,3 +57,26 @@ Unselected state: `bg-raised text-primary hover:bg-hover`.
 The wizard uses uncontrolled form submission (hidden radio inputs with `name`), but RatingCard is controlled (`value`/`onChange`). State is synced from DOM to React via `useEffect` on `formVersion` — this bridges the gap after `restoreForm` sets radio.checked directly on the DOM.
 
 **Do not replace RatingCard with RatingScale** for LOs or report items. RatingScale (the older uncontrolled radio grid) is kept only for backward compatibility but is no longer used in the wizard.
+
+## UI copy: formal Thai only
+
+All user-facing Thai text (copy.ts, help-copy.ts, error messages, labels, docx export) must be formal written Thai, not spoken Thai.
+
+**Why:** the audience is university staff and reviewers; the user asked for a formal register and a full sweep on 2026-10-02.
+
+**How to apply:** use these instead of the colloquial forms:
+- ติ๊ก → เลือก
+- เด้ง → แสดง
+- เจอ → พบ
+- ยังไง → อย่างไร
+- …ไหม → …หรือไม่
+- ใส่ → เพิ่ม / กำหนด
+- เอา → นำ
+- ฟอร์ม → แบบฟอร์ม
+- เบอร์โทร → เบอร์โทรศัพท์
+- ล็อกอิน → เข้าสู่ระบบ
+- ลองอีกครั้ง → ดำเนินการใหม่อีกครั้ง
+- จำ (ลิงก์/ร่าง) → บันทึก
+- ไลน์ → LINE
+- Avoid fillers such as "…ได้เลย" and "เต็มที่".
+- Re-read any sentence after a bulk replace — e.g. "ไม่มีล็อกอิน" became "ไม่มีเข้าสู่ระบบ" and had to be reworded to "ไม่ต้องเข้าสู่ระบบ".

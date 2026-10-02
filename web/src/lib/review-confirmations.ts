@@ -78,13 +78,13 @@ export async function createReviewConfirmation(
   input: NewConfirmationInput
 ): Promise<{ ok: true; confirmation: ReviewConfirmation } | { ok: false; error: string }> {
   if (!UUID_PATTERN.test(input.programId)) {
-    return { ok: false, error: "ไม่พบหลักสูตร กรุณารีเฟรชหน้าแล้วลองอีกครั้ง" };
+    return { ok: false, error: "ไม่พบหลักสูตร กรุณารีเฟรชหน้าแล้วดำเนินการใหม่อีกครั้ง" };
   }
   const name = input.reviewerName.trim();
   const email = input.reviewerEmail.trim();
   const phone = input.reviewerPhone.trim();
   if (!name || !email || !phone) {
-    return { ok: false, error: "กรุณากรอกชื่อ-สกุล อีเมล และเบอร์โทรให้ครบ" };
+    return { ok: false, error: "กรุณากรอกชื่อ-สกุล อีเมล และเบอร์โทรศัพท์ให้ครบ" };
   }
   try {
     const { rows } = await getPool().query(
@@ -106,6 +106,6 @@ export async function createReviewConfirmation(
     return { ok: true, confirmation };
   } catch (error) {
     console.error("Unable to create review confirmation", error);
-    return { ok: false, error: "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง" };
+    return { ok: false, error: "บันทึกไม่สำเร็จ กรุณาดำเนินการใหม่อีกครั้ง" };
   }
 }

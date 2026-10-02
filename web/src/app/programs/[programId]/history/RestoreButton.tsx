@@ -60,7 +60,7 @@ export function RestoreButton({
                   setError(result.error);
                 }
               } catch {
-                setError("ไม่สามารถคืนค่าได้ในขณะนี้ กรุณาลองอีกครั้ง");
+                setError("ไม่สามารถคืนค่าได้ในขณะนี้ กรุณาดำเนินการใหม่อีกครั้ง");
               }
             });
           }}

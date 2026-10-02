@@ -380,11 +380,11 @@ export function TemplateEditor({ doc, programKey }: { doc: TemplateDoc; programK
 
   const handleReviewerConfirm = () => {
     if (!reviewerName.trim() || !reviewerEmail.trim() || !reviewerPhone.trim()) {
-      setReviewerError("กรุณากรอกชื่อ-สกุล อีเมล และเบอร์โทรให้ครบ");
+      setReviewerError("กรุณากรอกชื่อ-สกุล อีเมล และเบอร์โทรศัพท์ให้ครบ");
       return;
     }
     if (!reviewerConfirmed) {
-      setReviewerError("กรุณาติ๊กยืนยันว่าตรวจสอบแล้ว");
+      setReviewerError("กรุณาเลือกยืนยันว่าตรวจสอบแล้ว");
       return;
     }
     setReviewerError(null);

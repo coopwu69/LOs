@@ -335,6 +335,6 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
     }
   } catch (error) {
     console.error("Unable to submit evaluation", error);
-    return { success: false, error: message("บันทึกแบบประเมินไม่สำเร็จ กรุณาลองอีกครั้ง", "The evaluation could not be saved. Please try again.") };
+    return { success: false, error: message("บันทึกแบบประเมินไม่สำเร็จ กรุณาดำเนินการใหม่อีกครั้ง", "The evaluation could not be saved. Please try again.") };
   }
 }

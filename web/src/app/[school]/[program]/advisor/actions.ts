@@ -275,7 +275,7 @@ export async function submitAdvisorEvaluation(
     return {
       success: false,
       error: message(
-        "บันทึกแบบประเมินไม่สำเร็จ กรุณาลองอีกครั้ง",
+        "บันทึกแบบประเมินไม่สำเร็จ กรุณาดำเนินการใหม่อีกครั้ง",
         "The evaluation could not be saved. Please try again.",
       ),
     };

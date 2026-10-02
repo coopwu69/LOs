@@ -33,7 +33,7 @@ export async function confirmReviewAction(
   const confirmed = formData.get("reviewer_confirmed") === "true";
 
   if (!UUID_RE.test(programId)) {
-    return { ok: false, error: "ไม่พบหลักสูตร กรุณารีเฟรชหน้าแล้วลองอีกครั้ง" };
+    return { ok: false, error: "ไม่พบหลักสูตร กรุณารีเฟรชหน้าแล้วดำเนินการใหม่อีกครั้ง" };
   }
   if (!isFormRole(role)) {
     return { ok: false, error: "แบบฟอร์มไม่ถูกต้อง" };
@@ -41,7 +41,7 @@ export async function confirmReviewAction(
   // The checkbox is part of the trust boundary too — without it the
   // confirmation means nothing even if all 3 text fields are filled.
   if (!confirmed) {
-    return { ok: false, error: "กรุณาติ๊กยืนยันว่าตรวจสอบแล้ว" };
+    return { ok: false, error: "กรุณาเลือกยืนยันว่าตรวจสอบแล้ว" };
   }
 
   const result = await createReviewConfirmation({

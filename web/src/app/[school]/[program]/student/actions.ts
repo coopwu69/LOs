@@ -272,6 +272,6 @@ export async function submitStudentSurvey(_prevState: unknown, formData: FormDat
     }
   } catch (error) {
     console.error("Unable to submit student survey", error);
-    return { success: false, error: message("บันทึกแบบสอบถามไม่สำเร็จ กรุณาลองอีกครั้ง", "The questionnaire could not be saved. Please try again.") };
+    return { success: false, error: message("บันทึกแบบสอบถามไม่สำเร็จ กรุณาดำเนินการใหม่อีกครั้ง", "The questionnaire could not be saved. Please try again.") };
   }
 }

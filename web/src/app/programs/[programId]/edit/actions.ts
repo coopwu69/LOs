@@ -94,7 +94,7 @@ export async function saveTemplate(
   reviewer: ReviewerInfo
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!isExistingId(payload.templateId) || !isExistingId(payload.programId)) {
-    return { ok: false, error: "ไม่พบแบบประเมินหรือหลักสูตร กรุณารีเฟรชหน้าแล้วลองอีกครั้ง" };
+    return { ok: false, error: "ไม่พบแบบประเมินหรือหลักสูตร กรุณารีเฟรชหน้าแล้วดำเนินการใหม่อีกครั้ง" };
   }
   // Q11: the editor must confirm their identity and tick "ตรวจสอบแล้ว" before
   // a Save is allowed to persist. The dialog enforces this on the client; this
@@ -105,7 +105,7 @@ export async function saveTemplate(
     !reviewer.email.trim() ||
     !reviewer.phone.trim()
   ) {
-    return { ok: false, error: "กรุณายืนยันตัวตนและติ๊กยืนยันว่าตรวจสอบแล้วก่อนบันทึก" };
+    return { ok: false, error: "กรุณายืนยันตัวตนและเลือกยืนยันว่าตรวจสอบแล้วก่อนบันทึก" };
   }
   const pool = getPool();
   const client = await pool.connect();
@@ -261,7 +261,7 @@ export async function saveTemplate(
     await client.query("ROLLBACK");
     return {
       ok: false,
-      error: e instanceof Error ? e.message : "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง",
+      error: e instanceof Error ? e.message : "บันทึกไม่สำเร็จ กรุณาดำเนินการใหม่อีกครั้ง",
     };
   } finally {
     client.release();

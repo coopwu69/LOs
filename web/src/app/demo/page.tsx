@@ -57,7 +57,7 @@ export default function DemoPage() {
         {/* 2. No descriptions */}
         <div className="rounded-xl border border-border-default bg-raised p-6 shadow-sm">
           <h2 className="mb-1 text-lg font-semibold text-primary">2. ไม่มี description (4 ระดับ)</h2>
-          <p className="mb-4 text-sm text-secondary">กรณีคำถามที่ยังไม่ได้ใส่ rubric — การ์ดจะกระทัดรัดขึ้น</p>
+          <p className="mb-4 text-sm text-secondary">กรณีคำถามที่ยังไม่ได้กำหนด rubric — การ์ดจะกระทัดรัดขึ้น</p>
           <RatingCard
             levels={LEVELS_4_NO_DESC}
             value={v2}
