@@ -244,10 +244,16 @@ export function ReportStep({
   // 4 levels displayed high → low. copy.reportRating is
   // [ต้องปรับปรุง..ดีมาก] (index 0→3), and the form schema maps
   // value = index + 1 (1=ต้องปรับปรุง, 4=ดีมาก). Reverse so the highest score
-  // renders first (leftmost).
-  const levels: RatingLevel[] = copy.reportRating
-    .map((label, i) => ({ value: i + 1, label }))
-    .reverse();
+  // renders first (leftmost). When copy.reportRubric has a per-item entry,
+  // each level's `description` (user-provided wording, 2026-10-02) replaces
+  // the generic reportRating label on the card — items without rubric text
+  // (e.g. English, for now) fall back to the plain label.
+  const levelsForItem = (index: number): RatingLevel[] => {
+    const rubric = copy.reportRubric?.[index];
+    return copy.reportRating
+      .map((label, i) => ({ value: i + 1, label, description: rubric?.[i] }))
+      .reverse();
+  };
 
   // Sync from DOM after draft restore (same pattern as CompetencyStep)
   useEffect(() => {
@@ -282,7 +288,7 @@ export function ReportStep({
             </legend>
             <div className="mt-4">
               <RatingCard
-                levels={levels}
+                levels={levelsForItem(index)}
                 value={ratings[index]}
                 onChange={(v) => setRatings((prev) => ({ ...prev, [index]: v }))}
                 name={fieldName}
