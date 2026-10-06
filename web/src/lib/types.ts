@@ -1,5 +1,23 @@
 // Type contract — agreed with the data agent. Do NOT change.
-export type Domain = 'knowledge' | 'skills' | 'ethics' | 'character' | 'general';
+export type Domain =
+  | 'knowledge'
+  | 'skills'
+  | 'knowledge_skills'
+  | 'social_skills'
+  | 'ethics'
+  | 'character'
+  | 'general';
+
+// Same values as the DB enum `domain_type`; runtime guard for untrusted input.
+export const DOMAINS: readonly Domain[] = [
+  'knowledge',
+  'skills',
+  'knowledge_skills',
+  'social_skills',
+  'ethics',
+  'character',
+  'general',
+];
 export type ScaleStatus = 'standard_4' | 'legacy_5' | 'needs_descriptions';
 
 export type OptionRow = {

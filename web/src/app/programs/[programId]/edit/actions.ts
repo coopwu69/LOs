@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getPool } from "@/lib/db";
-import type { ScaleStatus } from "@/lib/types";
+import { DOMAINS, type Domain, type ScaleStatus } from "@/lib/types";
 
 // Reviewer identity collected by the Q11 confirmation dialog before a Save is
 // allowed to fire. Persisted into template_revisions so /history can show who
@@ -26,6 +26,7 @@ export type EditPayload = {
   sections: {
     id: string;
     titleTh: string;
+    domainType: Domain;
     part: number;
     sequence: number;
     questions: {
@@ -107,6 +108,11 @@ export async function saveTemplate(
   ) {
     return { ok: false, error: "กรุณายืนยันตัวตนและเลือกยืนยันว่าตรวจสอบแล้วก่อนบันทึก" };
   }
+  // The enum cast in SQL would also reject a bad value; this gives the editor
+  // a readable error instead of a database exception.
+  if (payload.sections.some((s) => !DOMAINS.includes(s.domainType))) {
+    return { ok: false, error: "ประเภทหมวดไม่ถูกต้อง กรุณารีเฟรชหน้าแล้วดำเนินการใหม่อีกครั้ง" };
+  }
   const pool = getPool();
   const client = await pool.connect();
   try {
@@ -164,15 +170,15 @@ export async function saveTemplate(
       if (isExistingId(section.id)) {
         await client.query(
           `UPDATE assessment_sections
-           SET title_th = $2, part = $3, sequence = $4, updated_at = now()
+           SET title_th = $2, part = $3, sequence = $4, domain_type = $5::domain_type, updated_at = now()
            WHERE id = $1`,
-          [section.id, section.titleTh, section.part, section.sequence]
+          [section.id, section.titleTh, section.part, section.sequence, section.domainType]
         );
       } else {
         const ins = await client.query(
-          `INSERT INTO assessment_sections (template_id, title_th, part, sequence)
-           VALUES ($1, $2, $3, $4) RETURNING id`,
-          [payload.templateId, section.titleTh, section.part, section.sequence]
+          `INSERT INTO assessment_sections (template_id, title_th, part, sequence, domain_type)
+           VALUES ($1, $2, $3, $4, $5::domain_type) RETURNING id`,
+          [payload.templateId, section.titleTh, section.part, section.sequence, section.domainType]
         );
         section.id = String(ins.rows[0].id);
       }
