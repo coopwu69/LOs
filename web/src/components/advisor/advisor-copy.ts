@@ -55,8 +55,11 @@ export type AdvisorCopy = {
   centerTitle: string;
   centerItems: readonly [string, string];
   workplaceTitle: string;
-  workplaceItems: [string, string, string, string, string];
+  workplaceItems: [string, string, string, string, string, string];
   premiumWorkplace: string;
+  premiumCriteriaButton: string;
+  premiumCriteriaTitle: string;
+  premiumCriteria: readonly string[];
   premiumYes: string;
   premiumNo: string;
   premiumReview: string;
@@ -129,10 +132,19 @@ export const ADVISOR_COPY: Record<Locale, AdvisorCopy> = {
       "ความพร้อมและความร่วมมือของสถานประกอบการ การประสานงานกับมหาวิทยาลัย การจัดสิ่งอำนวยความสะดวกในการปฏิบัติงาน",
       "การมอบหมายให้พนักงานที่มีความรู้และประสบการณ์เป็นผู้ดูแลนักศึกษา",
       "การจัดทำโครงงานและรายงานสหกิจศึกษา ตรงและสอดคล้องกับสาขาวิชา มีความเหมาะสมและเกิดประโยชน์ต่อหน่วยงาน",
-      "สถานประกอบการมีการสนับสนุนด้านสวัสดิการและค่าตอบแทนที่เหมาะสม ความเหมาะสมของที่ตั้งสถานประกอบการและสภาพแวดล้อมที่ปลอดภัย",
+      "สถานประกอบการมีการสนับสนุนด้านสวัสดิการและค่าตอบแทนที่เหมาะสม",
+      "ความเหมาะสมของที่ตั้งสถานประกอบการและสภาพแวดล้อมที่ปลอดภัย",
       "ความพึงพอใจต่อสถานประกอบการโดยภาพรวม",
     ],
     premiumWorkplace: "ควรเป็นหน่วยงานพรีเมี่ยมหรือไม่",
+    premiumCriteriaButton: "ดูเกณฑ์หน่วยงานพรีเมี่ยม",
+    premiumCriteriaTitle: "เกณฑ์หน่วยงานพรีเมี่ยม",
+    premiumCriteria: [
+      "หน่วยงานมีระบบและพี่เลี้ยงที่ตรงสายในการดูแลนักศึกษา",
+      "หน่วยงานมีสวัสดิการดูแลนักศึกษา",
+      "เป็นหน่วยงานที่รับนักศึกษาสหกิจศึกษาอย่างต่อเนื่อง",
+      "เป็นหน่วยงานระดับชาติ และเคยได้รับรางวัลจากมหาวิทยาลัยในประเทศ",
+    ],
     premiumYes: "ใช่",
     premiumNo: "ไม่ใช่",
     premiumReview: "ทบทวนดูก่อน",
@@ -171,12 +183,21 @@ export const ADVISOR_COPY: Record<Locale, AdvisorCopy> = {
       "The readiness and cooperation of the workplace",
       "The suitability of the job supervisor assigned to the student",
       "The job and project assigned are related to the student's field of study, appropriate, and beneficial to the workplace",
-      "Welfare, appropriate compensation, suitable location, and a safe working environment",
+      "Welfare and appropriate compensation provided by the workplace",
+      "Suitability of the workplace location and a safe working environment",
       "Overall satisfaction with the workplace",
     ],
     // TODO(Q12): English wording for the premium-workplace question is a
     // proposal — confirm the official term for "หน่วยงานพรีเมี่ยม".
     premiumWorkplace: "Should this be designated a premium workplace?",
+    premiumCriteriaButton: "View premium workplace criteria",
+    premiumCriteriaTitle: "Premium workplace criteria",
+    premiumCriteria: [
+      "The workplace has a system and a field-relevant mentor to supervise students",
+      "The workplace provides welfare support for students",
+      "The workplace takes cooperative education students continuously",
+      "The workplace is nationally recognized and has received awards from universities in Thailand",
+    ],
     premiumYes: "Yes",
     premiumNo: "No",
     premiumReview: "Needs further review",

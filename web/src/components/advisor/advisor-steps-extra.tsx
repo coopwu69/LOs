@@ -29,6 +29,7 @@ const PROCESS_NAMES = [
   "adv-workplace-2",
   "adv-workplace-3",
   "adv-workplace-4",
+  "adv-workplace-5",
 ] as const;
 const REPORT_NAMES = [
   "adv-report-0",
@@ -278,6 +279,11 @@ export function AdvisorProcessStep({ locale, errors, formVersion }: StepProps) {
           <ChoiceGroup
             legend={`${copy.workplaceItems.length + 1}. ${copy.premiumWorkplace}`}
             name="adv_premium_workplace"
+            info={{
+              buttonLabel: copy.premiumCriteriaButton,
+              title: copy.premiumCriteriaTitle,
+              items: copy.premiumCriteria,
+            }}
             options={[
               { value: "yes", label: copy.premiumYes },
               { value: "no", label: copy.premiumNo },

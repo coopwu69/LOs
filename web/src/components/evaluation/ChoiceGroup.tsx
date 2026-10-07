@@ -13,16 +13,43 @@ type ChoiceGroupProps = {
   options: Choice[];
   required?: boolean;
   error?: string;
+  // Optional "i" hint next to the legend: hover, focus or tap shows the list.
+  info?: { buttonLabel: string; title: string; items: readonly string[] };
 };
 
 // Yes/No choice group rendered as an accessible radio fieldset.
-export function ChoiceGroup({ legend, name, options, required = true, error }: ChoiceGroupProps) {
+export function ChoiceGroup({ legend, name, options, required = true, error, info }: ChoiceGroupProps) {
   const errorId = error ? `${name}-error` : undefined;
+  const infoId = `${name}-info`;
   return (
     <fieldset>
       <legend className="text-sm font-medium text-primary">
         {legend}
         {required && <Required />}
+        {info && (
+          <span className="group/info relative ml-2 inline-block align-middle">
+            <button
+              type="button"
+              aria-label={info.buttonLabel}
+              aria-describedby={infoId}
+              className="inline-flex size-5 items-center justify-center rounded-full border border-border-strong text-xs font-semibold leading-none text-secondary transition-colors hover:border-border-focus hover:text-primary focus-visible:shadow-[var(--shadow-focus-ring)] focus-visible:outline-none"
+            >
+              i
+            </button>
+            <span
+              role="tooltip"
+              id={infoId}
+              className="invisible absolute left-0 top-full z-20 mt-2 w-72 max-w-[calc(100vw-4rem)] rounded-lg border border-border-default bg-raised p-3 text-left text-sm font-normal opacity-0 shadow-lg transition-opacity group-hover/info:visible group-hover/info:opacity-100 group-focus-within/info:visible group-focus-within/info:opacity-100"
+            >
+              <span className="block font-semibold text-primary">{info.title}</span>
+              <ol className="mt-2 list-decimal space-y-1 pl-5 text-secondary">
+                {info.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ol>
+            </span>
+          </span>
+        )}
       </legend>
       <div
         className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:[grid-template-columns:repeat(var(--option-count),minmax(0,1fr))]"

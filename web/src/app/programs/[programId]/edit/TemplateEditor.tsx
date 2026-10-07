@@ -286,6 +286,7 @@ function stateToPayload(state: State): EditPayload {
     sections: state.sections.map((s) => ({
       id: s.id,
       titleTh: s.titleTh,
+      domainType: s.domainType,
       part: s.part,
       sequence: s.sequence,
       questions: s.questions.map((q) => ({
@@ -577,6 +578,8 @@ export function TemplateEditor({ doc, programKey }: { doc: TemplateDoc; programK
                     >
                       <option value="knowledge">ความรู้</option>
                       <option value="skills">ทักษะ</option>
+                      <option value="knowledge_skills">ความรู้และทักษะ</option>
+                      <option value="social_skills">ทักษะทางสังคม</option>
                       <option value="ethics">จริยธรรม</option>
                       <option value="character">ลักษณะบุคคล</option>
                       <option value="general">ทั่วไป</option>

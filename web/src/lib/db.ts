@@ -11,6 +11,7 @@ import type {
   ScaleStatus,
   Domain,
 } from "./types";
+import { DOMAINS } from "./types";
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -111,9 +112,7 @@ const CONFIRMED_ROLES_LATERAL = `
 
 function asDomain(value: unknown): Domain {
   const v = String(value ?? "general") as Domain;
-  return ["knowledge", "skills", "ethics", "character", "general"].includes(v)
-    ? v
-    : "general";
+  return DOMAINS.includes(v) ? v : "general";
 }
 
 function asScaleStatus(value: unknown): ScaleStatus {

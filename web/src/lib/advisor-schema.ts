@@ -23,7 +23,7 @@ import {
 
 export const ADVISOR_OTHER_COUNT = 2;
 export const ADVISOR_CENTER_COUNT = 2;
-export const ADVISOR_WORKPLACE_COUNT = 5;
+export const ADVISOR_WORKPLACE_COUNT = 6;
 export const ADVISOR_REPORT_COUNT = 5;
 
 // --- Score items ---
@@ -75,6 +75,7 @@ export const advisorProcessStepSchema = z
     "adv-workplace-2": adv4ScoreSchema,
     "adv-workplace-3": adv4ScoreSchema,
     "adv-workplace-4": adv4ScoreSchema,
+    "adv-workplace-5": adv4ScoreSchema,
     adv_premium_workplace: z.enum(["yes", "no", "review"], { error: "required" }),
     adv_premium_workplace_reason: z.string().max(2000, "length").optional(),
     adv_future_placement: z.enum(["should", "should_not", "other"], { error: "required" }),
