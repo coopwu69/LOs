@@ -14,7 +14,7 @@ type ChoiceGroupProps = {
   required?: boolean;
   error?: string;
   // Optional "i" hint next to the legend: hover, focus or tap shows the list.
-  info?: { buttonLabel: string; title: string; items: readonly string[] };
+  info?: { buttonLabel: string; title: string; description?: string; items: readonly string[]; note?: string };
 };
 
 // Yes/No choice group rendered as an accessible radio fieldset.
@@ -39,14 +39,16 @@ export function ChoiceGroup({ legend, name, options, required = true, error, inf
             <span
               role="tooltip"
               id={infoId}
-              className="invisible absolute left-0 top-full z-20 mt-2 w-72 max-w-[calc(100vw-4rem)] rounded-lg border border-border-default bg-raised p-3 text-left text-sm font-normal opacity-0 shadow-lg transition-opacity group-hover/info:visible group-hover/info:opacity-100 group-focus-within/info:visible group-focus-within/info:opacity-100"
+              className="invisible absolute left-0 top-full z-20 mt-2 w-96 max-w-[calc(100vw-4rem)] rounded-lg border border-border-default bg-raised p-3 text-left text-sm font-normal opacity-0 shadow-lg transition-opacity group-hover/info:visible group-hover/info:opacity-100 group-focus-within/info:visible group-focus-within/info:opacity-100"
             >
               <span className="block font-semibold text-primary">{info.title}</span>
+              {info.description && <span className="mt-2 block text-secondary">{info.description}</span>}
               <ol className="mt-2 list-decimal space-y-1 pl-5 text-secondary">
                 {info.items.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ol>
+              {info.note && <span className="mt-2 block border-t border-border-default pt-2 text-secondary">{info.note}</span>}
             </span>
           </span>
         )}

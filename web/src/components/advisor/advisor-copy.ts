@@ -59,7 +59,9 @@ export type AdvisorCopy = {
   premiumWorkplace: string;
   premiumCriteriaButton: string;
   premiumCriteriaTitle: string;
+  premiumCriteriaDescription: string;
   premiumCriteria: readonly string[];
+  premiumCriteriaNote: string;
   premiumYes: string;
   premiumNo: string;
   premiumReview: string;
@@ -138,13 +140,16 @@ export const ADVISOR_COPY: Record<Locale, AdvisorCopy> = {
     ],
     premiumWorkplace: "ควรเป็นหน่วยงานพรีเมี่ยมหรือไม่",
     premiumCriteriaButton: "ดูเกณฑ์หน่วยงานพรีเมี่ยม",
-    premiumCriteriaTitle: "เกณฑ์หน่วยงานพรีเมี่ยม",
+    premiumCriteriaTitle: "เกณฑ์สถานประกอบการพรีเมี่ยม",
+    premiumCriteriaDescription: "เข้าใจระบบสหกิจศึกษาของมหาวิทยาลัย และจัดการเรียนรู้ร่วมกันได้อย่างมีประสิทธิภาพ โดยมีเกณฑ์ดังนี้",
     premiumCriteria: [
-      "หน่วยงานมีระบบและพี่เลี้ยงที่ตรงสายในการดูแลนักศึกษา",
-      "หน่วยงานมีสวัสดิการดูแลนักศึกษา",
-      "เป็นหน่วยงานที่รับนักศึกษาสหกิจศึกษาอย่างต่อเนื่อง",
-      "เป็นหน่วยงานระดับชาติ และเคยได้รับรางวัลจากมหาวิทยาลัยในประเทศ",
+      "มอบหมายงานที่มีคุณภาพและตรงกับวิชาชีพนักศึกษา",
+      "มีพี่เลี้ยงที่มีประสบการณ์ตรงสาย คอยดูแล ให้คำปรึกษา และประเมินตามเกณฑ์มหาวิทยาลัย",
+      "รับนักศึกษาต่อเนื่อง 3 ปี หรือเป็นพรีเมี่ยมของหลักสูตรอื่น หรือหลักสูตรเห็นว่ามีกระบวนการสหกิจศึกษาที่ดี",
+      "มีสวัสดิการอย่างน้อยหนึ่งอย่าง หรือมีสภาพแวดล้อมการทำงานที่เหมาะสม",
+      "ภาครัฐเพิ่มเติม: มีอย่างน้อย 3 ฝ่ายงาน และบุคลากร 20 คน โดยนับเฉพาะพื้นที่ที่นักศึกษาไปปฏิบัติงาน",
     ],
+    premiumCriteriaNote: "หมายเหตุ: สถานประกอบการใหม่ที่เพิ่งได้รับอนุมัติให้ส่งนักศึกษาในปีนั้น ยังเป็นพรีเมี่ยมไม่ได้",
     premiumYes: "ใช่",
     premiumNo: "ไม่ใช่",
     premiumReview: "ทบทวนดูก่อน",
@@ -192,12 +197,15 @@ export const ADVISOR_COPY: Record<Locale, AdvisorCopy> = {
     premiumWorkplace: "Should this be designated a premium workplace?",
     premiumCriteriaButton: "View premium workplace criteria",
     premiumCriteriaTitle: "Premium workplace criteria",
+    premiumCriteriaDescription: "Understands the university's cooperative education system and can effectively provide learning experiences together, meeting the following criteria:",
     premiumCriteria: [
-      "The workplace has a system and a field-relevant mentor to supervise students",
-      "The workplace provides welfare support for students",
-      "The workplace takes cooperative education students continuously",
-      "The workplace is nationally recognized and has received awards from universities in Thailand",
+      "Assigns quality work related to the student's profession",
+      "Provides an experienced mentor in the relevant field to supervise, advise, and assess students using university criteria",
+      "Has hosted students for 3 consecutive years, holds premium status with another program, or is considered by the program to have a good cooperative education process",
+      "Provides at least one welfare benefit or a suitable working environment",
+      "Additional public sector requirement: at least 3 departments and 20 staff, counting only the location where the student works",
     ],
+    premiumCriteriaNote: "Note: New workplaces first approved for student placement that year are not yet eligible for premium status.",
     premiumYes: "Yes",
     premiumNo: "No",
     premiumReview: "Needs further review",

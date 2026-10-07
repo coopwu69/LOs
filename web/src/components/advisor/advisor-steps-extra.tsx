@@ -282,7 +282,9 @@ export function AdvisorProcessStep({ locale, errors, formVersion }: StepProps) {
             info={{
               buttonLabel: copy.premiumCriteriaButton,
               title: copy.premiumCriteriaTitle,
+              description: copy.premiumCriteriaDescription,
               items: copy.premiumCriteria,
+              note: copy.premiumCriteriaNote,
             }}
             options={[
               { value: "yes", label: copy.premiumYes },
