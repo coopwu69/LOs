@@ -29,6 +29,7 @@ const PROCESS_NAMES = [
   "adv-workplace-2",
   "adv-workplace-3",
   "adv-workplace-4",
+  "adv-workplace-5",
 ] as const;
 const REPORT_NAMES = [
   "adv-report-0",
@@ -108,8 +109,11 @@ function rating4Levels(copy: AdvisorCopy): RatingLevel[] {
   return copy.rating4.map((label, i) => ({ value: i + 1, label })).reverse();
 }
 
-function reportLevels(copy: AdvisorCopy): RatingLevel[] {
-  return copy.reportRating.map((label, i) => ({ value: i + 1, label })).reverse();
+function reportLevels(copy: AdvisorCopy, index: number): RatingLevel[] {
+  const rubric = copy.reportRubric?.[index];
+  return copy.reportRating
+    .map((label, i) => ({ value: i + 1, label, description: rubric?.[i] }))
+    .reverse();
 }
 
 type RatingItemProps = {
@@ -275,6 +279,11 @@ export function AdvisorProcessStep({ locale, errors, formVersion }: StepProps) {
           <ChoiceGroup
             legend={`${copy.workplaceItems.length + 1}. ${copy.premiumWorkplace}`}
             name="adv_premium_workplace"
+            info={{
+              buttonLabel: copy.premiumCriteriaButton,
+              title: copy.premiumCriteriaTitle,
+              items: copy.premiumCriteria,
+            }}
             options={[
               { value: "yes", label: copy.premiumYes },
               { value: "no", label: copy.premiumNo },
@@ -338,7 +347,6 @@ export function AdvisorProcessStep({ locale, errors, formVersion }: StepProps) {
 // --- Section 4: Report appraisal ---
 export function AdvisorReportStep({ locale, errors, formVersion }: StepProps) {
   const copy = ADVISOR_COPY[locale];
-  const levels = reportLevels(copy);
   const { containerRef, ratings, setRatings } = useDomSyncedRatings(formVersion, REPORT_NAMES);
 
   return (
@@ -352,7 +360,7 @@ export function AdvisorReportStep({ locale, errors, formVersion }: StepProps) {
               name={name}
               index={index}
               label={item}
-              levels={levels}
+              levels={reportLevels(copy, index)}
               value={ratings[name]}
               onChange={(v) => setRatings((prev) => ({ ...prev, [name]: v }))}
               error={errors?.[name]}

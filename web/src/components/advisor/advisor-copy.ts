@@ -36,6 +36,14 @@ export type AdvisorCopy = {
   // Section 4 — report
   reportTitle: string;
   reportItems: [string, string, string, string, string];
+  // Per-item rubric descriptions for the 5 report items, each ordered
+  // low→high (index 0 = level 1 ... index 3 = level 4), shown on each
+  // rating card instead of the generic reportRating label when present
+  // (2026-10-02, user-provided wording — mirrors evaluation/copy.ts's
+  // reportRubric for the company form, but item 3's wording differs
+  // intentionally per the user: advisor sees "หลักวิชาการ" framing,
+  // company sees "หลักฐานอ้างอิง/ข้อมูล" framing).
+  reportRubric?: readonly (readonly [string, string, string, string])[];
   // Section 5 — comments
   otherTitle: string;
   otherItems: [string, string];
@@ -47,8 +55,11 @@ export type AdvisorCopy = {
   centerTitle: string;
   centerItems: readonly [string, string];
   workplaceTitle: string;
-  workplaceItems: [string, string, string, string, string];
+  workplaceItems: [string, string, string, string, string, string];
   premiumWorkplace: string;
+  premiumCriteriaButton: string;
+  premiumCriteriaTitle: string;
+  premiumCriteria: readonly string[];
   premiumYes: string;
   premiumNo: string;
   premiumReview: string;
@@ -73,6 +84,38 @@ export const ADVISOR_COPY: Record<Locale, AdvisorCopy> = {
       "ความถูกต้องในเชิงเนื้อหาและการจัดเก็บข้อมูล",
       "ประโยชน์ของรายงาน/โครงงานต่อหน่วยงานและการนำไปใช้ได้จริง",
     ],
+    reportRubric: [
+      [
+        "ไม่ตรงตามวัตถุประสงค์หรือความต้องการของหน่วยงาน",
+        "ตรงตามวัตถุประสงค์และความต้องการของหน่วยงานบางส่วน",
+        "ตรงตามวัตถุประสงค์และความต้องการของหน่วยงานเป็นส่วนใหญ่",
+        "ตรงตามวัตถุประสงค์และความต้องการของหน่วยงานครบถ้วน",
+      ],
+      [
+        "แทบไม่ขอรับคำปรึกษาหรือรายงานความก้าวหน้า",
+        "ขอรับคำปรึกษาและรายงานความก้าวหน้าเป็นบางครั้งต้องมีการติดตามบ่อย",
+        "ขอรับคำปรึกษาและรายงานความก้าวหน้าสม่ำเสมอโดยบางครั้งต้องมีการติดตาม",
+        "ขอรับคำปรึกษาและรายงานความก้าวหน้าอย่างต่อเนื่องสม่ำเสมอด้วยตนเอง",
+      ],
+      [
+        "เนื้อหาไม่เป็นไปตามหลักวิชาการ",
+        "เนื้อหาถูกต้องตามหลักวิชาการบางส่วน ต้องแก้ไขหลายจุด",
+        "เนื้อหาถูกต้องตามหลักวิชาการเป็นส่วนใหญ่มีข้อบกพร่องเล็กน้อย",
+        "เนื้อหาถูกต้องตามหลักวิชาการมีการอ้างอิงและเหตุผลสนับสนุนครบถ้วน",
+      ],
+      [
+        "ข้อมูลไม่ถูกต้อง หรือไม่มีการจัดเก็บที่เหมาะสม",
+        "ข้อมูลมีข้อผิดพลาดบางส่วน หรือจัดเก็บยังไม่เป็นระบบ",
+        "ข้อมูลถูกต้องเป็นส่วนใหญ่ และจัดเก็บเป็นระเบียบ",
+        "ข้อมูลถูกต้องครบถ้วน และจัดเก็บเป็นระบบสืบค้นและนำกลับมาใช้ได้ง่าย",
+      ],
+      [
+        "ไม่สามารถนำไปใช้ประโยชน์ได้",
+        "นำไปใช้ประโยชน์ได้อย่างจำกัด ต้องปรับปรุงมาก",
+        "หน่วยงานนำไปใช้ประโยชน์ได้ โดยต้องปรับปรุงเล็กน้อย",
+        "หน่วยงานนำไปใช้ประโยชน์ได้จริงและเกิดผลชัดเจน",
+      ],
+    ],
     otherTitle: "ส่วนที่ 5 ข้อคิดเห็น",
     otherItems: [
       "นักศึกษาสหกิจศึกษาสามารถใช้ภาษาอังกฤษหรือภาษาอื่น ๆ ที่เกี่ยวข้องกับการทำงานและในชีวิตประจำวัน",
@@ -89,10 +132,19 @@ export const ADVISOR_COPY: Record<Locale, AdvisorCopy> = {
       "ความพร้อมและความร่วมมือของสถานประกอบการ การประสานงานกับมหาวิทยาลัย การจัดสิ่งอำนวยความสะดวกในการปฏิบัติงาน",
       "การมอบหมายให้พนักงานที่มีความรู้และประสบการณ์เป็นผู้ดูแลนักศึกษา",
       "การจัดทำโครงงานและรายงานสหกิจศึกษา ตรงและสอดคล้องกับสาขาวิชา มีความเหมาะสมและเกิดประโยชน์ต่อหน่วยงาน",
-      "สถานประกอบการมีการสนับสนุนด้านสวัสดิการและค่าตอบแทนที่เหมาะสม ความเหมาะสมของที่ตั้งสถานประกอบการและสภาพแวดล้อมที่ปลอดภัย",
+      "สถานประกอบการมีการสนับสนุนด้านสวัสดิการและค่าตอบแทนที่เหมาะสม",
+      "ความเหมาะสมของที่ตั้งสถานประกอบการและสภาพแวดล้อมที่ปลอดภัย",
       "ความพึงพอใจต่อสถานประกอบการโดยภาพรวม",
     ],
     premiumWorkplace: "ควรเป็นหน่วยงานพรีเมี่ยมหรือไม่",
+    premiumCriteriaButton: "ดูเกณฑ์หน่วยงานพรีเมี่ยม",
+    premiumCriteriaTitle: "เกณฑ์หน่วยงานพรีเมี่ยม",
+    premiumCriteria: [
+      "หน่วยงานมีระบบและพี่เลี้ยงที่ตรงสายในการดูแลนักศึกษา",
+      "หน่วยงานมีสวัสดิการดูแลนักศึกษา",
+      "เป็นหน่วยงานที่รับนักศึกษาสหกิจศึกษาอย่างต่อเนื่อง",
+      "เป็นหน่วยงานระดับชาติ และเคยได้รับรางวัลจากมหาวิทยาลัยในประเทศ",
+    ],
     premiumYes: "ใช่",
     premiumNo: "ไม่ใช่",
     premiumReview: "ทบทวนดูก่อน",
@@ -131,12 +183,21 @@ export const ADVISOR_COPY: Record<Locale, AdvisorCopy> = {
       "The readiness and cooperation of the workplace",
       "The suitability of the job supervisor assigned to the student",
       "The job and project assigned are related to the student's field of study, appropriate, and beneficial to the workplace",
-      "Welfare, appropriate compensation, suitable location, and a safe working environment",
+      "Welfare and appropriate compensation provided by the workplace",
+      "Suitability of the workplace location and a safe working environment",
       "Overall satisfaction with the workplace",
     ],
     // TODO(Q12): English wording for the premium-workplace question is a
     // proposal — confirm the official term for "หน่วยงานพรีเมี่ยม".
     premiumWorkplace: "Should this be designated a premium workplace?",
+    premiumCriteriaButton: "View premium workplace criteria",
+    premiumCriteriaTitle: "Premium workplace criteria",
+    premiumCriteria: [
+      "The workplace has a system and a field-relevant mentor to supervise students",
+      "The workplace provides welfare support for students",
+      "The workplace takes cooperative education students continuously",
+      "The workplace is nationally recognized and has received awards from universities in Thailand",
+    ],
     premiumYes: "Yes",
     premiumNo: "No",
     premiumReview: "Needs further review",

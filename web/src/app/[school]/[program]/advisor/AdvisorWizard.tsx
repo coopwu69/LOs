@@ -3,10 +3,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition, useActionState } from "react";
 import type { Option, Program, Question, Section, Template } from "@/lib/db";
 import type { Locale } from "@/lib/i18n";
+import { computeLiveScores, type LiveScores } from "@/lib/live-score";
 import {
   StepProgressBar,
   ErrorSummary,
   AutosaveStatus,
+  LiveScoreBar,
   WIZARD_COPY,
   PRIMARY_DOMAINS,
   type WizardCopy,
@@ -35,6 +37,7 @@ import {
   validateAdvisorProcessStep,
   validateAdvisorReportStep,
   localizeFieldErrors,
+  ADVISOR_REPORT_COUNT,
 } from "@/lib/advisor-schema";
 
 type QuestionWithOptions = Question & { options: Option[] };
@@ -48,6 +51,9 @@ type Props = {
   locale: Locale;
   role?: string;
 };
+
+// Report items adv-report-0..4 feed the live score bar (G7, goal.md).
+const ADVISOR_REPORT_FIELD_NAMES = Array.from({ length: ADVISOR_REPORT_COUNT }, (_, i) => `adv-report-${i}`);
 
 function restoreForm(form: HTMLFormElement, payload: Record<string, string>) {
   for (const element of Array.from(form.elements)) {
@@ -103,6 +109,7 @@ function hasStepData(
       "adv-workplace-2",
       "adv-workplace-3",
       "adv-workplace-4",
+      "adv-workplace-5",
       "adv_premium_workplace",
       "adv_future_placement",
     ];
@@ -149,6 +156,7 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
   const [saveState, setSaveState] = useState<SaveState>(template ? "preparing" : "preview");
   const [savedAt, setSavedAt] = useState<string>("");
   const [formVersion, setFormVersion] = useState(0);
+  const [liveScores, setLiveScores] = useState<LiveScores>({ loScore: 0, loMax: 0, reportScore: 0, reportMax: 0 });
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [stepCompletion, setStepCompletion] = useState<boolean[]>(() => Array.from({ length: copy.steps.length }, () => false));
   const [, startSaving] = useTransition();
@@ -235,13 +243,14 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
             ? draft.currentStep
             : (ADVISOR_LEGACY_STEP_MAP[draft.currentStep] ?? ADVISOR_STEP.GENERAL);
         setCurrentStep(Math.min(savedStep, copy.steps.length - 1));
+        setLiveScores(computeLiveScores(formRef.current, questions, ADVISOR_REPORT_FIELD_NAMES));
         setFormVersion((version) => version + 1);
         setSaveState("restored");
       } else {
         setSaveState("ready");
       }
     });
-  }, [copy.steps.length, program.id, storageKey, template]);
+  }, [copy.steps.length, program.id, questions, storageKey, template]);
 
   // --- Clear storage on success ---
   useEffect(() => {
@@ -281,10 +290,11 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
 
   // --- Trigger re-render + debounce autosave ---
   const handleChange = useCallback(() => {
+    if (formRef.current) setLiveScores(computeLiveScores(formRef.current, questions, ADVISOR_REPORT_FIELD_NAMES));
     setFormVersion((version) => version + 1);
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => persistDraft(), 900);
-  }, [persistDraft]);
+  }, [persistDraft, questions]);
 
   // --- Navigate to a step ---
   const goToStep = useCallback(
@@ -423,6 +433,15 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
       <input type="hidden" name="draftToken" defaultValue="" />
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="evaluatorRole" value={role} />
+
+      <LiveScoreBar
+        locale={locale}
+        variant="advisor"
+        loScore={liveScores.loScore}
+        loMax={liveScores.loMax}
+        reportScore={liveScores.reportScore}
+        reportMax={liveScores.reportMax}
+      />
 
       <StepProgressBar
         currentStep={currentStep}
