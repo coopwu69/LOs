@@ -15,6 +15,7 @@ import { Field, SelectField, TextAreaField, Required } from "./fields";
 import { StudentAutocomplete } from "./StudentAutocomplete";
 import { RatingCard, type RatingLevel } from "./RatingCard";
 import { ChoiceGroup } from "./ChoiceGroup";
+import { PHONE_PATTERN } from "@/lib/contact-validation";
 import { ACADEMIC_TERMS, semestersForYear } from "@/lib/evaluation-schema";
 
 type QuestionWithOptions = Question & { options: Option[] };
@@ -84,7 +85,7 @@ export function GeneralStep({
           <Field label={copy.evaluatorName} name="evaluator_name" autoComplete="name" required locale={locale} error={errors?.evaluator_name} />
           <Field label={copy.position} name="position" autoComplete="organization-title" required locale={locale} error={errors?.position} />
           <Field label={copy.department} name="department" autoComplete="organization" required locale={locale} error={errors?.department} />
-          <Field label={copy.phone} name="phone" type="tel" inputMode="tel" placeholder={copy.phoneExample} pattern="[0-9+() \\-]{8,20}" autoComplete="tel" required locale={locale} error={errors?.phone} />
+          <Field label={copy.phone} name="phone" type="tel" inputMode="tel" placeholder={copy.phoneExample} pattern={PHONE_PATTERN.source} autoComplete="tel" required locale={locale} error={errors?.phone} />
         </div>
       </fieldset>
       <fieldset className="border-t border-border-default pt-8">

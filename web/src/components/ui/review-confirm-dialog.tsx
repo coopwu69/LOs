@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Locale } from "@/lib/i18n";
+import { reviewerValidationError } from "@/lib/contact-validation";
 import { FORM_NAMES } from "@/lib/form-names";
 import type { FormRole } from "@/lib/routes";
 import { confirmReviewAction, type ConfirmReviewState } from "@/app/programs/[programId]/review/actions";
@@ -141,6 +142,12 @@ export function ReviewConfirmDialog({ programId, programName, programCode, role,
       setLocalError(c.required);
       return;
     }
+    const validationError = reviewerValidationError({ name, email, phone }, locale);
+    if (validationError) {
+      event.preventDefault();
+      setLocalError(validationError);
+      return;
+    }
     setLocalError(null);
     // Let the native submit proceed to the server action (useActionState).
   };
@@ -195,6 +202,7 @@ export function ReviewConfirmDialog({ programId, programName, programCode, role,
                 id="review_reviewer_email"
                 name="reviewer_email"
                 type="email"
+                maxLength={254}
                 className={inputClass}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -208,6 +216,8 @@ export function ReviewConfirmDialog({ programId, programName, programCode, role,
                 id="review_reviewer_phone"
                 name="reviewer_phone"
                 type="tel"
+                inputMode="tel"
+                maxLength={25}
                 className={inputClass}
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}

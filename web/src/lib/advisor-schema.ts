@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { fullNameSchema } from "./contact-validation";
 import {
   SEMESTER_PATTERN,
   ACADEMIC_YEAR_PATTERN,
@@ -43,9 +44,9 @@ export const advisorGeneralStepSchema = z.object({
   academic_year: z.string().min(1, "required").regex(ACADEMIC_YEAR_PATTERN, "academic_year"),
   semester: z.string().min(1, "required").regex(SEMESTER_PATTERN, "semester"),
   student_code: z.string().min(1, "required").regex(STUDENT_CODE_PATTERN, "student_code"),
-  student_name: z.string().min(1, "required").max(200, "length"),
+  student_name: fullNameSchema,
   company: z.string().min(1, "required").max(200, "length"),
-  advisor_name: z.string().min(1, "required").max(120, "length"),
+  advisor_name: fullNameSchema.max(120, "length"),
 });
 
 // --- Section 4: Report appraisal (4-level scale, same as every other item) ---

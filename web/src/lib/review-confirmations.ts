@@ -1,3 +1,4 @@
+import { reviewerValidationError } from "./contact-validation";
 import { getPool } from "./db";
 import { UUID_PATTERN } from "./evaluation-schema";
 import type { FormRole } from "./routes";
@@ -83,9 +84,8 @@ export async function createReviewConfirmation(
   const name = input.reviewerName.trim();
   const email = input.reviewerEmail.trim();
   const phone = input.reviewerPhone.trim();
-  if (!name || !email || !phone) {
-    return { ok: false, error: "กรุณากรอกชื่อ-สกุล อีเมล และเบอร์โทรศัพท์ให้ครบ" };
-  }
+  const validationError = reviewerValidationError({ name, email, phone });
+  if (validationError) return { ok: false, error: validationError };
   try {
     const { rows } = await getPool().query(
       `INSERT INTO curriculum_review_confirmations

@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import Link from "next/link";
+import { reviewerValidationError } from "@/lib/contact-validation";
 import type { TemplateDoc, ScaleStatus, Domain } from "@/lib/types";
 import { saveTemplateAction } from "./actions";
 import { buildStandard4Options, newId } from "@/lib/editor-utils";
@@ -380,8 +381,9 @@ export function TemplateEditor({ doc, programKey }: { doc: TemplateDoc; programK
   };
 
   const handleReviewerConfirm = () => {
-    if (!reviewerName.trim() || !reviewerEmail.trim() || !reviewerPhone.trim()) {
-      setReviewerError("กรุณากรอกชื่อ-สกุล อีเมล และเบอร์โทรศัพท์ให้ครบ");
+    const validationError = reviewerValidationError({ name: reviewerName, email: reviewerEmail, phone: reviewerPhone });
+    if (validationError) {
+      setReviewerError(validationError);
       return;
     }
     if (!reviewerConfirmed) {
@@ -875,6 +877,7 @@ export function TemplateEditor({ doc, programKey }: { doc: TemplateDoc; programK
                 id="reviewer_email"
                 name="reviewer_email"
                 type="email"
+                maxLength={254}
                 className={inputClass}
                 value={reviewerEmail}
                 onChange={(e) => setReviewerEmail(e.target.value)}
@@ -887,6 +890,8 @@ export function TemplateEditor({ doc, programKey }: { doc: TemplateDoc; programK
                 id="reviewer_phone"
                 name="reviewer_phone"
                 type="tel"
+                inputMode="tel"
+                maxLength={25}
                 className={inputClass}
                 value={reviewerPhone}
                 onChange={(e) => setReviewerPhone(e.target.value)}

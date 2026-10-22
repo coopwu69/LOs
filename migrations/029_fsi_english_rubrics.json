@@ -1,0 +1,531 @@
+{
+  "source_url": "https://los-wu.vercel.app/agri/fsi/company/th",
+  "template_id": "09adf8a5-5588-48bd-b969-f26cc5c4ed72",
+  "program_id": "7701a2f3-85ee-4f89-a946-5db9d0afb8ce",
+  "notes": [
+    "English translations preserve the existing Thai criteria. Accidental section-heading suffixes in LO4/LO10/LO11 score 1 are not translated.",
+    "User approved the existing LO10 question and rubric on 2026-10-22. Only its score-1 section-heading suffix is removed from the Thai text."
+  ],
+  "options": [
+    {
+      "option_id": "7882fc44-0333-4e33-b8a8-c03d2c655502",
+      "question_id": "a38c6926-e700-47dc-8df6-9deb03f2c4fe",
+      "lo_code": "LO1",
+      "score": 4,
+      "description_th_expected": "สามารถนำความรู้พื้นฐานหลายด้านมาเชื่อมโยงและประยุกต์ใช้กับงานได้อย่างถูกต้อง อธิบายเหตุผลหรือหลักการที่ใช้ได้ชัดเจน และสามารถนำความรู้มาใช้แก้ปัญหาหรือปรับปรุงงานได้",
+      "description_en": "Integrates and correctly applies fundamental knowledge from multiple disciplines to work, clearly explains the underlying reasoning or principles, and uses that knowledge to solve problems or improve work.",
+      "label_en": "Very good",
+      "description_th_new": "สามารถนำความรู้พื้นฐานหลายด้านมาเชื่อมโยงและประยุกต์ใช้กับงานได้อย่างถูกต้อง อธิบายเหตุผลหรือหลักการที่ใช้ได้ชัดเจน และสามารถนำความรู้มาใช้แก้ปัญหาหรือปรับปรุงงานได้"
+    },
+    {
+      "option_id": "6068cfd1-13dd-4cdd-be42-27fa2e5182d3",
+      "question_id": "a38c6926-e700-47dc-8df6-9deb03f2c4fe",
+      "lo_code": "LO1",
+      "score": 3,
+      "description_th_expected": "สามารถนำความรู้พื้นฐานที่เกี่ยวข้องมาใช้กับงานได้ถูกต้อง อธิบายหลักการที่เกี่ยวข้องได้ และปฏิบัติงานได้ตามความคาดหวัง",
+      "description_en": "Correctly applies relevant fundamental knowledge to work, explains the related principles, and performs tasks as expected.",
+      "label_en": "Good",
+      "description_th_new": "สามารถนำความรู้พื้นฐานที่เกี่ยวข้องมาใช้กับงานได้ถูกต้อง อธิบายหลักการที่เกี่ยวข้องได้ และปฏิบัติงานได้ตามความคาดหวัง"
+    },
+    {
+      "option_id": "4d2e0862-4726-4e49-9878-55d7f53a6ebb",
+      "question_id": "a38c6926-e700-47dc-8df6-9deb03f2c4fe",
+      "lo_code": "LO1",
+      "score": 2,
+      "description_th_expected": "มีความรู้พื้นฐานบางส่วนและสามารถนำมาใช้กับงานได้ แต่ยังมีข้อผิดพลาดหรือต้องได้รับคำแนะนำจากผู้ควบคุมงาน",
+      "description_en": "Has some fundamental knowledge and can apply it to work, but still makes errors or requires guidance from the supervisor.",
+      "label_en": "Fair",
+      "description_th_new": "มีความรู้พื้นฐานบางส่วนและสามารถนำมาใช้กับงานได้ แต่ยังมีข้อผิดพลาดหรือต้องได้รับคำแนะนำจากผู้ควบคุมงาน"
+    },
+    {
+      "option_id": "cd9eb844-ede4-4e45-bc10-51bd0d80f7f5",
+      "question_id": "a38c6926-e700-47dc-8df6-9deb03f2c4fe",
+      "lo_code": "LO1",
+      "score": 1,
+      "description_th_expected": "ขาดความรู้พื้นฐานที่จำเป็นต่อการปฏิบัติงาน ไม่สามารถอธิบายหรือประยุกต์ใช้ความรู้ได้ และต้องได้รับการสอนหรือกำกับอย่างใกล้ชิด",
+      "description_en": "Lacks the fundamental knowledge needed for the work, cannot explain or apply that knowledge, and requires close instruction or supervision.",
+      "label_en": "Needs improvement",
+      "description_th_new": "ขาดความรู้พื้นฐานที่จำเป็นต่อการปฏิบัติงาน ไม่สามารถอธิบายหรือประยุกต์ใช้ความรู้ได้ และต้องได้รับการสอนหรือกำกับอย่างใกล้ชิด"
+    },
+    {
+      "option_id": "63840f6d-29b0-4941-a9b1-47b22508c272",
+      "question_id": "a8f121aa-43bb-40c6-aa99-54a19c117088",
+      "lo_code": "LO2",
+      "score": 4,
+      "description_th_expected": "เคารพความแตกต่างทางวัฒนธรรมและความคิดเห็น สามารถปรับตัวเข้ากับบริบทขององค์กรและผู้ร่วมงานได้ดี และเสนอหรือปฏิบัติแนวทางที่สนับสนุนความรับผิดชอบต่อสังคม/สิ่งแวดล้อมและความยั่งยืน",
+      "description_en": "Respects cultural differences and differing opinions, adapts well to the organization and colleagues, and proposes or follows practices that support social and environmental responsibility and sustainability.",
+      "label_en": "Very good",
+      "description_th_new": "เคารพความแตกต่างทางวัฒนธรรมและความคิดเห็น สามารถปรับตัวเข้ากับบริบทขององค์กรและผู้ร่วมงานได้ดี และเสนอหรือปฏิบัติแนวทางที่สนับสนุนความรับผิดชอบต่อสังคม/สิ่งแวดล้อมและความยั่งยืน"
+    },
+    {
+      "option_id": "2f5e8312-7bc1-4d86-a1e2-b8ed12347a2c",
+      "question_id": "a8f121aa-43bb-40c6-aa99-54a19c117088",
+      "lo_code": "LO2",
+      "score": 3,
+      "description_th_expected": "เคารพความแตกต่าง ปฏิบัติตนเหมาะสมกับวัฒนธรรมองค์กร และสามารถปรับตัวต่อสถานการณ์หรือสภาพแวดล้อมการทำงานได้",
+      "description_en": "Respects differences, behaves appropriately within the organizational culture, and adapts to workplace situations or conditions.",
+      "label_en": "Good",
+      "description_th_new": "เคารพความแตกต่าง ปฏิบัติตนเหมาะสมกับวัฒนธรรมองค์กร และสามารถปรับตัวต่อสถานการณ์หรือสภาพแวดล้อมการทำงานได้"
+    },
+    {
+      "option_id": "f542b5e8-1c8d-43cf-a819-bc332004810e",
+      "question_id": "a8f121aa-43bb-40c6-aa99-54a19c117088",
+      "lo_code": "LO2",
+      "score": 2,
+      "description_th_expected": "สามารถปรับตัวได้บางสถานการณ์ แต่ยังต้องได้รับคำแนะนำเกี่ยวกับวัฒนธรรมองค์กร การทำงานร่วมกับผู้อื่น หรือการคำนึงถึงความยั่งยืน",
+      "description_en": "Adapts to some situations but still requires guidance on organizational culture, working with others, or considering sustainability.",
+      "label_en": "Fair",
+      "description_th_new": "สามารถปรับตัวได้บางสถานการณ์ แต่ยังต้องได้รับคำแนะนำเกี่ยวกับวัฒนธรรมองค์กร การทำงานร่วมกับผู้อื่น หรือการคำนึงถึงความยั่งยืน"
+    },
+    {
+      "option_id": "680e27e6-e186-4ce5-91d3-e113917d035b",
+      "question_id": "a8f121aa-43bb-40c6-aa99-54a19c117088",
+      "lo_code": "LO2",
+      "score": 1,
+      "description_th_expected": "ปรับตัวเข้ากับบริบทการทำงานได้ยาก ไม่คำนึงถึงความแตกต่างหรือบริบทของผู้อื่น และมีพฤติกรรมที่ไม่เหมาะสมกับสภาพแวดล้อมการทำงาน",
+      "description_en": "Has difficulty adapting to the workplace, disregards differences or others' circumstances, and behaves in ways that are inappropriate for the work environment.",
+      "label_en": "Needs improvement",
+      "description_th_new": "ปรับตัวเข้ากับบริบทการทำงานได้ยาก ไม่คำนึงถึงความแตกต่างหรือบริบทของผู้อื่น และมีพฤติกรรมที่ไม่เหมาะสมกับสภาพแวดล้อมการทำงาน"
+    },
+    {
+      "option_id": "e7d75170-6719-4bb4-b0a4-e2a7890b30c8",
+      "question_id": "2a73a32c-206e-4379-b207-d9649a236e7b",
+      "lo_code": "LO3",
+      "score": 4,
+      "description_th_expected": "มีความรู้เชิงลึกในสาขาที่เกี่ยวข้องกับงาน สามารถเชื่อมโยงความรู้จากหลายด้านของวิทยาศาสตร์อาหารเพื่อวิเคราะห์งานหรือปัญหา และอธิบายเหตุผลทางวิชาการได้อย่างถูกต้อง",
+      "description_en": "Has in-depth knowledge relevant to the work, integrates knowledge from multiple areas of food science to analyze tasks or problems, and correctly explains the scientific reasoning.",
+      "label_en": "Very good",
+      "description_th_new": "มีความรู้เชิงลึกในสาขาที่เกี่ยวข้องกับงาน สามารถเชื่อมโยงความรู้จากหลายด้านของวิทยาศาสตร์อาหารเพื่อวิเคราะห์งานหรือปัญหา และอธิบายเหตุผลทางวิชาการได้อย่างถูกต้อง"
+    },
+    {
+      "option_id": "b58d8b0b-0db1-440a-8b7e-12f3dcdad94c",
+      "question_id": "2a73a32c-206e-4379-b207-d9649a236e7b",
+      "lo_code": "LO3",
+      "score": 3,
+      "description_th_expected": "มีความรู้ด้านวิทยาศาสตร์อาหารที่จำเป็นต่อการปฏิบัติงาน และสามารถนำความรู้มาใช้ได้ถูกต้องตามขั้นตอนและมาตรฐานของงาน",
+      "description_en": "Has the food science knowledge needed for the work and applies it correctly in accordance with work procedures and standards.",
+      "label_en": "Good",
+      "description_th_new": "มีความรู้ด้านวิทยาศาสตร์อาหารที่จำเป็นต่อการปฏิบัติงาน และสามารถนำความรู้มาใช้ได้ถูกต้องตามขั้นตอนและมาตรฐานของงาน"
+    },
+    {
+      "option_id": "8ab64b51-2be2-4ab7-bddf-702b20aff891",
+      "question_id": "2a73a32c-206e-4379-b207-d9649a236e7b",
+      "lo_code": "LO3",
+      "score": 2,
+      "description_th_expected": "มีความรู้พื้นฐานที่เกี่ยวข้องกับงาน แต่ยังไม่สามารถประยุกต์ใช้ได้อย่างสม่ำเสมอ มีข้อผิดพลาด และต้องได้รับคำแนะนำ",
+      "description_en": "Has fundamental knowledge relevant to the work but cannot yet apply it consistently, makes errors, and requires guidance.",
+      "label_en": "Fair",
+      "description_th_new": "มีความรู้พื้นฐานที่เกี่ยวข้องกับงาน แต่ยังไม่สามารถประยุกต์ใช้ได้อย่างสม่ำเสมอ มีข้อผิดพลาด และต้องได้รับคำแนะนำ"
+    },
+    {
+      "option_id": "627894c8-2a3f-4b8a-8787-806e21e1c3c4",
+      "question_id": "2a73a32c-206e-4379-b207-d9649a236e7b",
+      "lo_code": "LO3",
+      "score": 1,
+      "description_th_expected": "ขาดความรู้ที่จำเป็นต่อการปฏิบัติงาน ไม่สามารถอธิบายหลักการสำคัญหรือประยุกต์ใช้ความรู้ด้านวิทยาศาสตร์อาหารได้",
+      "description_en": "Lacks the knowledge needed for the work and cannot explain key principles or apply food science knowledge.",
+      "label_en": "Needs improvement",
+      "description_th_new": "ขาดความรู้ที่จำเป็นต่อการปฏิบัติงาน ไม่สามารถอธิบายหลักการสำคัญหรือประยุกต์ใช้ความรู้ด้านวิทยาศาสตร์อาหารได้"
+    },
+    {
+      "option_id": "154a03ff-332a-45d6-8ed3-160383da2327",
+      "question_id": "50a76bb8-fa37-4cab-9f7a-90c7ceea0a9c",
+      "lo_code": "LO4",
+      "score": 4,
+      "description_th_expected": "สามารถบูรณาการความรู้เพื่อเสนอหรือพัฒนาวิธีการ กระบวนการ หรือผลิตภัณฑ์ใหม่ที่มีคุณค่า และสามารถอธิบายเหตุผล ประโยชน์ หรือผลที่คาดว่าจะได้รับอย่างเป็นระบบ",
+      "description_en": "Integrates knowledge to propose or develop valuable new methods, processes, or products, and systematically explains the reasoning, benefits, or expected outcomes.",
+      "label_en": "Very good",
+      "description_th_new": "สามารถบูรณาการความรู้เพื่อเสนอหรือพัฒนาวิธีการ กระบวนการ หรือผลิตภัณฑ์ใหม่ที่มีคุณค่า และสามารถอธิบายเหตุผล ประโยชน์ หรือผลที่คาดว่าจะได้รับอย่างเป็นระบบ"
+    },
+    {
+      "option_id": "9ba8a9d7-5ce7-465f-b39b-8448e3353e41",
+      "question_id": "50a76bb8-fa37-4cab-9f7a-90c7ceea0a9c",
+      "lo_code": "LO4",
+      "score": 3,
+      "description_th_expected": "สามารถนำความรู้ด้านวิทยาศาสตร์อาหารมาประยุกต์ใช้เพื่อปรับปรุงกระบวนการ ผลิตภัณฑ์ หรือคุณภาพของงานได้อย่างเหมาะสม",
+      "description_en": "Appropriately applies food science knowledge to improve processes, products, or work quality.",
+      "label_en": "Good",
+      "description_th_new": "สามารถนำความรู้ด้านวิทยาศาสตร์อาหารมาประยุกต์ใช้เพื่อปรับปรุงกระบวนการ ผลิตภัณฑ์ หรือคุณภาพของงานได้อย่างเหมาะสม"
+    },
+    {
+      "option_id": "abeadd95-6a76-48a9-a340-b4b05fa16f15",
+      "question_id": "50a76bb8-fa37-4cab-9f7a-90c7ceea0a9c",
+      "lo_code": "LO4",
+      "score": 2,
+      "description_th_expected": "สามารถนำความรู้มาประยุกต์ใช้เพื่อแก้ปัญหาหรือปรับปรุงงานได้บางส่วน แต่ยังต้องได้รับคำแนะนำในการพัฒนาแนวคิดหรือวิธีการ",
+      "description_en": "Applies knowledge to solve problems or improve some aspects of the work but still requires guidance to develop ideas or methods.",
+      "label_en": "Fair",
+      "description_th_new": "สามารถนำความรู้มาประยุกต์ใช้เพื่อแก้ปัญหาหรือปรับปรุงงานได้บางส่วน แต่ยังต้องได้รับคำแนะนำในการพัฒนาแนวคิดหรือวิธีการ"
+    },
+    {
+      "option_id": "be0188ee-b189-47e5-ae6f-d3d0066bc581",
+      "question_id": "50a76bb8-fa37-4cab-9f7a-90c7ceea0a9c",
+      "lo_code": "LO4",
+      "score": 1,
+      "description_th_expected": "ไม่สามารถเชื่อมโยงความรู้กับการปฏิบัติงานหรือเสนอแนวทางในการปรับปรุงงานได้ทักษะ (Skills)",
+      "description_en": "Cannot connect knowledge with practical work or propose ways to improve the work.",
+      "label_en": "Needs improvement",
+      "description_th_new": "ไม่สามารถเชื่อมโยงความรู้กับการปฏิบัติงานหรือเสนอแนวทางในการปรับปรุงงานได้ทักษะ (Skills)"
+    },
+    {
+      "option_id": "5088573f-5c9d-4178-af0e-0d78f59721be",
+      "question_id": "b5b67169-5d57-434f-aeb8-bdd672bf9f11",
+      "lo_code": "LO5",
+      "score": 4,
+      "description_th_expected": "เลือกเครื่องมือ/วิธีการได้เหมาะสม ใช้งานได้ถูกต้อง ปลอดภัย และตรวจสอบความถูกต้องของผลการปฏิบัติงานได้ด้วยตนเอง",
+      "description_en": "Selects appropriate tools and methods, uses them correctly and safely, and independently verifies the accuracy of the results.",
+      "label_en": "Very good",
+      "description_th_new": "เลือกเครื่องมือ/วิธีการได้เหมาะสม ใช้งานได้ถูกต้อง ปลอดภัย และตรวจสอบความถูกต้องของผลการปฏิบัติงานได้ด้วยตนเอง"
+    },
+    {
+      "option_id": "32eeddfc-d73e-47b5-a99d-3d145ca594c3",
+      "question_id": "b5b67169-5d57-434f-aeb8-bdd672bf9f11",
+      "lo_code": "LO5",
+      "score": 3,
+      "description_th_expected": "ใช้เครื่องมือและวิธีการได้ถูกต้องตามหลักการและ SOP ปฏิบัติตามข้อกำหนดด้านความปลอดภัย และทำงานได้ด้วยตนเองเป็นส่วนใหญ่",
+      "description_en": "Uses tools and methods correctly in accordance with scientific principles and standard operating procedures, follows safety requirements, and works independently for most tasks.",
+      "label_en": "Good",
+      "description_th_new": "ใช้เครื่องมือและวิธีการได้ถูกต้องตามหลักการและ SOP ปฏิบัติตามข้อกำหนดด้านความปลอดภัย และทำงานได้ด้วยตนเองเป็นส่วนใหญ่"
+    },
+    {
+      "option_id": "8f30f59b-2f84-4c51-8acc-a639bbe265f5",
+      "question_id": "b5b67169-5d57-434f-aeb8-bdd672bf9f11",
+      "lo_code": "LO5",
+      "score": 2,
+      "description_th_expected": "สามารถใช้เครื่องมือหรือวิธีการพื้นฐานได้ แต่ยังมีข้อผิดพลาดและต้องได้รับการตรวจสอบหรือคำแนะนำเป็นระยะ",
+      "description_en": "Uses basic tools or methods but still makes errors and requires periodic checks or guidance.",
+      "label_en": "Fair",
+      "description_th_new": "สามารถใช้เครื่องมือหรือวิธีการพื้นฐานได้ แต่ยังมีข้อผิดพลาดและต้องได้รับการตรวจสอบหรือคำแนะนำเป็นระยะ"
+    },
+    {
+      "option_id": "4e828108-1baa-4120-9796-183c375417fa",
+      "question_id": "b5b67169-5d57-434f-aeb8-bdd672bf9f11",
+      "lo_code": "LO5",
+      "score": 1,
+      "description_th_expected": "ใช้เครื่องมือหรือวิธีการไม่ถูกต้อง ไม่ปฏิบัติตามข้อกำหนดด้านความปลอดภัย หรือก่อให้เกิดความเสี่ยงต่อบุคคล เครื่องมือ หรือผลการทดสอบ",
+      "description_en": "Uses tools or methods incorrectly, fails to follow safety requirements, or creates risks to people, equipment, or test results.",
+      "label_en": "Needs improvement",
+      "description_th_new": "ใช้เครื่องมือหรือวิธีการไม่ถูกต้อง ไม่ปฏิบัติตามข้อกำหนดด้านความปลอดภัย หรือก่อให้เกิดความเสี่ยงต่อบุคคล เครื่องมือ หรือผลการทดสอบ"
+    },
+    {
+      "option_id": "23c9085e-2b4e-4bd8-8178-2e733feb11f1",
+      "question_id": "80e84372-6cf5-48d0-a388-5da4c86cecae",
+      "lo_code": "LO6",
+      "score": 4,
+      "description_th_expected": "ปฏิบัติงานด้านวิทยาศาสตร์อาหารได้ถูกต้อง ครบถ้วน สม่ำเสมอ และเป็นไปตามมาตรฐาน/SOP สามารถควบคุมคุณภาพและตรวจสอบความถูกต้องของงานได้ด้วยตนเอง",
+      "description_en": "Performs food science tasks correctly, completely, and consistently in accordance with standards and standard operating procedures, and independently controls quality and verifies the accuracy of the work.",
+      "label_en": "Very good",
+      "description_th_new": "ปฏิบัติงานด้านวิทยาศาสตร์อาหารได้ถูกต้อง ครบถ้วน สม่ำเสมอ และเป็นไปตามมาตรฐาน/SOP สามารถควบคุมคุณภาพและตรวจสอบความถูกต้องของงานได้ด้วยตนเอง"
+    },
+    {
+      "option_id": "d15a478c-b99d-43a9-b2b9-1301a55e0c7b",
+      "question_id": "80e84372-6cf5-48d0-a388-5da4c86cecae",
+      "lo_code": "LO6",
+      "score": 3,
+      "description_th_expected": "ปฏิบัติงานด้านวิทยาศาสตร์อาหารได้ถูกต้องตามขั้นตอนและมาตรฐานขององค์กร มีข้อผิดพลาดน้อยและสามารถแก้ไขได้",
+      "description_en": "Performs food science tasks correctly in accordance with organizational procedures and standards, makes few errors, and can correct them.",
+      "label_en": "Good",
+      "description_th_new": "ปฏิบัติงานด้านวิทยาศาสตร์อาหารได้ถูกต้องตามขั้นตอนและมาตรฐานขององค์กร มีข้อผิดพลาดน้อยและสามารถแก้ไขได้"
+    },
+    {
+      "option_id": "6360afca-5fc8-4672-944b-1ef38212ea7c",
+      "question_id": "80e84372-6cf5-48d0-a388-5da4c86cecae",
+      "lo_code": "LO6",
+      "score": 2,
+      "description_th_expected": "ปฏิบัติงานได้บางส่วน แต่ยังมีข้อผิดพลาดหรือต้องได้รับการกำกับดูแลในขั้นตอนสำคัญ",
+      "description_en": "Completes some aspects of the work but still makes errors or requires supervision during critical steps.",
+      "label_en": "Fair",
+      "description_th_new": "ปฏิบัติงานได้บางส่วน แต่ยังมีข้อผิดพลาดหรือต้องได้รับการกำกับดูแลในขั้นตอนสำคัญ"
+    },
+    {
+      "option_id": "d50d54fd-311f-4c30-8775-fec15fc0fa66",
+      "question_id": "80e84372-6cf5-48d0-a388-5da4c86cecae",
+      "lo_code": "LO6",
+      "score": 1,
+      "description_th_expected": "ไม่สามารถปฏิบัติงานตามขั้นตอนหรือมาตรฐานที่กำหนดได้ และต้องได้รับการดูแลอย่างใกล้ชิด",
+      "description_en": "Cannot perform tasks in accordance with the specified procedures or standards and requires close supervision.",
+      "label_en": "Needs improvement",
+      "description_th_new": "ไม่สามารถปฏิบัติงานตามขั้นตอนหรือมาตรฐานที่กำหนดได้ และต้องได้รับการดูแลอย่างใกล้ชิด"
+    },
+    {
+      "option_id": "c67b42f0-261b-4af2-8ede-b65b41db4f40",
+      "question_id": "d470ebd3-e0cb-4b51-94a1-fc1dca12ca43",
+      "lo_code": "LO7",
+      "score": 4,
+      "description_th_expected": "วิเคราะห์ปัญหาอย่างเป็นระบบ สามารถระบุสาเหตุที่แท้จริง พิจารณาทางเลือกหลายแนวทาง ใช้ข้อมูลหรือหลักฐานประกอบการตัดสินใจ และเสนอวิธีแก้ปัญหาที่เหมาะสม",
+      "description_en": "Analyzes problems systematically, identifies root causes, considers multiple alternatives, uses data or evidence to support decisions, and proposes appropriate solutions.",
+      "label_en": "Very good",
+      "description_th_new": "วิเคราะห์ปัญหาอย่างเป็นระบบ สามารถระบุสาเหตุที่แท้จริง พิจารณาทางเลือกหลายแนวทาง ใช้ข้อมูลหรือหลักฐานประกอบการตัดสินใจ และเสนอวิธีแก้ปัญหาที่เหมาะสม"
+    },
+    {
+      "option_id": "d69de8e4-30e2-4b8a-bf0d-d529440003fe",
+      "question_id": "d470ebd3-e0cb-4b51-94a1-fc1dca12ca43",
+      "lo_code": "LO7",
+      "score": 3,
+      "description_th_expected": "วิเคราะห์ปัญหาได้อย่างมีเหตุผล ระบุสาเหตุและเลือกแนวทางแก้ไขที่เหมาะสมกับสถานการณ์ได้",
+      "description_en": "Analyzes problems logically, identifies their causes, and selects solutions appropriate to the situation.",
+      "label_en": "Good",
+      "description_th_new": "วิเคราะห์ปัญหาได้อย่างมีเหตุผล ระบุสาเหตุและเลือกแนวทางแก้ไขที่เหมาะสมกับสถานการณ์ได้"
+    },
+    {
+      "option_id": "0c198b33-3d0b-41ee-b2cb-97962bf445c8",
+      "question_id": "d470ebd3-e0cb-4b51-94a1-fc1dca12ca43",
+      "lo_code": "LO7",
+      "score": 2,
+      "description_th_expected": "แก้ปัญหาพื้นฐานได้ แต่ยังต้องได้รับคำแนะนำในการวิเคราะห์สาเหตุหรือเลือกแนวทางแก้ไขสำหรับปัญหาที่ซับซ้อน",
+      "description_en": "Solves basic problems but still requires guidance to analyze causes or select solutions for complex problems.",
+      "label_en": "Fair",
+      "description_th_new": "แก้ปัญหาพื้นฐานได้ แต่ยังต้องได้รับคำแนะนำในการวิเคราะห์สาเหตุหรือเลือกแนวทางแก้ไขสำหรับปัญหาที่ซับซ้อน"
+    },
+    {
+      "option_id": "c4ea3dab-1f1f-4d9e-8953-bed3a81b2fa3",
+      "question_id": "d470ebd3-e0cb-4b51-94a1-fc1dca12ca43",
+      "lo_code": "LO7",
+      "score": 1,
+      "description_th_expected": "ไม่สามารถวิเคราะห์ปัญหาอย่างเป็นระบบ ไม่สามารถระบุสาเหตุหรือเลือกแนวทางแก้ไขที่เหมาะสมได้",
+      "description_en": "Cannot analyze problems systematically, identify their causes, or select appropriate solutions.",
+      "label_en": "Needs improvement",
+      "description_th_new": "ไม่สามารถวิเคราะห์ปัญหาอย่างเป็นระบบ ไม่สามารถระบุสาเหตุหรือเลือกแนวทางแก้ไขที่เหมาะสมได้"
+    },
+    {
+      "option_id": "196541b7-393a-4166-a289-c5972f4ad0fe",
+      "question_id": "32a82a57-f1d7-44bf-ad5e-426dbfd7894b",
+      "lo_code": "LO8",
+      "score": 4,
+      "description_th_expected": "สื่อสารภาษาไทยและ/หรือภาษาอังกฤษได้ชัดเจน ถูกต้อง เหมาะสมกับผู้รับสารและบริบททางวิชาชีพ สามารถนำเสนอข้อมูลทางวิทยาศาสตร์ได้อย่างเป็นระบบและตอบคำถามได้อย่างมั่นใจ",
+      "description_en": "Communicates clearly and accurately in Thai and/or English, using language appropriate to the audience and professional context, presents scientific information systematically, and answers questions confidently.",
+      "label_en": "Very good",
+      "description_th_new": "สื่อสารภาษาไทยและ/หรือภาษาอังกฤษได้ชัดเจน ถูกต้อง เหมาะสมกับผู้รับสารและบริบททางวิชาชีพ สามารถนำเสนอข้อมูลทางวิทยาศาสตร์ได้อย่างเป็นระบบและตอบคำถามได้อย่างมั่นใจ"
+    },
+    {
+      "option_id": "5b1b32d7-51d8-4de1-9f4f-498f8debea4d",
+      "question_id": "32a82a57-f1d7-44bf-ad5e-426dbfd7894b",
+      "lo_code": "LO8",
+      "score": 3,
+      "description_th_expected": "สื่อสารในสถานที่ทำงานได้ชัดเจน ทั้งการพูด การเขียน การอ่าน หรือการนำเสนอ สามารถสื่อสารข้อมูลทางวิชาการที่เกี่ยวข้องกับงานได้",
+      "description_en": "Communicates clearly in the workplace through speaking, writing, reading, or presenting, and conveys technical information relevant to the work.",
+      "label_en": "Good",
+      "description_th_new": "สื่อสารในสถานที่ทำงานได้ชัดเจน ทั้งการพูด การเขียน การอ่าน หรือการนำเสนอ สามารถสื่อสารข้อมูลทางวิชาการที่เกี่ยวข้องกับงานได้"
+    },
+    {
+      "option_id": "6449a474-8288-49d8-be5f-efd7ae1f1f92",
+      "question_id": "32a82a57-f1d7-44bf-ad5e-426dbfd7894b",
+      "lo_code": "LO8",
+      "score": 2,
+      "description_th_expected": "สามารถสื่อสารเรื่องพื้นฐานได้ แต่ยังมีข้อจำกัดด้านความชัดเจน ความถูกต้องของภาษา หรือการนำเสนอ และต้องได้รับคำแนะนำ",
+      "description_en": "Communicates basic information but has limitations in clarity, language accuracy, or presentation and requires guidance.",
+      "label_en": "Fair",
+      "description_th_new": "สามารถสื่อสารเรื่องพื้นฐานได้ แต่ยังมีข้อจำกัดด้านความชัดเจน ความถูกต้องของภาษา หรือการนำเสนอ และต้องได้รับคำแนะนำ"
+    },
+    {
+      "option_id": "e89874a2-deb6-4170-b9be-c57b77834099",
+      "question_id": "32a82a57-f1d7-44bf-ad5e-426dbfd7894b",
+      "lo_code": "LO8",
+      "score": 1,
+      "description_th_expected": "มีข้อจำกัดด้านการสื่อสารจนส่งผลกระทบต่อการปฏิบัติงานหรือการทำงานร่วมกับผู้อื่น",
+      "description_en": "Has communication limitations that adversely affect work performance or collaboration with others.",
+      "label_en": "Needs improvement",
+      "description_th_new": "มีข้อจำกัดด้านการสื่อสารจนส่งผลกระทบต่อการปฏิบัติงานหรือการทำงานร่วมกับผู้อื่น"
+    },
+    {
+      "option_id": "c3233e90-abb9-44ad-b3a3-86877f342db3",
+      "question_id": "02856b5f-bf2e-4a1e-936e-ab5537adc0b2",
+      "lo_code": "LO9",
+      "score": 4,
+      "description_th_expected": "เลือกใช้เทคโนโลยีหรือโปรแกรมที่เหมาะสม สามารถค้นหา วิเคราะห์ จัดการ และนำเสนอข้อมูลได้อย่างมีประสิทธิภาพ และตรวจสอบความน่าเชื่อถือของข้อมูลได้",
+      "description_en": "Selects appropriate technologies or software, searches for, analyzes, manages, and presents information effectively, and assesses the reliability of the information.",
+      "label_en": "Very good",
+      "description_th_new": "เลือกใช้เทคโนโลยีหรือโปรแกรมที่เหมาะสม สามารถค้นหา วิเคราะห์ จัดการ และนำเสนอข้อมูลได้อย่างมีประสิทธิภาพ และตรวจสอบความน่าเชื่อถือของข้อมูลได้"
+    },
+    {
+      "option_id": "1ba4b59d-674a-4f71-8e37-7d72609d4b0e",
+      "question_id": "02856b5f-bf2e-4a1e-936e-ab5537adc0b2",
+      "lo_code": "LO9",
+      "score": 3,
+      "description_th_expected": "ใช้โปรแกรมและเทคโนโลยีสารสนเทศที่จำเป็นต่อการทำงานได้ถูกต้อง สามารถค้นหา วิเคราะห์ และนำเสนอข้อมูลได้",
+      "description_en": "Correctly uses the software and information technologies needed for the work and can search for, analyze, and present information.",
+      "label_en": "Good",
+      "description_th_new": "ใช้โปรแกรมและเทคโนโลยีสารสนเทศที่จำเป็นต่อการทำงานได้ถูกต้อง สามารถค้นหา วิเคราะห์ และนำเสนอข้อมูลได้"
+    },
+    {
+      "option_id": "549fdea5-32df-4d7b-9d8c-739e884ef78e",
+      "question_id": "02856b5f-bf2e-4a1e-936e-ab5537adc0b2",
+      "lo_code": "LO9",
+      "score": 2,
+      "description_th_expected": "ใช้เทคโนโลยีพื้นฐานได้ แต่ยังต้องได้รับคำแนะนำในการเลือกเครื่องมือ วิเคราะห์ข้อมูล หรือจัดทำสื่อ/รายงาน",
+      "description_en": "Uses basic technologies but still requires guidance to select tools, analyze data, or prepare materials or reports.",
+      "label_en": "Fair",
+      "description_th_new": "ใช้เทคโนโลยีพื้นฐานได้ แต่ยังต้องได้รับคำแนะนำในการเลือกเครื่องมือ วิเคราะห์ข้อมูล หรือจัดทำสื่อ/รายงาน"
+    },
+    {
+      "option_id": "ceb89d08-909c-4dbe-b341-c875555bfe77",
+      "question_id": "02856b5f-bf2e-4a1e-936e-ab5537adc0b2",
+      "lo_code": "LO9",
+      "score": 1,
+      "description_th_expected": "ไม่สามารถใช้เทคโนโลยีสารสนเทศที่จำเป็นต่อการปฏิบัติงานได้ หรือใช้ข้อมูล/เทคโนโลยีไม่ถูกต้อง",
+      "description_en": "Cannot use the information technologies needed for the work or uses information or technology incorrectly.",
+      "label_en": "Needs improvement",
+      "description_th_new": "ไม่สามารถใช้เทคโนโลยีสารสนเทศที่จำเป็นต่อการปฏิบัติงานได้ หรือใช้ข้อมูล/เทคโนโลยีไม่ถูกต้อง"
+    },
+    {
+      "option_id": "0ab50c34-7ff3-4dfc-8195-14e917ad0aeb",
+      "question_id": "ca1c1f9c-cf19-4074-b08f-7089d35ae031",
+      "lo_code": "LO10",
+      "score": 4,
+      "description_th_expected": "ปฏิบัติตามหลักสุขอนามัยและความปลอดภัยอย่างสม่ำเสมอ เป็นแบบอย่างแก่ผู้อื่น และสามารถเตือน/เสนอแนวทางป้องกันความเสี่ยงได้",
+      "description_en": "Consistently follows hygiene and safety principles, serves as a role model, and can alert others to risks or propose preventive measures.",
+      "label_en": "Very good",
+      "description_th_new": "ปฏิบัติตามหลักสุขอนามัยและความปลอดภัยอย่างสม่ำเสมอ เป็นแบบอย่างแก่ผู้อื่น และสามารถเตือน/เสนอแนวทางป้องกันความเสี่ยงได้"
+    },
+    {
+      "option_id": "a9b73a11-b5d8-4d32-9303-0c70ed5c890f",
+      "question_id": "ca1c1f9c-cf19-4074-b08f-7089d35ae031",
+      "lo_code": "LO10",
+      "score": 3,
+      "description_th_expected": "ปฏิบัติตามข้อกำหนดด้านสุขอนามัย ความปลอดภัย และสุขลักษณะของสถานประกอบการอย่างสม่ำเสมอ",
+      "description_en": "Consistently follows workplace hygiene, safety, and sanitation requirements.",
+      "label_en": "Good",
+      "description_th_new": "ปฏิบัติตามข้อกำหนดด้านสุขอนามัย ความปลอดภัย และสุขลักษณะของสถานประกอบการอย่างสม่ำเสมอ"
+    },
+    {
+      "option_id": "31a46baa-c9f0-4ca8-a7a0-844317ca52e7",
+      "question_id": "ca1c1f9c-cf19-4074-b08f-7089d35ae031",
+      "lo_code": "LO10",
+      "score": 2,
+      "description_th_expected": "ปฏิบัติตามข้อกำหนดได้บางส่วน แต่ยังต้องได้รับการเตือนหรือกำกับดูแล",
+      "description_en": "Meets some requirements but still needs reminders or supervision.",
+      "label_en": "Fair",
+      "description_th_new": "ปฏิบัติตามข้อกำหนดได้บางส่วน แต่ยังต้องได้รับการเตือนหรือกำกับดูแล"
+    },
+    {
+      "option_id": "91abfcc1-5e2b-4cd9-aa34-a8a1acf020ee",
+      "question_id": "ca1c1f9c-cf19-4074-b08f-7089d35ae031",
+      "lo_code": "LO10",
+      "score": 1,
+      "description_th_expected": "ไม่ปฏิบัติตามข้อกำหนดด้านสุขอนามัยหรือความปลอดภัย และอาจก่อให้เกิดความเสี่ยงต่อบุคคล ผลิตภัณฑ์ หรือสถานที่ทำงานจริยธรรมและลักษณะบุคคล (Ethics and Character)จริยธรรม (Ethics)",
+      "description_en": "Fails to follow hygiene or safety requirements and may create risks to people, products, or the workplace.",
+      "label_en": "Needs improvement",
+      "description_th_new": "ไม่ปฏิบัติตามข้อกำหนดด้านสุขอนามัยหรือความปลอดภัย และอาจก่อให้เกิดความเสี่ยงต่อบุคคล ผลิตภัณฑ์ หรือสถานที่ทำงาน"
+    },
+    {
+      "option_id": "71233530-4b8a-4ede-840f-3851ba6c1450",
+      "question_id": "8e476ae4-7522-4efd-b35b-ffb6ed264917",
+      "lo_code": "LO11",
+      "score": 4,
+      "description_th_expected": "มีความรับผิดชอบสูง ส่งงานตรงเวลา ซื่อสัตย์ โปร่งใส ปฏิบัติตามกฎ ระเบียบ กฎหมาย และจริยธรรมอย่างเคร่งครัด และเป็นแบบอย่างที่ดีแก่ผู้อื่น",
+      "description_en": "Demonstrates a high level of responsibility, submits work on time, acts honestly and transparently, strictly follows rules, regulations, laws, and ethical principles, and serves as a role model.",
+      "label_en": "Very good",
+      "description_th_new": "มีความรับผิดชอบสูง ส่งงานตรงเวลา ซื่อสัตย์ โปร่งใส ปฏิบัติตามกฎ ระเบียบ กฎหมาย และจริยธรรมอย่างเคร่งครัด และเป็นแบบอย่างที่ดีแก่ผู้อื่น"
+    },
+    {
+      "option_id": "75246cbd-cfc8-4760-a223-f94ba28e687e",
+      "question_id": "8e476ae4-7522-4efd-b35b-ffb6ed264917",
+      "lo_code": "LO11",
+      "score": 3,
+      "description_th_expected": "รับผิดชอบต่องาน ตรงต่อเวลา ซื่อสัตย์ และปฏิบัติตามกฎ ระเบียบ และข้อกำหนดขององค์กรได้อย่างเหมาะสม",
+      "description_en": "Takes responsibility for assigned work, is punctual and honest, and appropriately follows organizational rules, regulations, and requirements.",
+      "label_en": "Good",
+      "description_th_new": "รับผิดชอบต่องาน ตรงต่อเวลา ซื่อสัตย์ และปฏิบัติตามกฎ ระเบียบ และข้อกำหนดขององค์กรได้อย่างเหมาะสม"
+    },
+    {
+      "option_id": "39950e59-0989-43e0-9fbd-1a68ea1177d5",
+      "question_id": "8e476ae4-7522-4efd-b35b-ffb6ed264917",
+      "lo_code": "LO11",
+      "score": 2,
+      "description_th_expected": "รับผิดชอบงานได้บางส่วน แต่ยังมีปัญหาเรื่องเวลา การติดตามงาน หรือการปฏิบัติตามกฎ และต้องได้รับการเตือน",
+      "description_en": "Takes responsibility for some aspects of the work but still has problems with time management, following up on tasks, or complying with rules and needs reminders.",
+      "label_en": "Fair",
+      "description_th_new": "รับผิดชอบงานได้บางส่วน แต่ยังมีปัญหาเรื่องเวลา การติดตามงาน หรือการปฏิบัติตามกฎ และต้องได้รับการเตือน"
+    },
+    {
+      "option_id": "d42cc876-c23b-4df6-a680-6c40bcb4a775",
+      "question_id": "8e476ae4-7522-4efd-b35b-ffb6ed264917",
+      "lo_code": "LO11",
+      "score": 1,
+      "description_th_expected": "ขาดความรับผิดชอบ ไม่ปฏิบัติตามกฎหรือข้อกำหนด มีพฤติกรรมที่ไม่เหมาะสม หรือมีปัญหาด้านความซื่อสัตย์ในการปฏิบัติงานลักษณะบุคคล (Character)",
+      "description_en": "Lacks responsibility, fails to follow rules or requirements, behaves inappropriately, or demonstrates a lack of honesty in the workplace.",
+      "label_en": "Needs improvement",
+      "description_th_new": "ขาดความรับผิดชอบ ไม่ปฏิบัติตามกฎหรือข้อกำหนด มีพฤติกรรมที่ไม่เหมาะสม หรือมีปัญหาด้านความซื่อสัตย์ในการปฏิบัติงานลักษณะบุคคล (Character)"
+    },
+    {
+      "option_id": "03ed0231-379a-4658-9a15-2b6db05ed246",
+      "question_id": "1d231502-10f7-4395-a6e1-09dc0df0e534",
+      "lo_code": "LO12",
+      "score": 4,
+      "description_th_expected": "แสดงภาวะผู้นำ ร่วมมือกับทีมอย่างกระตือรือร้น มุ่งมั่นตั้งใจ มีวินัย ช่วยเหลือผู้อื่น มีจิตอาสา และแสวงหาความรู้เพื่อพัฒนาตนเองอย่างต่อเนื่อง",
+      "description_en": "Demonstrates leadership, collaborates enthusiastically with the team, shows commitment and discipline, helps others, volunteers, and continually seeks knowledge for self-development.",
+      "label_en": "Very good",
+      "description_th_new": "แสดงภาวะผู้นำ ร่วมมือกับทีมอย่างกระตือรือร้น มุ่งมั่นตั้งใจ มีวินัย ช่วยเหลือผู้อื่น มีจิตอาสา และแสวงหาความรู้เพื่อพัฒนาตนเองอย่างต่อเนื่อง"
+    },
+    {
+      "option_id": "90bdfdd0-e50f-404e-9a5d-a4d7c91ed604",
+      "question_id": "1d231502-10f7-4395-a6e1-09dc0df0e534",
+      "lo_code": "LO12",
+      "score": 3,
+      "description_th_expected": "ทำงานร่วมกับผู้อื่นได้ดี มีวินัย รับฟังความคิดเห็น มีส่วนร่วมในทีม และพร้อมเรียนรู้สิ่งใหม่",
+      "description_en": "Works well with others, demonstrates discipline, listens to others' opinions, participates in the team, and is willing to learn new things.",
+      "label_en": "Good",
+      "description_th_new": "ทำงานร่วมกับผู้อื่นได้ดี มีวินัย รับฟังความคิดเห็น มีส่วนร่วมในทีม และพร้อมเรียนรู้สิ่งใหม่"
+    },
+    {
+      "option_id": "706322c2-379b-4552-8837-7a7f7f1fcc07",
+      "question_id": "1d231502-10f7-4395-a6e1-09dc0df0e534",
+      "lo_code": "LO12",
+      "score": 2,
+      "description_th_expected": "สามารถทำงานร่วมกับทีมได้ แต่การมีส่วนร่วม วินัย หรือการเรียนรู้ยังไม่สม่ำเสมอ และต้องได้รับการกระตุ้นหรือคำแนะนำ",
+      "description_en": "Works with the team but is inconsistent in participation, discipline, or learning and requires encouragement or guidance.",
+      "label_en": "Fair",
+      "description_th_new": "สามารถทำงานร่วมกับทีมได้ แต่การมีส่วนร่วม วินัย หรือการเรียนรู้ยังไม่สม่ำเสมอ และต้องได้รับการกระตุ้นหรือคำแนะนำ"
+    },
+    {
+      "option_id": "6daf376a-64f7-4106-b4f5-dea2521a894f",
+      "question_id": "1d231502-10f7-4395-a6e1-09dc0df0e534",
+      "lo_code": "LO12",
+      "score": 1,
+      "description_th_expected": "มีปัญหาในการทำงานร่วมกับผู้อื่น ขาดวินัย ไม่รับฟังความคิดเห็น หรือไม่แสดงความสนใจในการพัฒนาตนเอง",
+      "description_en": "Has difficulty working with others, lacks discipline, does not listen to others' opinions, or shows no interest in self-development.",
+      "label_en": "Needs improvement",
+      "description_th_new": "มีปัญหาในการทำงานร่วมกับผู้อื่น ขาดวินัย ไม่รับฟังความคิดเห็น หรือไม่แสดงความสนใจในการพัฒนาตนเอง"
+    },
+    {
+      "option_id": "f2365e2a-3eea-4b28-af56-72f8fe4640e8",
+      "question_id": "aa96a438-6d1f-43b1-914c-f484afcc9e9a",
+      "lo_code": "LO13",
+      "score": 4,
+      "description_th_expected": "มีบุคลิกภาพและความเป็นมืออาชีพสูง สังเกตและมองเห็นโอกาสในการปรับปรุงงาน มีความคิดสร้างสรรค์ ตัดสินใจอย่างมีเหตุผล และสามารถมองเห็นโอกาสในการสร้างคุณค่าหรือธุรกิจ",
+      "description_en": "Demonstrates a high level of professionalism, observes and identifies opportunities for improvement, thinks creatively, makes reasoned decisions, and recognizes opportunities to create value or develop a business.",
+      "label_en": "Very good",
+      "description_th_new": "มีบุคลิกภาพและความเป็นมืออาชีพสูง สังเกตและมองเห็นโอกาสในการปรับปรุงงาน มีความคิดสร้างสรรค์ ตัดสินใจอย่างมีเหตุผล และสามารถมองเห็นโอกาสในการสร้างคุณค่าหรือธุรกิจ"
+    },
+    {
+      "option_id": "58413466-5b57-43ca-8c6d-df0a6f7f9c2e",
+      "question_id": "aa96a438-6d1f-43b1-914c-f484afcc9e9a",
+      "lo_code": "LO13",
+      "score": 3,
+      "description_th_expected": "มีบุคลิกภาพเหมาะสมกับวิชาชีพ สังเกตปัญหาได้ มีความคิดสร้างสรรค์ในงาน และตัดสินใจได้เหมาะสมกับสถานการณ์",
+      "description_en": "Demonstrates professional conduct, identifies problems through observation, shows creativity at work, and makes decisions appropriate to the situation.",
+      "label_en": "Good",
+      "description_th_new": "มีบุคลิกภาพเหมาะสมกับวิชาชีพ สังเกตปัญหาได้ มีความคิดสร้างสรรค์ในงาน และตัดสินใจได้เหมาะสมกับสถานการณ์"
+    },
+    {
+      "option_id": "8f5c8f5e-a359-4d98-b1d2-bd3dd922bc09",
+      "question_id": "aa96a438-6d1f-43b1-914c-f484afcc9e9a",
+      "lo_code": "LO13",
+      "score": 2,
+      "description_th_expected": "มีบุคลิกภาพเหมาะสมในระดับหนึ่ง สามารถสังเกตและตัดสินใจในงานพื้นฐานได้ แต่ยังต้องได้รับคำแนะนำ",
+      "description_en": "Demonstrates an adequate level of professional conduct and can observe and make decisions in basic tasks but still requires guidance.",
+      "label_en": "Fair",
+      "description_th_new": "มีบุคลิกภาพเหมาะสมในระดับหนึ่ง สามารถสังเกตและตัดสินใจในงานพื้นฐานได้ แต่ยังต้องได้รับคำแนะนำ"
+    },
+    {
+      "option_id": "effc1173-eaca-4fa3-921e-08353009fedc",
+      "question_id": "aa96a438-6d1f-43b1-914c-f484afcc9e9a",
+      "lo_code": "LO13",
+      "score": 1,
+      "description_th_expected": "มีข้อจำกัดด้านบุคลิกภาพ การสังเกต การตัดสินใจ หรือการริเริ่มงาน จนส่งผลต่อประสิทธิภาพในการปฏิบัติงาน",
+      "description_en": "Has limitations in professional conduct, observation, decision-making, or initiative that adversely affect work performance.",
+      "label_en": "Needs improvement",
+      "description_th_new": "มีข้อจำกัดด้านบุคลิกภาพ การสังเกต การตัดสินใจ หรือการริเริ่มงาน จนส่งผลต่อประสิทธิภาพในการปฏิบัติงาน"
+    }
+  ]
+}

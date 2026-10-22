@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { fullNameSchema, emailSchema, phoneSchema, CONTACT_MESSAGES } from "./contact-validation";
+export { PHONE_PATTERN } from "./contact-validation";
 
 // Shared Zod schema for the evaluation wizard.
 // Used by both the client (inline validation + error summaries) and the
@@ -13,7 +15,6 @@ export const SEMESTER_PATTERN = /^[1-3]$/;
 // Buddhist-era academic year. Only 2569 and 2570 are offered — see ACADEMIC_TERMS.
 export const ACADEMIC_YEAR_PATTERN = /^(2569|2570)$/;
 export const STUDENT_CODE_PATTERN = /^\d{8}$/;
-export const PHONE_PATTERN = /^[0-9+()\-\s]{8,20}$/;
 export const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -40,27 +41,19 @@ export function isValidTerm(year: string, semester: string): boolean {
 
 // --- General step (step 0) ---
 export const generalStepSchema = z.object({
-  evaluator_email: z
-    .string()
-    .min(1, "required")
-    .email("email")
-    .max(254, "email"),
+  evaluator_email: emailSchema,
   semester: z.string().min(1, "required").regex(SEMESTER_PATTERN, "semester"),
   academic_year: z.string().min(1, "required").regex(ACADEMIC_YEAR_PATTERN, "academic_year"),
   company: z.string().min(1, "required").max(200, "length"),
-  evaluator_name: z.string().min(1, "required").max(120, "length"),
+  evaluator_name: fullNameSchema.max(120, "length"),
   position: z.string().min(1, "required").max(120, "length"),
   department: z.string().min(1, "required").max(120, "length"),
-  phone: z
-    .string()
-    .min(1, "required")
-    .regex(PHONE_PATTERN, "phone")
-    .max(20, "phone"),
+  phone: phoneSchema,
   student_code: z
     .string()
     .min(1, "required")
     .regex(STUDENT_CODE_PATTERN, "student_code"),
-  student_name: z.string().min(1, "required").max(200, "length"),
+  student_name: fullNameSchema,
   school: z.string().max(200).optional(),
   program: z.string().max(200).optional(),
 }).superRefine((data, ctx) => {
@@ -199,6 +192,7 @@ export type ErrorKey =
   | "phone"
   | "student_code"
   | "uuid"
+  | "full_name"
   | "length"
   | "score_range"
   | "non_negative"
@@ -208,11 +202,12 @@ export type ErrorKey =
 export const ERROR_MESSAGES: Record<"th" | "en", Record<ErrorKey, string>> = {
   th: {
     required: "กรุณากรอกข้อมูลในช่องนี้",
-    email: "รูปแบบอีเมลไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง",
+    full_name: CONTACT_MESSAGES.th.full_name,
+    email: CONTACT_MESSAGES.th.email,
     semester: "กรุณาเลือกภาคการศึกษา",
     academic_year: "กรุณาเลือกปีการศึกษา",
     invalid_term: "ปีการศึกษาและภาคการศึกษาที่เลือกไม่ถูกต้อง",
-    phone: "เบอร์โทรศัพท์ไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง",
+    phone: CONTACT_MESSAGES.th.phone,
     student_code: "รหัสนักศึกษาต้องเป็นตัวเลข 8 หลัก",
     uuid: "ไม่พบหลักสูตรหรือแบบประเมิน กรุณาเปิดแบบประเมินใหม่อีกครั้ง",
     length: "ข้อมูลยาวเกินไป กรุณากรอกให้สั้นลง",
@@ -223,11 +218,12 @@ export const ERROR_MESSAGES: Record<"th" | "en", Record<ErrorKey, string>> = {
   },
   en: {
     required: "This field is required.",
-    email: "Enter a valid email address and try again.",
+    full_name: CONTACT_MESSAGES.en.full_name,
+    email: CONTACT_MESSAGES.en.email,
     semester: "Please select a semester.",
     academic_year: "Please select an academic year.",
     invalid_term: "The selected academic year and semester are not valid.",
-    phone: "The phone number is invalid. Please check and try again.",
+    phone: CONTACT_MESSAGES.en.phone,
     student_code: "The student ID must contain exactly 8 digits.",
     uuid: "The program or evaluation could not be found. Please reopen the evaluation.",
     length: "The value is too long. Please shorten it.",

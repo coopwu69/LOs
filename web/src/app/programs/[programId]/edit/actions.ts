@@ -1,5 +1,6 @@
 "use server";
 
+import { reviewerValidationError } from "@/lib/contact-validation";
 import { revalidatePath } from "next/cache";
 import { getPool } from "@/lib/db";
 import { DOMAINS, type Domain, type ScaleStatus } from "@/lib/types";
@@ -113,6 +114,8 @@ export async function saveTemplate(
   if (payload.sections.some((s) => !DOMAINS.includes(s.domainType))) {
     return { ok: false, error: "ประเภทหมวดไม่ถูกต้อง กรุณารีเฟรชหน้าแล้วดำเนินการใหม่อีกครั้ง" };
   }
+  const validationError = reviewerValidationError(reviewer);
+  if (validationError) return { ok: false, error: validationError };
   const pool = getPool();
   const client = await pool.connect();
   try {
