@@ -400,7 +400,7 @@ export const WIZARD_COPY: Record<Locale, WizardCopy> = {
   },
 };
 
-export const PRIMARY_DOMAINS = new Set(["knowledge", "skills", "knowledge_skills", "social_skills"]);
+export { PRIMARY_DOMAINS } from "@/lib/lo-numbering";
 
 export const ENGLISH_SCORE_LABELS: Record<number, string> = {
   5: "Excellent",

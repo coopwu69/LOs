@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import Link from "next/link";
+import { getLoQuestionNumbers, PRIMARY_DOMAINS } from "@/lib/lo-numbering";
 import { reviewerValidationError } from "@/lib/contact-validation";
 import type { TemplateDoc, ScaleStatus, Domain } from "@/lib/types";
 import { saveTemplateAction } from "./actions";
@@ -93,7 +94,7 @@ type Action =
   | { type: "update_section"; sectionId: string; patch: Partial<Pick<SectionState, "titleTh" | "part" | "domainType">> }
   | { type: "delete_section"; sectionId: string }
   | { type: "add_question"; sectionId: string }
-  | { type: "update_question"; sectionId: string; questionId: string; patch: Partial<Pick<QuestionState, "loCode" | "text" | "textEn" | "ploRefs">> }
+  | { type: "update_question"; sectionId: string; questionId: string; patch: Partial<Pick<QuestionState, "text" | "textEn" | "ploRefs">> }
   | { type: "delete_question"; sectionId: string; questionId: string }
   | { type: "add_option"; sectionId: string; questionId: string }
   | { type: "update_option"; sectionId: string; questionId: string; optionId: string; patch: Partial<Pick<OptionState, "score" | "labelTh" | "descriptionTh">> }
@@ -362,6 +363,10 @@ export function TemplateEditor({ doc, programKey }: { doc: TemplateDoc; programK
   const formRef = useRef<HTMLFormElement>(null);
   const reviewerDialogRef = useRef<HTMLDialogElement>(null);
   const reviewerNameRef = useRef<HTMLInputElement>(null);
+  const questionNumbers = getLoQuestionNumbers(
+    state.sections.map((section) => ({ ...section, domain_type: section.domainType })),
+    state.sections.flatMap((section) => section.questions.map((q) => ({ ...q, section_id: section.id }))),
+  );
   const [reviewerName, setReviewerName] = useState("");
   const [reviewerEmail, setReviewerEmail] = useState("");
   const [reviewerPhone, setReviewerPhone] = useState("");
@@ -515,7 +520,9 @@ export function TemplateEditor({ doc, programKey }: { doc: TemplateDoc; programK
 
       {/* Sections */}
       <div className="space-y-6">
-        {state.sections.map((section, sIdx) => (
+        {[...state.sections].sort((a, b) =>
+        Number(!PRIMARY_DOMAINS.has(a.domainType)) - Number(!PRIMARY_DOMAINS.has(b.domainType)) || a.sequence - b.sequence,
+      ).map((section, sIdx) => (
           <details key={section.id} className="group rounded-xl border border-border-default bg-raised">
             <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 marker:hidden sm:px-6">
               <div className="min-w-0">
@@ -598,11 +605,11 @@ export function TemplateEditor({ doc, programKey }: { doc: TemplateDoc; programK
 
             {/* Questions */}
             <div className="mt-5 space-y-5">
-              {section.questions.map((question, qIdx) => (
+              {section.questions.map((question) => (
                 <details key={question.id} className="group/question border-b border-border-default last:border-b-0">
                   <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-3 marker:hidden">
                     <div className="min-w-0">
-                      <p className="text-xs font-medium text-secondary">ข้อที่ {qIdx + 1} · {question.loCode || "ยังไม่มีรหัส LO"}</p>
+                      <p className="text-xs font-medium text-secondary">ข้อที่ {questionNumbers.get(question.id)} · LO{questionNumbers.get(question.id)}</p>
                       <p className="truncate text-sm font-medium text-primary">{question.text || "คำถามที่ยังไม่มีข้อความ"}</p>
                     </div>
                     <span className="shrink-0 text-xs font-medium text-action group-open/question:hidden">แก้ไข</span>
@@ -611,25 +618,7 @@ export function TemplateEditor({ doc, programKey }: { doc: TemplateDoc; programK
                   <div className="border-t border-border-default py-4">
                   <div className="flex flex-col gap-4">
                     <div className="space-y-3">
-                      <div className="grid gap-x-4 gap-y-3 sm:grid-cols-[8rem_1fr]">
-                        <div>
-                          <label htmlFor={`lo-${question.id}`} className="text-xs font-medium text-secondary">รหัส LO</label>
-                          <input
-                            id={`lo-${question.id}`}
-                            type="text"
-                            className={`${inputClass} mt-1`}
-                            value={question.loCode ?? ""}
-                            onChange={(e) =>
-                              dispatch({
-                                type: "update_question",
-                                sectionId: section.id,
-                                questionId: question.id,
-                                patch: { loCode: e.target.value || null },
-                              })
-                            }
-                            placeholder="LO1"
-                          />
-                        </div>
+                      <div className="grid gap-x-4 gap-y-3 sm:grid-cols-1">
                         <div>
                           <label htmlFor={`text-${question.id}`} className="text-xs font-medium text-secondary">ข้อความคำถาม (TH) *</label>
                           <textarea
@@ -799,7 +788,7 @@ export function TemplateEditor({ doc, programKey }: { doc: TemplateDoc; programK
                     <div className="flex justify-end">
                       <ConfirmDelete
                         label="ลบข้อ"
-                        detail={`ลบ ${question.loCode || `คำถามข้อที่ ${qIdx + 1}`} พร้อมตัวเลือกทั้งหมดหรือไม่?`}
+                        detail={`ลบข้อที่ ${questionNumbers.get(question.id)} พร้อมตัวเลือกทั้งหมดหรือไม่?`}
                         onConfirm={() =>
                           dispatch({
                             type: "delete_question",

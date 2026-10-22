@@ -1,3 +1,4 @@
+import { numberLoSections } from "./lo-numbering";
 import { getTemplateDoc } from "./db";
 import { isFixtureMode, getFixtureTemplateDoc } from "./fixtures";
 import type { Locale } from "./i18n";
@@ -342,6 +343,8 @@ export async function getRoleFormDoc(
   } catch {
     doc = null;
   }
+
+  if (doc) doc = { ...doc, sections: numberLoSections(doc.sections) };
 
   let sections: FormDocSection[];
   if (role === "company") sections = companySections(doc, locale);

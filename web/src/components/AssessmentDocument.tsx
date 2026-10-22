@@ -1,3 +1,4 @@
+import { numberLoSections } from "@/lib/lo-numbering";
 import type { Locale } from "@/lib/i18n";
 import type { TemplateDoc, SectionRow, QuestionRow } from "@/lib/types";
 import { FormShell } from "./FormShell";
@@ -104,7 +105,7 @@ function CompetencyPart({ step, sections, locale }: { step: 3 | 4; sections: Sec
 }
 
 export function AssessmentDocument({ doc, locale }: { doc: TemplateDoc; locale: Locale }) {
-  const sections = normalizedSections(doc.sections);
+  const sections = numberLoSections(normalizedSections(doc.sections));
   const primary = sections.filter((section) => PRIMARY_DOMAINS.has(section.domain_type));
   const secondary = sections.filter((section) => !PRIMARY_DOMAINS.has(section.domain_type));
 

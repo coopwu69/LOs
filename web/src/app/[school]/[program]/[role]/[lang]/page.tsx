@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getLoQuestionNumbers } from "@/lib/lo-numbering";
 import { notFound, permanentRedirect } from "next/navigation";
 import {
   getProgramPageData,
@@ -103,6 +104,9 @@ export default async function FormPage({
   if (!programData) notFound();
 
   const { program: programRow, template, sections, questions } = programData;
+  const uniqueQuestions = dedupeByLoCode(questions as QuestionWithOptions[]);
+  const questionNumbers = getLoQuestionNumbers(sections, uniqueQuestions);
+  const numberedQuestions = uniqueQuestions.map((q) => ({ ...q, lo_code: `LO${questionNumbers.get(q.id)}` }));
 
   if (getSchoolSlug(programRow.school) !== school) {
     const programKey = getProgramRouteKey(programRow);
@@ -148,7 +152,7 @@ export default async function FormPage({
             program={programRow}
             template={template}
             sections={sections}
-            questions={dedupeByLoCode(questions as QuestionWithOptions[])}
+            questions={numberedQuestions}
             locale={locale}
           />
         </main>
@@ -165,7 +169,7 @@ export default async function FormPage({
             program={programRow}
             template={template}
             sections={sections}
-            questions={dedupeByLoCode(questions as QuestionWithOptions[])}
+            questions={numberedQuestions}
             locale={locale}
           />
         </main>
@@ -181,7 +185,7 @@ export default async function FormPage({
           program={programRow}
           template={template}
           sections={sections}
-          questions={dedupeByLoCode(questions as QuestionWithOptions[])}
+          questions={numberedQuestions}
           locale={locale}
           role={role}
         />

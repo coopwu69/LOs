@@ -1,3 +1,4 @@
+import { numberLoSections } from "@/lib/lo-numbering";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
@@ -465,7 +466,7 @@ export async function GET(
     };
   }
 
-  const document = buildDocx(doc);
+  const document = buildDocx({ ...doc, sections: numberLoSections(doc.sections) });
   const buffer = await Packer.toBuffer(document);
   const uint8 = new Uint8Array(buffer);
 

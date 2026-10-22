@@ -169,7 +169,8 @@ export async function saveTemplate(
       await client.query(`DELETE FROM assessment_sections WHERE template_id = $1`, [payload.templateId]);
     }
 
-    for (const section of payload.sections) {
+    for (const [sectionIndex, section] of payload.sections.entries()) {
+      section.sequence = sectionIndex + 1;
       if (isExistingId(section.id)) {
         await client.query(
           `UPDATE assessment_sections
@@ -197,15 +198,15 @@ export async function saveTemplate(
         await client.query(`DELETE FROM evaluation_questions WHERE section_id = $1`, [section.id]);
       }
 
-      for (const question of section.questions) {
+      for (const [questionIndex, question] of section.questions.entries()) {
+        question.sequence = questionIndex + 1;
         if (isExistingId(question.id)) {
           await client.query(
             `UPDATE evaluation_questions
-             SET lo_code = $2, text = $3, text_en = $4, plo_refs = $5::jsonb, sequence = $6, updated_at = now()
+             SET text = $2, text_en = $3, plo_refs = $4::jsonb, sequence = $5, updated_at = now()
              WHERE id = $1`,
             [
               question.id,
-              question.loCode,
               question.text,
               question.textEn,
               question.ploRefs ? JSON.stringify(question.ploRefs) : null,
@@ -221,7 +222,7 @@ export async function saveTemplate(
               section.id,
               question.text,
               question.textEn,
-              question.loCode,
+              null, // Display numbering is automatic; new rows need no editable source code.
               question.ploRefs ? JSON.stringify(question.ploRefs) : null,
               question.sequence,
             ]
