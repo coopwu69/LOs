@@ -1,5 +1,7 @@
 "use client";
 
+import { programDisplayName } from "@/lib/i18n";
+
 import { useActionState, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import Link from "next/link";
 import { getLoQuestionNumbers, PRIMARY_DOMAINS } from "@/lib/lo-numbering";
@@ -55,7 +57,7 @@ function docToState(doc: TemplateDoc): State {
     templateId: doc.id,
     programId: doc.program.id,
     title: doc.title ?? "",
-    programNameTh: doc.program.name_th ?? "",
+    programNameTh: programDisplayName(doc.program, "th"),
     courseCodesText: (doc.course_codes ?? []).join(", "),
     scaleStatus: doc.scale_status,
     sections: doc.sections.map((s) => ({

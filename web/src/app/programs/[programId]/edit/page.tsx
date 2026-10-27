@@ -1,3 +1,4 @@
+import { programDisplayName } from "@/lib/i18n";
 import { notFound, permanentRedirect } from "next/navigation";
 import { getProgram, getProgramRouteKey, getTemplateDoc, hasEditorSchema } from "@/lib/db";
 import {
@@ -49,14 +50,14 @@ export default async function EditPage({
     return (
       <div className="flex-1">
         <PageHeader
-          title={`แก้ไข: ${program.name_th}`}
+          title={`แก้ไข: ${programDisplayName(program, "th")}`}
           subtitle="โหมดตัวอย่าง (USE_FIXTURES) — ไม่สามารถบันทึกได้"
           breadcrumbs={[
             { label: "หน้าแรก", href: "/" },
             program.school
               ? { label: program.school, href: `/schools/${getSchoolSlug(program.school)}` }
               : { label: "สำนักวิชา" },
-            { label: program.name_th, href: viewPath },
+            { label: programDisplayName(program, "th"), href: viewPath },
             { label: "แก้ไข" },
           ]}
         >
@@ -92,11 +93,11 @@ export default async function EditPage({
     return (
       <div className="flex-1">
         <PageHeader
-          title={`แก้ไข: ${program.name_th}`}
+          title={`แก้ไข: ${programDisplayName(program, "th")}`}
           subtitle="ระบบแก้ไขยังไม่พร้อมใช้งานกับฐานข้อมูลชุดนี้"
           breadcrumbs={[
             { label: "หน้าแรก", href: "/" },
-            { label: program.name_th, href: viewPath },
+            { label: programDisplayName(program, "th"), href: viewPath },
             { label: "แก้ไข" },
           ]}
         >
@@ -119,14 +120,14 @@ export default async function EditPage({
     return (
       <div className="flex-1">
         <PageHeader
-          title={`แก้ไข: ${program.name_th}`}
+          title={`แก้ไข: ${programDisplayName(program, "th")}`}
           subtitle="ยังไม่มีแบบประเมินสำหรับหลักสูตรนี้"
           breadcrumbs={[
             { label: "หน้าแรก", href: "/" },
             program.school
               ? { label: program.school, href: `/schools/${getSchoolSlug(program.school)}` }
               : { label: "สำนักวิชา" },
-            { label: program.name_th, href: viewPath },
+            { label: programDisplayName(program, "th"), href: viewPath },
             { label: "แก้ไข" },
           ]}
         >
@@ -149,14 +150,14 @@ export default async function EditPage({
   return (
     <div className="flex-1">
       <PageHeader
-        title={`แก้ไข: ${program.name_th}`}
+        title={`แก้ไข: ${programDisplayName(program, "th")}`}
         subtitle={doc.title ?? "แบบประเมิน LOs"}
         breadcrumbs={[
           { label: "หน้าแรก", href: "/" },
           program.school
             ? { label: program.school, href: `/schools/${getSchoolSlug(program.school)}` }
             : { label: "สำนักวิชา" },
-          { label: program.name_th, href: viewPath },
+          { label: programDisplayName(program, "th"), href: viewPath },
           { label: "แก้ไข" },
         ]}
       >

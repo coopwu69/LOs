@@ -1,3 +1,4 @@
+import { programDisplayName } from "@/lib/i18n";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { getProgram, getProgramRouteKey, getRevisions } from "@/lib/db";
@@ -72,14 +73,14 @@ export default async function HistoryPage({
   return (
     <div className="flex-1">
       <PageHeader
-        title={`ประวัติการแก้ไข: ${program.name_th}`}
+        title={`ประวัติการแก้ไข: ${programDisplayName(program, "th")}`}
         subtitle="เวอร์ชันทั้งหมดของแบบประเมิน สามารถคืนค่ากลับเป็นเวอร์ชันก่อนหน้าได้"
         breadcrumbs={[
           { label: "หน้าแรก", href: "/" },
           program.school
             ? { label: program.school, href: `/schools/${getSchoolSlug(program.school)}` }
             : { label: "สำนักวิชา" },
-          { label: program.name_th, href: viewPath },
+          { label: programDisplayName(program, "th"), href: viewPath },
           { label: "ประวัติ" },
         ]}
       />

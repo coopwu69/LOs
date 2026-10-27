@@ -56,7 +56,7 @@ export interface ProgramNameSource {
 }
 
 export function programDisplayName(program: ProgramNameSource, locale: Locale): string {
-  if (locale === "th") return program.name_th;
+  if (locale === "th") return program.code.toUpperCase() === "ARCH" ? "สถาปัตยกรรม" : program.name_th;
   return program.name_en?.trim() || (program.code === "INTL" ? "International Program (WUIC)" : program.code);
 }
 

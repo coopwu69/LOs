@@ -1,3 +1,4 @@
+import { programDisplayName } from "@/lib/i18n";
 import { numberLoSections } from "@/lib/lo-numbering";
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -277,7 +278,7 @@ function buildDocx(doc: TemplateDoc): Document {
     new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: { after: 40 },
-      children: [run({ text: doc.program.name_th, bold: true, size: SIZE_HEADING })],
+      children: [run({ text: programDisplayName(doc.program, "th"), bold: true, size: SIZE_HEADING })],
     })
   );
   if (doc.program.revision_label) {
@@ -372,7 +373,7 @@ function buildDocx(doc: TemplateDoc): Document {
   return new Document({
     creator: "ระบบแบบประเมินสหกิจศึกษา (COOP69)",
     title: doc.title ?? TEMPLATE_DOC_TITLE.th,
-    description: `${TEMPLATE_DOC_TITLE.th} สำหรับ ${doc.program.name_th}`,
+    description: `${TEMPLATE_DOC_TITLE.th} สำหรับ ${programDisplayName(doc.program, "th")}`,
     ...(embeddedFont ? { fonts: [{ name: FONT_NAME, data: embeddedFont }] } : {}),
     styles: {
       default: {
