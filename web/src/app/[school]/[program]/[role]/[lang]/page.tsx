@@ -31,7 +31,7 @@ type PageParams = {
 
 type QuestionWithOptions = Question & { options: Option[] };
 
-function Toolbar({ programKey, hasTemplate, locale, returnPath }: { programKey: string; hasTemplate: boolean; locale: Locale; returnPath: string }) {
+function Toolbar({ programKey, role, hasTemplate, locale, returnPath }: { programKey: string; role: string; hasTemplate: boolean; locale: Locale; returnPath: string }) {
   const copy = uiCopy[locale];
   const secondary = "inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg border border-border-strong bg-raised px-4 text-sm font-medium text-primary transition-colors hover:border-border-focus hover:bg-hover";
   // The template editor/print/history tools are shared by the company and
@@ -52,8 +52,8 @@ function Toolbar({ programKey, hasTemplate, locale, returnPath }: { programKey: 
         groupLabel={copy.tools}
       />
       {hasTemplate && <>
-        <PrintButton className={secondary} label={copy.print} previewHref={withReturn(`/programs/${programKey}/print`)} />
-        <Link href={withLocale(`/programs/${programKey}/export/docx`, locale)} className={secondary}>{copy.downloadWord}</Link>
+        <PrintButton className={secondary} label={copy.print} previewHref={`${withReturn(`/programs/${programKey}/print`)}&role=${role}`} />
+        <Link href={withLocale(`/programs/${programKey}/review/export/${role}`, locale)} className={secondary}>{copy.downloadWord}</Link>
         <Link href={withReturn(`/programs/${programKey}/history`)} className={secondary}>{copy.history}</Link>
       </>}
     </nav>
@@ -120,7 +120,7 @@ export default async function FormPage({
     >
       <p className="mt-2 text-sm text-secondary">{formName(role, locale)}</p>
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <Toolbar programKey={programKey} hasTemplate={Boolean(template)} locale={locale} returnPath={returnPath} />
+        <Toolbar programKey={programKey} role={role} hasTemplate={Boolean(template)} locale={locale} returnPath={returnPath} />
         <LanguageSwitch
           locale={locale}
           thHref={formPath(school, programKey, role, "th")}

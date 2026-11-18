@@ -1,13 +1,14 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
-import { AssessmentDocument } from "@/components/AssessmentDocument";
+import { RoleFormPrint } from "@/components/RoleFormPrint";
+import { getRoleFormDoc } from "@/lib/form-doc";
 import { PrintButton } from "@/components/PrintButton";
 import { getProgram, getProgramRouteKey, getTemplateDoc } from "@/lib/db";
 import { getFixtureProgram, getFixtureTemplateDoc, isFixtureMode } from "@/lib/fixtures";
 import { programDisplayName, resolveLocale, uiCopy, withLocale } from "@/lib/i18n";
 import type { TemplateDoc } from "@/lib/types";
-import { isSafeReturnPath } from "@/lib/routes";
+import { FORM_ROLES, isSafeReturnPath, type FormRole } from "@/lib/routes";
 import { TEMPLATE_DOC_TITLE } from "@/lib/form-names";
 
 export const dynamic = "force-dynamic";
@@ -53,6 +54,9 @@ export default async function PrintPreviewPage({
     doc = null;
   }
   if (!doc) notFound();
+  const requestedRole = Array.isArray(resolvedSearchParams.role) ? resolvedSearchParams.role[0] : resolvedSearchParams.role;
+  const role: FormRole = FORM_ROLES.find((r) => r === requestedRole) ?? "company";
+  const roleDoc = await getRoleFormDoc(program, role, locale);
 
   const copy = uiCopy[locale];
   const secondary = "inline-flex min-h-11 items-center justify-center rounded-lg border border-border-strong bg-raised px-4 text-sm font-medium text-primary transition-colors hover:border-border-focus hover:bg-hover";
@@ -73,7 +77,7 @@ export default async function PrintPreviewPage({
         </div>
       </aside>
       <main id="main-content" tabIndex={-1} className="mx-auto my-6 w-full max-w-5xl bg-raised px-4 py-8 shadow-sm sm:px-8 lg:px-12 print:my-0 print:max-w-none print:p-0 print:shadow-none">
-        <AssessmentDocument doc={doc} locale={locale} />
+        <RoleFormPrint doc={roleDoc} locale={locale} />
       </main>
     </div>
   );
