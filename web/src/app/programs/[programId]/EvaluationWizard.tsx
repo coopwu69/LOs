@@ -424,6 +424,7 @@ export function EvaluationWizard({ program, template, sections, questions, local
         centerScore={state.centerScore}
         centerCount={state.centerCount}
         locale={locale}
+        reportLabel={reportContent.scoreLabel}
       />
     );
   }
@@ -452,6 +453,7 @@ export function EvaluationWizard({ program, template, sections, questions, local
         loMax={liveScores.loMax}
         reportScore={liveScores.reportScore}
         reportMax={liveScores.reportMax}
+        reportLabel={reportContent.step?.[0]}
       />
 
       <StepProgressBar
@@ -460,6 +462,7 @@ export function EvaluationWizard({ program, template, sections, questions, local
         onSelect={goToStep}
         locale={locale}
         allowUnrestrictedNavigation
+        steps={copy.steps}
       />
 
       <div className="mt-8 rounded-xl border border-border-default bg-raised shadow-sm sm:mt-10">

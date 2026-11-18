@@ -17,6 +17,8 @@ type AdvisorCompletionScreenProps = {
   reportScore: number;
   reportCount: number;
   locale: Locale;
+  /** Program-specific name for the report score (lib/report-content.ts). */
+  reportLabel?: string | null;
 };
 
 // Completion screen shown after a successful advisor evaluation submission.
@@ -69,6 +71,7 @@ export function AdvisorCompletionScreen({
   reportScore,
   reportCount,
   locale,
+  reportLabel,
 }: AdvisorCompletionScreenProps) {
   const copy = COMPLETION_COPY[locale];
 
@@ -107,7 +110,7 @@ export function AdvisorCompletionScreen({
           percent={centerPercent}
         />
         <ScoreCard
-          label={copy.reportLabel}
+          label={reportLabel ?? copy.reportLabel}
           score={reportScore}
           max={reportCount * 4}
           percent={reportPercent}

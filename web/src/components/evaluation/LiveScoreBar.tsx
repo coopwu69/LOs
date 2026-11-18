@@ -34,6 +34,8 @@ type LiveScoreBarProps = {
   // Report/project section — raw, answered-only. Divisor is 4 per item (G4).
   reportScore: number;
   reportMax: number; // answeredReportCount * 4; 0 when nothing answered
+  /** Program-specific name for the report section (lib/report-content.ts); default copy when absent. */
+  reportLabel?: string;
 };
 
 type LiveScoreCopy = {
@@ -133,8 +135,9 @@ export function LiveScoreBar({
   loMax,
   reportScore,
   reportMax,
+  reportLabel,
 }: LiveScoreBarProps) {
-  const copy = LIVE_SCORE_COPY[locale];
+  const copy = { ...LIVE_SCORE_COPY[locale], ...(reportLabel ? { reportLabel } : {}) };
   const w = WEIGHTS[variant];
   const totalMax = w.lo + w.report + w.presentation;
   const totalWeighted =

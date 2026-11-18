@@ -14,6 +14,8 @@ type CompletionScreenProps = {
   centerScore: number;
   centerCount: number;
   locale: Locale;
+  /** Program-specific name for the report score (lib/report-content.ts). */
+  reportLabel?: string | null;
 };
 
 // Completion screen shown after a successful submission.
@@ -36,6 +38,7 @@ export function CompletionScreen({
   centerScore,
   centerCount,
   locale,
+  reportLabel,
 }: CompletionScreenProps) {
   const copy = COPY[locale];
   const loPercent = loMax > 0 && loCount > 0 ? Math.round((loScore / (loCount * loMax)) * 100) : 0;
@@ -70,7 +73,7 @@ export function CompletionScreen({
           <dd className="mt-1 text-2xl font-semibold text-primary">{loCount}</dd>
         </div>
         <div>
-          <dt className="text-sm text-secondary">{copy.completionReport}</dt>
+          <dt className="text-sm text-secondary">{reportLabel ?? copy.completionReport}</dt>
           <dd className="mt-1 text-2xl font-semibold text-primary">
             {cScore}
             {/* Report scale is 1–4, not 1–5 (G4, goal.md) — divisor must match or this shows e.g. "16 / 25" for a full 20. */}

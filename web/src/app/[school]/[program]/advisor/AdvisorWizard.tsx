@@ -425,6 +425,7 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
         reportScore={state.reportScore}
         reportCount={state.reportCount}
         locale={locale}
+        reportLabel={reportContent.scoreLabel}
       />
     );
   }
@@ -454,6 +455,7 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
         loMax={liveScores.loMax}
         reportScore={liveScores.reportScore}
         reportMax={liveScores.reportMax}
+        reportLabel={reportContent.step?.[0]}
       />
 
       <StepProgressBar

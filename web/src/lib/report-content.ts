@@ -24,7 +24,11 @@ export type ReportContent = {
   step: [string, string, string] | null;
   /** Section heading used by the print view and the Word export. */
   docTitle: string;
+  /** Score label on the completion screen ("Work and performance score"); null = keep the default. */
+  scoreLabel: string | null;
 };
+
+const scoreLabelFor = (step: readonly string[] | undefined, locale: Locale) => (step ? (locale === "th" ? `คะแนน${step[0]}` : `${step[0]} score`) : null);
 
 export function reportContentFor(role: ReportRole, programCode: string | null | undefined, locale: Locale): ReportContent {
   const variant = reportVariantFor(programCode);
@@ -39,6 +43,7 @@ export function reportContentFor(role: ReportRole, programCode: string | null | 
       naLabel: v?.naLabel ?? null,
       step: v?.step ?? null,
       docTitle: v?.step[0] ?? c.steps[4][0],
+      scoreLabel: scoreLabelFor(v?.step, locale),
     };
   }
   const a = ADVISOR_COPY[locale];
@@ -50,5 +55,6 @@ export function reportContentFor(role: ReportRole, programCode: string | null | 
     naLabel: v?.naLabel ?? null,
     step: v?.step ?? null,
     docTitle: v ? `${locale === "th" ? "ส่วนที่ 4" : "Part 4:"} ${v.step[1]}` : a.reportTitle,
+    scoreLabel: scoreLabelFor(v?.step, locale),
   };
 }
