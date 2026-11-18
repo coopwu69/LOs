@@ -4,9 +4,10 @@ import { isFixtureMode, getFixtureTemplateDoc } from "./fixtures";
 import type { Locale } from "./i18n";
 import { programDisplayName } from "./i18n";
 import { FORM_NAMES } from "./form-names";
+import { BUILD_ID } from "./build-info";
 import { FORM_ROLES, type FormRole } from "./routes";
 import { WIZARD_COPY, PRIMARY_DOMAINS, ENGLISH_SCORE_LABELS } from "@/components/evaluation/copy";
-import { reportVariantFor, type ReportVariant } from "@/lib/report-variants";
+import { reportContentFor, type ReportContent } from "@/lib/report-content";
 import { ADVISOR_COPY } from "@/components/advisor/advisor-copy";
 import { STUDENT_COPY } from "@/components/student/student-copy";
 import type { TemplateDoc, SectionRow, QuestionRow, OptionRow, ProgramRow } from "./types";
@@ -60,6 +61,8 @@ export type RoleFormDoc = {
   formName: string;
   programName: string;
   programCode: string;
+  /** Deployed release that produced this document (lib/build-info.ts). */
+  buildId: string;
   sections: FormDocSection[];
 };
 
@@ -148,20 +151,19 @@ function ratingQuestion(text: string, labelsLowHigh: readonly string[], code?: s
 
 // ---------- Per-role assembly ----------
 
-// Report items for a program variant: level text comes from the variant's
-// rubric, and items that accept "X" get an extra last row for it.
-function variantReportQuestions(variant: ReportVariant, locale: Locale, labels: readonly string[]): FormDocQuestion[] {
-  const v = variant.copy[locale];
-  return v.items.map((item, i) => {
-    const scale: FormDocScaleLevel[] = labels
-      .map((label, idx) => ({ score: idx + 1, label, description: v.rubric[i]?.[idx] }))
+// Report questions from the single report source (lib/report-content.ts):
+// level text comes from the rubric, and items that accept "X" get a last row.
+function reportQuestions(content: ReportContent): FormDocQuestion[] {
+  return content.items.map((item, i) => {
+    const scale: FormDocScaleLevel[] = content.ratingLabels
+      .map((label, idx) => ({ score: idx + 1, label, description: content.rubric?.[i]?.[idx] }))
       .reverse();
-    if (variant.naItems.includes(i)) scale.push({ score: 0, scoreLabel: "–", label: v.naLabel });
+    if (content.naItems.includes(i) && content.naLabel) scale.push({ score: 0, scoreLabel: "–", label: content.naLabel });
     return { code: `${i + 1}`, text: item, type: "rating" as const, scale };
   });
 }
 
-function companySections(doc: TemplateDoc | null, locale: Locale, variant: ReportVariant | null): FormDocSection[] {
+function companySections(doc: TemplateDoc | null, locale: Locale, report: ReportContent): FormDocSection[] {
   const c = WIZARD_COPY[locale];
   const { primary, secondary } = doc ? splitLoSections(doc) : { primary: [], secondary: [] };
   const sections: FormDocSection[] = [];
@@ -195,8 +197,8 @@ function companySections(doc: TemplateDoc | null, locale: Locale, variant: Repor
 
   // 5. Report / project
   sections.push({
-    title: variant ? variant.copy[locale].step[0] : c.steps[4][0],
-    questions: variant ? variantReportQuestions(variant, locale, c.reportRating) : c.reportItems.map((item, i) => ratingQuestion(item, c.reportRating, `${i + 1}`)),
+    title: report.docTitle,
+    questions: reportQuestions(report),
   });
 
   // 6. Feedback
@@ -217,7 +219,7 @@ function companySections(doc: TemplateDoc | null, locale: Locale, variant: Repor
   return sections;
 }
 
-function advisorSections(doc: TemplateDoc | null, locale: Locale, variant: ReportVariant | null): FormDocSection[] {
+function advisorSections(doc: TemplateDoc | null, locale: Locale, report: ReportContent): FormDocSection[] {
   const c = WIZARD_COPY[locale];
   const a = ADVISOR_COPY[locale];
   const { primary, secondary } = doc ? splitLoSections(doc) : { primary: [], secondary: [] };
@@ -238,8 +240,8 @@ function advisorSections(doc: TemplateDoc | null, locale: Locale, variant: Repor
 
   // 4. Report
   sections.push({
-    title: variant ? `${locale === "th" ? "ส่วนที่ 4" : "Part 4:"} ${variant.copy[locale].step[1]}` : a.reportTitle,
-    questions: variant ? variantReportQuestions(variant, locale, a.reportRating) : a.reportItems.map((item, i) => ratingQuestion(item, a.reportRating, `${i + 1}`)),
+    title: report.docTitle,
+    questions: reportQuestions(report),
   });
 
   // 5. Comments
@@ -363,9 +365,8 @@ export async function getRoleFormDoc(
   if (doc) doc = { ...doc, sections: numberLoSections(doc.sections) };
 
   let sections: FormDocSection[];
-  const reportVariant = reportVariantFor(program.code);
-  if (role === "company") sections = companySections(doc, locale, reportVariant);
-  else if (role === "advisor") sections = advisorSections(doc, locale, reportVariant);
+  if (role === "company") sections = companySections(doc, locale, reportContentFor("company", program.code, locale));
+  else if (role === "advisor") sections = advisorSections(doc, locale, reportContentFor("advisor", program.code, locale));
   else sections = studentSections(doc, locale);
 
   return {
@@ -373,6 +374,7 @@ export async function getRoleFormDoc(
     formName: FORM_NAMES[locale][role],
     programName: programDisplayName(program, locale),
     programCode: program.code,
+    buildId: BUILD_ID,
     sections,
   };
 }

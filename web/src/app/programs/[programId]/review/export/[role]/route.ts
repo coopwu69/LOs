@@ -15,7 +15,7 @@ import {
 } from "docx";
 import { getProgram, getProgramRouteKey } from "@/lib/db";
 import { isFixtureMode, getFixtureProgram } from "@/lib/fixtures";
-import { resolveLocale } from "@/lib/i18n";
+import { resolveLocale, type Locale } from "@/lib/i18n";
 import { isFormRole } from "@/lib/routes";
 import { getRoleFormDoc, type RoleFormDoc, type FormDocQuestion } from "@/lib/form-doc";
 
@@ -168,7 +168,7 @@ function sectionBlock(title: string, questions: FormDocQuestion[]): (Paragraph |
   return blocks;
 }
 
-function buildDocx(doc: RoleFormDoc): Document {
+function buildDocx(doc: RoleFormDoc, locale: Locale): Document {
   const children: (Paragraph | Table)[] = [];
 
   // Title
@@ -190,7 +190,7 @@ function buildDocx(doc: RoleFormDoc): Document {
     new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: { after: 200 },
-      children: [run({ text: doc.programCode })],
+      children: [run({ text: `${doc.programCode} · ${locale === "en" ? "Release" : "เวอร์ชันระบบ"} ${doc.buildId}` })],
     })
   );
 
@@ -263,7 +263,7 @@ export async function GET(
 
   const locale = resolveLocale(req.nextUrl.searchParams.get("lang") ?? undefined, false);
   const doc = await getRoleFormDoc(program, role, locale);
-  const document = buildDocx(doc);
+  const document = buildDocx(doc, locale);
   const buffer = await Packer.toBuffer(document);
   const uint8 = new Uint8Array(buffer);
 

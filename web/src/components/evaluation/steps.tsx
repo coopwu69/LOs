@@ -17,7 +17,8 @@ import { RatingCard, type RatingLevel } from "./RatingCard";
 import { ChoiceGroup } from "./ChoiceGroup";
 import { PHONE_PATTERN } from "@/lib/contact-validation";
 import { ACADEMIC_TERMS, semestersForYear } from "@/lib/evaluation-schema";
-import { REPORT_NA_VALUE, type ReportVariant } from "@/lib/report-variants";
+import { REPORT_NA_VALUE } from "@/lib/report-variants";
+import type { ReportContent } from "@/lib/report-content";
 
 type QuestionWithOptions = Question & { options: Option[] };
 type FieldErrors = Record<string, string>;
@@ -234,21 +235,16 @@ export function CompetencyStep({
 const NA_SELECTED = -1;
 
 export function ReportStep({
-  locale,
   errors,
   formVersion,
-  variant,
+  content,
 }: {
-  locale: Locale;
   errors?: FieldErrors;
   formVersion: number;
-  /** Program-specific wording (lib/report-variants.ts); null/absent = shared default. */
-  variant?: ReportVariant | null;
+  /** Everything shown in this step — see lib/report-content.ts (single source). */
+  content: ReportContent;
 }) {
-  const baseCopy = COPY[locale];
-  const variantCopy = variant?.copy[locale];
-  const copy = variantCopy ? { ...baseCopy, reportItems: [...variantCopy.items], reportRubric: variantCopy.rubric } : baseCopy;
-  const naItems = variant?.naItems ?? [];
+  const naItems = content.naItems;
   const containerRef = useRef<HTMLDivElement>(null);
   const [ratings, setRatings] = useState<Record<number, number | undefined>>({});
 
@@ -260,8 +256,8 @@ export function ReportStep({
   // the generic reportRating label on the card — items without rubric text
   // (e.g. English, for now) fall back to the plain label.
   const levelsForItem = (index: number): RatingLevel[] => {
-    const rubric = copy.reportRubric?.[index];
-    return copy.reportRating
+    const rubric = content.rubric?.[index];
+    return content.ratingLabels
       .map((label, i) => ({ value: i + 1, label, description: rubric?.[i] }))
       .reverse();
   };
@@ -271,7 +267,7 @@ export function ReportStep({
     const form = containerRef.current?.closest("form");
     if (!form) return;
     const next: Record<number, number | undefined> = {};
-    for (let i = 0; i < copy.reportItems.length; i++) {
+    for (let i = 0; i < content.items.length; i++) {
       const group = form.elements.namedItem(`c-${i}`);
       if (group instanceof RadioNodeList) {
         for (const radio of group) {
@@ -286,11 +282,11 @@ export function ReportStep({
       }
     }
     setRatings(next);
-  }, [formVersion, copy.reportItems.length]);
+  }, [formVersion, content.items.length]);
 
   return (
     <div ref={containerRef} className="space-y-8">
-      {copy.reportItems.map((item, index) => {
+      {content.items.map((item, index) => {
         const fieldName = `c-${index}`;
         return (
           <fieldset key={item}>
@@ -308,7 +304,7 @@ export function ReportStep({
                 error={errors?.[fieldName]}
                 aria-label={`${index + 1}. ${item}`}
               />
-              {naItems.includes(index) && variantCopy && (
+              {naItems.includes(index) && content.naLabel && (
                 // Same `name` as the cards' radios, so picking X natively
                 // unselects the numeric level (and vice versa).
                 <label className="mt-3 inline-flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
@@ -320,7 +316,7 @@ export function ReportStep({
                     onChange={() => setRatings((prev) => ({ ...prev, [index]: NA_SELECTED }))}
                     className="size-4"
                   />
-                  {variantCopy.naLabel}
+                  {content.naLabel}
                 </label>
               )}
             </div>

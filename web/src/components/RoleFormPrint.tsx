@@ -70,7 +70,7 @@ export function RoleFormPrint({ doc, locale }: { doc: RoleFormDoc; locale: Local
         <h1 className="text-xl font-bold text-primary sm:text-2xl">{doc.formName}</h1>
         <p className="mt-2 text-lg font-semibold text-primary">{doc.programName}</p>
         <p className="mt-1 text-sm text-secondary">
-          {locale === "en" ? "Program code" : "รหัสหลักสูตร"}: {doc.programCode} · {TEMPLATE_DOC_TITLE[locale]}
+          {locale === "en" ? "Program code" : "รหัสหลักสูตร"}: {doc.programCode} · {TEMPLATE_DOC_TITLE[locale]} · {locale === "en" ? "Release" : "เวอร์ชันระบบ"} {doc.buildId}
         </p>
       </header>
       {doc.sections.map((section, i) => (

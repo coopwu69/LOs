@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, useTransition, useAc
 import type { Option, Program, Question, Section, Template } from "@/lib/db";
 import type { Locale } from "@/lib/i18n";
 import { computeLiveScores, type LiveScores } from "@/lib/live-score";
-import { reportVariantFor } from "@/lib/report-variants";
+import { reportContentFor } from "@/lib/report-content";
 import {
   StepProgressBar,
   ErrorSummary,
@@ -150,18 +150,18 @@ function fieldStep(
 }
 
 export function AdvisorWizard({ program, template, sections, questions, locale, role = "advisor" }: Props) {
-  // Program-specific report step wording (e.g. IMAG); null for every other program.
-  const reportVariant = useMemo(() => reportVariantFor(program.code), [program.code]);
-  const reportNaItems = reportVariant?.naItems;
+  // Single source for the report step wording, program overrides included.
+  const reportContent = useMemo(() => reportContentFor("advisor", program.code, locale), [program.code, locale]);
+  const reportNaItems = reportContent.naItems;
   const steps = useMemo(() => {
     const base = ADVISOR_STEPS[locale];
-    const reportStep = reportVariant?.copy[locale].step;
+    const reportStep = reportContent.step;
     return reportStep ? base.map((s, i) => (i === ADVISOR_STEP.REPORT ? reportStep : s)) : base;
-  }, [locale, reportVariant]);
+  }, [locale, reportContent]);
   const copy: WizardCopy = useMemo(() => ({ ...WIZARD_COPY[locale], steps }), [locale, steps]);
   const reportLabels = useMemo(
-    () => (reportVariant ? Object.fromEntries(reportVariant.copy[locale].items.map((item, i) => [`adv-report-${i}`, item])) : undefined),
-    [locale, reportVariant],
+    () => Object.fromEntries(reportContent.items.map((item, i) => [`adv-report-${i}`, item])),
+    [reportContent],
   );
 
   const [state, formAction, pending] = useActionState(submitAdvisorEvaluation, null as AdvisorSubmitResult | null);
@@ -504,7 +504,7 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
             />
           </div>
           <div hidden={currentStep !== ADVISOR_STEP.REPORT}>
-            <AdvisorReportStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} variant={reportVariant} />
+            <AdvisorReportStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} content={reportContent} />
           </div>
           <div hidden={currentStep !== ADVISOR_STEP.COMMENTS}>
             <AdvisorOtherStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />

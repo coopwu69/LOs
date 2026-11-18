@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/lib/i18n";
 import { ADVISOR_COPY, type AdvisorCopy } from "./advisor-copy";
-import { REPORT_NA_VALUE, type ReportVariant } from "@/lib/report-variants";
+import { REPORT_NA_VALUE } from "@/lib/report-variants";
+import type { ReportContent } from "@/lib/report-content";
 import {
   ChoiceGroup,
   Field,
@@ -113,9 +114,9 @@ function rating4Levels(copy: AdvisorCopy): RatingLevel[] {
   return copy.rating4.map((label, i) => ({ value: i + 1, label })).reverse();
 }
 
-function reportLevels(copy: AdvisorCopy, index: number): RatingLevel[] {
-  const rubric = copy.reportRubric?.[index];
-  return copy.reportRating
+function reportLevels(content: ReportContent, index: number): RatingLevel[] {
+  const rubric = content.rubric?.[index];
+  return content.ratingLabels
     .map((label, i) => ({ value: i + 1, label, description: rubric?.[i] }))
     .reverse();
 }
@@ -354,19 +355,14 @@ export function AdvisorProcessStep({ locale, errors, formVersion }: StepProps) {
 }
 
 // --- Section 4: Report appraisal ---
-export function AdvisorReportStep({ locale, errors, formVersion, variant }: StepProps & { variant?: ReportVariant | null }) {
-  const baseCopy = ADVISOR_COPY[locale];
-  const variantCopy = variant?.copy[locale];
-  const copy = variantCopy
-    ? { ...baseCopy, reportItems: variantCopy.items as unknown as AdvisorCopy["reportItems"], reportRubric: variantCopy.rubric }
-    : baseCopy;
-  const naItems = variant?.naItems ?? [];
+export function AdvisorReportStep({ errors, formVersion, content }: StepProps & { content: ReportContent }) {
+  const naItems = content.naItems;
   const { containerRef, ratings, setRatings } = useDomSyncedRatings(formVersion, REPORT_NAMES);
 
   return (
     <div ref={containerRef} className="space-y-8">
       <div className="divide-y divide-border-default">
-        {copy.reportItems.map((item, index) => {
+        {content.items.map((item, index) => {
           const name = REPORT_NAMES[index];
           return (
             <RatingItem
@@ -374,12 +370,12 @@ export function AdvisorReportStep({ locale, errors, formVersion, variant }: Step
               name={name}
               index={index}
               label={item}
-              levels={reportLevels(copy, index)}
+              levels={reportLevels(content, index)}
               value={ratings[name] === NA_SELECTED ? undefined : ratings[name]}
               onChange={(v) => setRatings((prev) => ({ ...prev, [name]: v }))}
               error={errors?.[name]}
               extra={
-                naItems.includes(index) && variantCopy ? (
+                naItems.includes(index) && content.naLabel ? (
                   // Same `name` as the cards' radios, so X and a numeric level exclude each other.
                   <label className="mt-3 inline-flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
                     <input
@@ -390,7 +386,7 @@ export function AdvisorReportStep({ locale, errors, formVersion, variant }: Step
                       onChange={() => setRatings((prev) => ({ ...prev, [name]: NA_SELECTED }))}
                       className="size-4"
                     />
-                    {variantCopy.naLabel}
+                    {content.naLabel}
                   </label>
                 ) : null
               }

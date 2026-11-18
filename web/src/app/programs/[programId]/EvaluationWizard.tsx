@@ -4,7 +4,7 @@ import { useCallback, useEffect, useActionState, useMemo, useRef, useState, useT
 import type { Option, Program, Question, Section, Template } from "@/lib/db";
 import type { Locale } from "@/lib/i18n";
 import { computeLiveScores, type LiveScores } from "@/lib/live-score";
-import { reportVariantFor } from "@/lib/report-variants";
+import { reportContentFor } from "@/lib/report-content";
 import { loadEvaluationDraft, saveEvaluationDraft, submitEvaluation } from "./actions";
 import {
   WIZARD_COPY as COPY,
@@ -136,19 +136,19 @@ function namedControl(form: HTMLFormElement, fieldName: string): HTMLElement | n
 }
 
 export function EvaluationWizard({ program, template, sections, questions, locale }: Props) {
-  // Program-specific report step wording (e.g. IMAG); null for every other program.
-  const reportVariant = useMemo(() => reportVariantFor(program.code), [program.code]);
-  const reportNaItems = reportVariant?.naItems;
+  // Single source for the report step wording, program overrides included.
+  const reportContent = useMemo(() => reportContentFor("company", program.code, locale), [program.code, locale]);
+  const reportNaItems = reportContent.naItems;
   const reportLabels = useMemo(
-    () => (reportVariant ? Object.fromEntries(reportVariant.copy[locale].items.map((item, i) => [`c-${i}`, item])) : undefined),
-    [locale, reportVariant],
+    () => Object.fromEntries(reportContent.items.map((item, i) => [`c-${i}`, item])),
+    [reportContent],
   );
   const copy: WizardCopy = useMemo(() => {
     const base = COPY[locale];
-    const step = reportVariant?.copy[locale].step;
+    const step = reportContent.step;
     if (!step) return base;
     return { ...base, steps: base.steps.map((s, i) => (i === STEP.REPORT ? step : s)) };
-  }, [locale, reportVariant]);
+  }, [locale, reportContent]);
   const [state, formAction, pending] = useActionState(submitEvaluation, null as SubmitResult | null);
   const [currentStep, setCurrentStep] = useState(0);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- setter is used below; the value itself isn't read yet
@@ -492,7 +492,7 @@ export function EvaluationWizard({ program, template, sections, questions, local
             <CompetencyStep sections={secondarySections} questions={secondaryQuestions} locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
           </div>
           <div hidden={currentStep !== STEP.REPORT}>
-            <ReportStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} variant={reportVariant} />
+            <ReportStep errors={effectiveFieldErrors} formVersion={formVersion} content={reportContent} />
           </div>
           <div hidden={currentStep !== STEP.FEEDBACK}>
             <FeedbackStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} answered={answered} total={questions.length} />
