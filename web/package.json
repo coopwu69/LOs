@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:parity": "tsx --test scripts/form-parity.test.tsx"
   },
   "dependencies": {
     "@types/pg": "^8.23.1",
@@ -27,6 +28,7 @@
     "eslint-config-next": "16.3.3",
     "playwright": "^1.63.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }

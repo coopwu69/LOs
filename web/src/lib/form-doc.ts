@@ -261,7 +261,9 @@ function advisorSections(doc: TemplateDoc | null, locale: Locale, report: Report
       ...a.centerItems.map((item, i) => ratingQuestion(item, a.rating4, `${i + 1}`)),
       ...a.workplaceItems.map((item, i) => ratingQuestion(item, a.rating4, `${i + 1}`)),
       choice(a.premiumWorkplace, [a.premiumYes, a.premiumNo, a.premiumReview]),
+      text(a.premiumReviewReason),
       choice(a.futurePlacement, [a.futureShould, a.futureShouldNot, a.futureOther]),
+      text(a.futureOtherSpecify),
       text(a.otherComments),
     ],
   });
@@ -326,6 +328,7 @@ function studentSections(doc: TemplateDoc | null, locale: Locale): FormDocSectio
       ...s.centerItems.map((item, i) => ratingQuestion(item, s.rating4, `${i + 1}`)),
       ...s.workplaceSupportItems.map((item, i) => ratingQuestion(item, s.rating4, `${i + 1}`)),
       choice(s.futurePlacement, [s.futureShould, s.futureShouldNot, s.futureOther]),
+      text(s.futureOtherSpecify),
       text(s.otherComments),
     ],
   });
