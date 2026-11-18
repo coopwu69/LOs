@@ -85,7 +85,7 @@ function scaleTable(question: FormDocQuestion): Table {
       new TableCell({
         width: { size: 8, type: WidthType.PERCENTAGE },
         borders: { top: solidBorder, bottom: solidBorder, left: solidBorder, right: solidBorder },
-        children: [p(String(lvl.score), { bold: true, align: AlignmentType.CENTER })],
+        children: [p(lvl.scoreLabel ?? String(lvl.score), { bold: true, align: AlignmentType.CENTER })],
       }),
       new TableCell({
         width: { size: 25, type: WidthType.PERCENTAGE },

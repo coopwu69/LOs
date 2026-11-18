@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, useTransition, useAc
 import type { Option, Program, Question, Section, Template } from "@/lib/db";
 import type { Locale } from "@/lib/i18n";
 import { computeLiveScores, type LiveScores } from "@/lib/live-score";
+import { reportVariantFor } from "@/lib/report-variants";
 import {
   StepProgressBar,
   ErrorSummary,
@@ -149,7 +150,19 @@ function fieldStep(
 }
 
 export function AdvisorWizard({ program, template, sections, questions, locale, role = "advisor" }: Props) {
-  const copy: WizardCopy = useMemo(() => ({ ...WIZARD_COPY[locale], steps: ADVISOR_STEPS[locale] }), [locale]);
+  // Program-specific report step wording (e.g. IMAG); null for every other program.
+  const reportVariant = useMemo(() => reportVariantFor(program.code), [program.code]);
+  const reportNaItems = reportVariant?.naItems;
+  const steps = useMemo(() => {
+    const base = ADVISOR_STEPS[locale];
+    const reportStep = reportVariant?.copy[locale].step;
+    return reportStep ? base.map((s, i) => (i === ADVISOR_STEP.REPORT ? reportStep : s)) : base;
+  }, [locale, reportVariant]);
+  const copy: WizardCopy = useMemo(() => ({ ...WIZARD_COPY[locale], steps }), [locale, steps]);
+  const reportLabels = useMemo(
+    () => (reportVariant ? Object.fromEntries(reportVariant.copy[locale].items.map((item, i) => [`adv-report-${i}`, item])) : undefined),
+    [locale, reportVariant],
+  );
 
   const [state, formAction, pending] = useActionState(submitAdvisorEvaluation, null as AdvisorSubmitResult | null);
   const [currentStep, setCurrentStep] = useState<number>(ADVISOR_STEP.GENERAL);
@@ -215,12 +228,12 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
       if (step === ADVISOR_STEP.GENERAL) rawErrors = validateAdvisorGeneralStep(data);
       else if (step === ADVISOR_STEP.KNOWLEDGE) rawErrors = validateAdvisorCompetencyStep(data, primaryConfig);
       else if (step === ADVISOR_STEP.ETHICS) rawErrors = validateAdvisorCompetencyStep(data, secondaryConfig);
-      else if (step === ADVISOR_STEP.REPORT) rawErrors = validateAdvisorReportStep(data);
+      else if (step === ADVISOR_STEP.REPORT) rawErrors = validateAdvisorReportStep(data, reportNaItems);
       else if (step === ADVISOR_STEP.COMMENTS) rawErrors = validateAdvisorOtherStep(data);
       else if (step === ADVISOR_STEP.PROCESS) rawErrors = validateAdvisorProcessStep(data);
       return localizeFieldErrors(rawErrors, locale);
     },
-    [locale, primaryConfig, secondaryConfig],
+    [locale, primaryConfig, reportNaItems, secondaryConfig],
   );
 
   // --- Draft load on mount ---
@@ -449,7 +462,7 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
         onSelect={goToStep}
         locale={locale}
         allowUnrestrictedNavigation
-        steps={ADVISOR_STEPS[locale]}
+        steps={steps}
       />
 
       <div className="mt-8 rounded-xl border border-border-default bg-raised shadow-sm sm:mt-10">
@@ -491,7 +504,7 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
             />
           </div>
           <div hidden={currentStep !== ADVISOR_STEP.REPORT}>
-            <AdvisorReportStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
+            <AdvisorReportStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} variant={reportVariant} />
           </div>
           <div hidden={currentStep !== ADVISOR_STEP.COMMENTS}>
             <AdvisorOtherStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
@@ -501,7 +514,7 @@ export function AdvisorWizard({ program, template, sections, questions, locale, 
           </div>
         </div>
 
-        {hasErrors && <ErrorSummary fieldErrors={effectiveFieldErrors} locale={locale} onFieldFocus={focusField} />}
+        {hasErrors && <ErrorSummary fieldErrors={effectiveFieldErrors} locale={locale} onFieldFocus={focusField} extraLabels={reportLabels} />}
 
         {state && !state.success && state.error && !state.fieldErrors && (
           <div

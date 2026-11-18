@@ -1,6 +1,7 @@
 "use server";
 
 import { getPool } from "@/lib/db";
+import { REPORT_NA_VALUE, reportVariantFor } from "@/lib/report-variants";
 import {
   saveAdvisorDraft as dbSaveAdvisorDraft,
   loadAdvisorDraft as dbLoadAdvisorDraft,
@@ -14,7 +15,7 @@ import {
   advisorGeneralStepSchema,
   advisorOtherStepSchema,
   advisorProcessStepSchema,
-  advisorReportStepSchema,
+  buildAdvisorReportStepSchema,
   flattenZodToKeys,
   localizeFieldErrors,
   localizeError,
@@ -70,7 +71,10 @@ export async function submitAdvisorEvaluation(
   const generalResult = advisorGeneralStepSchema.safeParse(raw);
   const otherResult = advisorOtherStepSchema.safeParse(raw);
   const processResult = advisorProcessStepSchema.safeParse(raw);
-  const reportResult = advisorReportStepSchema.safeParse(raw);
+  // Program variants (e.g. IMAG) allow "X" (unable to assess) on some report items.
+  const programCodeRow = await getPool().query("SELECT code FROM programs WHERE id = $1", [programId]);
+  const reportNaItems = reportVariantFor(programCodeRow.rows[0]?.code)?.naItems ?? [];
+  const reportResult = buildAdvisorReportStepSchema(reportNaItems).safeParse(raw);
 
   const allFieldErrors: Record<string, string> = {};
   if (!generalResult.success) Object.assign(allFieldErrors, flattenZodToKeys(generalResult.error));
@@ -178,7 +182,14 @@ export async function submitAdvisorEvaluation(
 
   let reportScore = 0;
   let reportCount = 0;
+  let reportNaCount = 0;
   for (let i = 0; i < ADVISOR_REPORT_COUNT; i++) {
+    // "X" was validated against the program's allowed items; it counts toward
+    // neither the score nor the item count.
+    if (raw[`adv-report-${i}`] === REPORT_NA_VALUE) {
+      reportNaCount++;
+      continue;
+    }
     const score = parseInt(raw[`adv-report-${i}`] ?? "", 10);
     if (!Number.isNaN(score) && score >= 1 && score <= 4) {
       reportScore += score;
@@ -206,7 +217,7 @@ export async function submitAdvisorEvaluation(
       ),
     };
   }
-  if (reportCount !== ADVISOR_REPORT_COUNT) {
+  if (reportCount + reportNaCount !== ADVISOR_REPORT_COUNT) {
     return {
       success: false,
       error: message(

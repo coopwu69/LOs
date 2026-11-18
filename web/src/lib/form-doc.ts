@@ -6,6 +6,7 @@ import { programDisplayName } from "./i18n";
 import { FORM_NAMES } from "./form-names";
 import { FORM_ROLES, type FormRole } from "./routes";
 import { WIZARD_COPY, PRIMARY_DOMAINS, ENGLISH_SCORE_LABELS } from "@/components/evaluation/copy";
+import { REPORT_NA_VALUE, reportVariantFor, type ReportVariant } from "@/lib/report-variants";
 import { ADVISOR_COPY } from "@/components/advisor/advisor-copy";
 import { STUDENT_COPY } from "@/components/student/student-copy";
 import type { TemplateDoc, SectionRow, QuestionRow, OptionRow, ProgramRow } from "./types";
@@ -27,6 +28,8 @@ export type FormDocScaleLevel = {
   score: number;
   label: string;
   description?: string;
+  /** Shown in place of the numeric score (e.g. "X" for "unable to assess"). */
+  scoreLabel?: string;
   /** Present when this level is intentionally unselectable (e.g. skill level 1). */
   disabled?: boolean;
 };
@@ -145,7 +148,20 @@ function ratingQuestion(text: string, labelsLowHigh: readonly string[], code?: s
 
 // ---------- Per-role assembly ----------
 
-function companySections(doc: TemplateDoc | null, locale: Locale): FormDocSection[] {
+// Report items for a program variant: level text comes from the variant's
+// rubric, and items that accept "X" get an extra last row for it.
+function variantReportQuestions(variant: ReportVariant, locale: Locale, labels: readonly string[]): FormDocQuestion[] {
+  const v = variant.copy[locale];
+  return v.items.map((item, i) => {
+    const scale: FormDocScaleLevel[] = labels
+      .map((label, idx) => ({ score: idx + 1, label, description: v.rubric[i]?.[idx] }))
+      .reverse();
+    if (variant.naItems.includes(i)) scale.push({ score: 0, scoreLabel: REPORT_NA_VALUE, label: v.naLabel.replace(/^X\s*/, "") });
+    return { code: `${i + 1}`, text: item, type: "rating" as const, scale };
+  });
+}
+
+function companySections(doc: TemplateDoc | null, locale: Locale, variant: ReportVariant | null): FormDocSection[] {
   const c = WIZARD_COPY[locale];
   const { primary, secondary } = doc ? splitLoSections(doc) : { primary: [], secondary: [] };
   const sections: FormDocSection[] = [];
@@ -179,8 +195,8 @@ function companySections(doc: TemplateDoc | null, locale: Locale): FormDocSectio
 
   // 5. Report / project
   sections.push({
-    title: c.steps[4][0],
-    questions: c.reportItems.map((item, i) => ratingQuestion(item, c.reportRating, `${i + 1}`)),
+    title: variant ? variant.copy[locale].step[0] : c.steps[4][0],
+    questions: variant ? variantReportQuestions(variant, locale, c.reportRating) : c.reportItems.map((item, i) => ratingQuestion(item, c.reportRating, `${i + 1}`)),
   });
 
   // 6. Feedback
@@ -201,7 +217,7 @@ function companySections(doc: TemplateDoc | null, locale: Locale): FormDocSectio
   return sections;
 }
 
-function advisorSections(doc: TemplateDoc | null, locale: Locale): FormDocSection[] {
+function advisorSections(doc: TemplateDoc | null, locale: Locale, variant: ReportVariant | null): FormDocSection[] {
   const c = WIZARD_COPY[locale];
   const a = ADVISOR_COPY[locale];
   const { primary, secondary } = doc ? splitLoSections(doc) : { primary: [], secondary: [] };
@@ -222,8 +238,8 @@ function advisorSections(doc: TemplateDoc | null, locale: Locale): FormDocSectio
 
   // 4. Report
   sections.push({
-    title: a.reportTitle,
-    questions: a.reportItems.map((item, i) => ratingQuestion(item, a.reportRating, `${i + 1}`)),
+    title: variant ? `${locale === "th" ? "ส่วนที่ 4" : "Part 4:"} ${variant.copy[locale].step[1]}` : a.reportTitle,
+    questions: variant ? variantReportQuestions(variant, locale, a.reportRating) : a.reportItems.map((item, i) => ratingQuestion(item, a.reportRating, `${i + 1}`)),
   });
 
   // 5. Comments
@@ -347,8 +363,9 @@ export async function getRoleFormDoc(
   if (doc) doc = { ...doc, sections: numberLoSections(doc.sections) };
 
   let sections: FormDocSection[];
-  if (role === "company") sections = companySections(doc, locale);
-  else if (role === "advisor") sections = advisorSections(doc, locale);
+  const reportVariant = reportVariantFor(program.code);
+  if (role === "company") sections = companySections(doc, locale, reportVariant);
+  else if (role === "advisor") sections = advisorSections(doc, locale, reportVariant);
   else sections = studentSections(doc, locale);
 
   return {

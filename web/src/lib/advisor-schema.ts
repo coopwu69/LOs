@@ -58,6 +58,25 @@ export const advisorReportStepSchema = z.object({
   "adv-report-4": adv4ScoreSchema,
 });
 
+// Program variants (lib/report-variants.ts) may let some report items also
+// accept "X" (unable to assess).
+const adv4OrNaScoreSchema = z
+  .string()
+  .min(1, "required")
+  .refine((v) => v === "X" || (Number.isInteger(Number(v)) && Number(v) >= 1 && Number(v) <= 4), "score_range");
+
+export function buildAdvisorReportStepSchema(naItems: readonly number[] = []) {
+  if (naItems.length === 0) return advisorReportStepSchema;
+  const item = (i: number) => (naItems.includes(i) ? adv4OrNaScoreSchema : adv4ScoreSchema);
+  return z.object({
+    "adv-report-0": item(0),
+    "adv-report-1": item(1),
+    "adv-report-2": item(2),
+    "adv-report-3": item(3),
+    "adv-report-4": item(4),
+  });
+}
+
 // --- Section 5: Comments (overall items + strengths / improvements) ---
 export const advisorOtherStepSchema = z.object({
   "adv-other-0": adv4ScoreSchema,
@@ -150,8 +169,11 @@ export function validateAdvisorProcessStep(data: Record<string, string>): Record
   return result.success ? {} : flattenZodToKeys(result.error);
 }
 
-export function validateAdvisorReportStep(data: Record<string, string>): Record<string, string> {
-  const result = advisorReportStepSchema.safeParse(data);
+export function validateAdvisorReportStep(
+  data: Record<string, string>,
+  naItems: readonly number[] = [],
+): Record<string, string> {
+  const result = buildAdvisorReportStepSchema(naItems).safeParse(data);
   return result.success ? {} : flattenZodToKeys(result.error);
 }
 

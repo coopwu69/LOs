@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/lib/i18n";
 import { ADVISOR_COPY, type AdvisorCopy } from "./advisor-copy";
+import { REPORT_NA_VALUE, type ReportVariant } from "@/lib/report-variants";
 import {
   ChoiceGroup,
   Field,
@@ -43,6 +44,9 @@ const REPORT_NAMES = [
 // radio.checked directly on the DOM (restoreForm). This hook bridges
 // that gap by reading DOM radio state into React whenever formVersion
 // changes (fires on restore and on every form change).
+// Sentinel for the "X" (unable to assess) answer in rating state.
+const NA_SELECTED = -1;
+
 function useDomSyncedRatings(formVersion: number, names: readonly string[]) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [ratings, setRatings] = useState<Record<string, number | undefined>>({});
@@ -56,12 +60,12 @@ function useDomSyncedRatings(formVersion: number, names: readonly string[]) {
       if (group instanceof RadioNodeList) {
         for (const radio of group) {
           if (radio instanceof HTMLInputElement && radio.checked) {
-            next[name] = Number(radio.value);
+            next[name] = radio.value === REPORT_NA_VALUE ? NA_SELECTED : Number(radio.value);
             break;
           }
         }
       } else if (group instanceof HTMLInputElement && group.checked) {
-        next[name] = Number(group.value);
+        next[name] = group.value === REPORT_NA_VALUE ? NA_SELECTED : Number(group.value);
       }
     }
     setRatings(next);
@@ -124,9 +128,11 @@ type RatingItemProps = {
   value: number | undefined;
   onChange: (value: number) => void;
   error?: string;
+  /** Extra control rendered under the rating cards (e.g. the "X" option). */
+  extra?: React.ReactNode;
 };
 
-function RatingItem({ name, index, label, levels, value, onChange, error }: RatingItemProps) {
+function RatingItem({ name, index, label, levels, value, onChange, error, extra }: RatingItemProps) {
   return (
     <fieldset className="py-7 first:pt-6 last:pb-0">
       <legend className="w-full text-base font-medium leading-relaxed text-primary">
@@ -143,6 +149,7 @@ function RatingItem({ name, index, label, levels, value, onChange, error }: Rati
           error={error}
           aria-label={`${index + 1}. ${label}`}
         />
+        {extra}
       </div>
     </fieldset>
   );
@@ -347,8 +354,13 @@ export function AdvisorProcessStep({ locale, errors, formVersion }: StepProps) {
 }
 
 // --- Section 4: Report appraisal ---
-export function AdvisorReportStep({ locale, errors, formVersion }: StepProps) {
-  const copy = ADVISOR_COPY[locale];
+export function AdvisorReportStep({ locale, errors, formVersion, variant }: StepProps & { variant?: ReportVariant | null }) {
+  const baseCopy = ADVISOR_COPY[locale];
+  const variantCopy = variant?.copy[locale];
+  const copy = variantCopy
+    ? { ...baseCopy, reportItems: variantCopy.items as unknown as AdvisorCopy["reportItems"], reportRubric: variantCopy.rubric }
+    : baseCopy;
+  const naItems = variant?.naItems ?? [];
   const { containerRef, ratings, setRatings } = useDomSyncedRatings(formVersion, REPORT_NAMES);
 
   return (
@@ -363,9 +375,25 @@ export function AdvisorReportStep({ locale, errors, formVersion }: StepProps) {
               index={index}
               label={item}
               levels={reportLevels(copy, index)}
-              value={ratings[name]}
+              value={ratings[name] === NA_SELECTED ? undefined : ratings[name]}
               onChange={(v) => setRatings((prev) => ({ ...prev, [name]: v }))}
               error={errors?.[name]}
+              extra={
+                naItems.includes(index) && variantCopy ? (
+                  // Same `name` as the cards' radios, so X and a numeric level exclude each other.
+                  <label className="mt-3 inline-flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
+                    <input
+                      type="radio"
+                      name={name}
+                      value={REPORT_NA_VALUE}
+                      checked={ratings[name] === NA_SELECTED}
+                      onChange={() => setRatings((prev) => ({ ...prev, [name]: NA_SELECTED }))}
+                      className="size-4"
+                    />
+                    {variantCopy.naLabel}
+                  </label>
+                ) : null
+              }
             />
           );
         })}

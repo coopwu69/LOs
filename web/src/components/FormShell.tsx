@@ -1,6 +1,7 @@
 import { programDisplayName, schoolDisplayName, type Locale } from "@/lib/i18n";
 import type { ProgramRow } from "@/lib/types";
 import { WIZARD_COPY as COPY } from "./evaluation/copy";
+import { reportVariantFor } from "@/lib/report-variants";
 import { TEMPLATE_DOC_TITLE } from "@/lib/form-names";
 
 function BlankLine({ label, value }: { label: string; value?: string | null }) {
@@ -92,6 +93,8 @@ export function FormShell({
 }) {
   const copy = COPY[locale];
   const programName = programDisplayName(program, locale);
+  const reportVariant = reportVariantFor(program.code);
+  const reportVariantCopy = reportVariant?.copy[locale];
   const schoolName = schoolDisplayName(program.school ?? "", locale);
 
   return (
@@ -154,12 +157,20 @@ export function FormShell({
 
       {children}
 
-      <StepSection locale={locale} step={5} title={copy.steps[4][1]} description={copy.steps[4][2]} newPage>
+      <StepSection locale={locale} step={5} title={reportVariantCopy?.step[1] ?? copy.steps[4][1]} description={reportVariantCopy?.step[2] ?? copy.steps[4][2]} newPage>
         <div className="space-y-8">
-          {copy.reportItems.map((item, index) => (
+          {(reportVariantCopy?.items ?? copy.reportItems).map((item, index) => (
             <fieldset key={item} className="print-break-avoid">
               <legend className="text-base font-medium leading-relaxed text-primary">{index + 1}. {item}</legend>
               <PrintRating labels={copy.reportRating} />
+              {reportVariantCopy && (
+                <ul className="mt-3 space-y-1 text-xs text-secondary">
+                  {reportVariantCopy.rubric[index].map((text, level) => (
+                    <li key={level}><span className="font-semibold text-primary">{level + 1}</span> {text}</li>
+                  ))}
+                  {reportVariant?.naItems.includes(index) && <li><span className="font-semibold text-primary">X</span> {reportVariantCopy.naLabel.replace(/^X\s*/, "")}</li>}
+                </ul>
+              )}
             </fieldset>
           ))}
         </div>

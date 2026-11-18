@@ -139,6 +139,10 @@ export function EvaluationWizard({ program, template, sections, questions, local
   // Program-specific report step wording (e.g. IMAG); null for every other program.
   const reportVariant = useMemo(() => reportVariantFor(program.code), [program.code]);
   const reportNaItems = reportVariant?.naItems;
+  const reportLabels = useMemo(
+    () => (reportVariant ? Object.fromEntries(reportVariant.copy[locale].items.map((item, i) => [`c-${i}`, item])) : undefined),
+    [locale, reportVariant],
+  );
   const copy: WizardCopy = useMemo(() => {
     const base = COPY[locale];
     const step = reportVariant?.copy[locale].step;
@@ -495,7 +499,7 @@ export function EvaluationWizard({ program, template, sections, questions, local
           </div>
         </div>
 
-        {hasErrors && <ErrorSummary fieldErrors={effectiveFieldErrors} locale={locale} onFieldFocus={focusField} />}
+        {hasErrors && <ErrorSummary fieldErrors={effectiveFieldErrors} locale={locale} onFieldFocus={focusField} extraLabels={reportLabels} />}
 
         {state && !state.success && state.error && !state.fieldErrors && (
           <div
