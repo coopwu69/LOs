@@ -17,6 +17,7 @@ import { RatingCard, type RatingLevel } from "./RatingCard";
 import { ChoiceGroup } from "./ChoiceGroup";
 import { PHONE_PATTERN } from "@/lib/contact-validation";
 import { ACADEMIC_TERMS, semestersForYear } from "@/lib/evaluation-schema";
+import { REPORT_NA_VALUE, type ReportVariant } from "@/lib/report-variants";
 
 type QuestionWithOptions = Question & { options: Option[] };
 type FieldErrors = Record<string, string>;
@@ -229,16 +230,25 @@ export function CompetencyStep({
 }
 
 // --- Step 3: Report / project ---
+// Sentinel for the "X" (unable to assess) answer in the ReportStep rating state.
+const NA_SELECTED = -1;
+
 export function ReportStep({
   locale,
   errors,
   formVersion,
+  variant,
 }: {
   locale: Locale;
   errors?: FieldErrors;
   formVersion: number;
+  /** Program-specific wording (lib/report-variants.ts); null/absent = shared default. */
+  variant?: ReportVariant | null;
 }) {
-  const copy = COPY[locale];
+  const baseCopy = COPY[locale];
+  const variantCopy = variant?.copy[locale];
+  const copy = variantCopy ? { ...baseCopy, reportItems: [...variantCopy.items], reportRubric: variantCopy.rubric } : baseCopy;
+  const naItems = variant?.naItems ?? [];
   const containerRef = useRef<HTMLDivElement>(null);
   const [ratings, setRatings] = useState<Record<number, number | undefined>>({});
 
@@ -266,12 +276,13 @@ export function ReportStep({
       if (group instanceof RadioNodeList) {
         for (const radio of group) {
           if (radio instanceof HTMLInputElement && radio.checked) {
-            next[i] = Number(radio.value);
+            // "X" (unable to assess) has no numeric level — leaves the cards unselected.
+            next[i] = radio.value === REPORT_NA_VALUE ? NA_SELECTED : Number(radio.value);
             break;
           }
         }
       } else if (group instanceof HTMLInputElement && group.checked) {
-        next[i] = Number(group.value);
+        next[i] = group.value === REPORT_NA_VALUE ? NA_SELECTED : Number(group.value);
       }
     }
     setRatings(next);
@@ -290,13 +301,28 @@ export function ReportStep({
             <div className="mt-4">
               <RatingCard
                 levels={levelsForItem(index)}
-                value={ratings[index]}
+                value={ratings[index] === NA_SELECTED ? undefined : ratings[index]}
                 onChange={(v) => setRatings((prev) => ({ ...prev, [index]: v }))}
                 name={fieldName}
                 required
                 error={errors?.[fieldName]}
                 aria-label={`${index + 1}. ${item}`}
               />
+              {naItems.includes(index) && variantCopy && (
+                // Same `name` as the cards' radios, so picking X natively
+                // unselects the numeric level (and vice versa).
+                <label className="mt-3 inline-flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
+                  <input
+                    type="radio"
+                    name={fieldName}
+                    value={REPORT_NA_VALUE}
+                    checked={ratings[index] === NA_SELECTED}
+                    onChange={() => setRatings((prev) => ({ ...prev, [index]: NA_SELECTED }))}
+                    className="size-4"
+                  />
+                  {variantCopy.naLabel}
+                </label>
+              )}
             </div>
           </fieldset>
         );

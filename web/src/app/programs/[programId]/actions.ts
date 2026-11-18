@@ -1,12 +1,13 @@
 "use server";
 
 import { getPool } from "@/lib/db";
+import { REPORT_NA_VALUE, reportVariantFor } from "@/lib/report-variants";
 import {
   UUID_PATTERN,
   submissionEnvelopeSchema,
   generalStepSchema,
   feedbackStepSchema,
-  reportStepSchema,
+  buildReportStepSchema,
   skillExpectationStepSchema,
   REPORT_ITEM_COUNT,
   SKILL_COUNT,
@@ -165,7 +166,10 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
 
 
   // --- Report validation ---
-  const reportResult = reportStepSchema.safeParse({
+  // Program variants (e.g. IMAG) allow "X" (unable to assess) on some items.
+  const programCodeRow = await getPool().query("SELECT code FROM programs WHERE id = $1", [programId]);
+  const reportNaItems = reportVariantFor(programCodeRow.rows[0]?.code)?.naItems ?? [];
+  const reportResult = buildReportStepSchema(reportNaItems).safeParse({
     "c-0": raw["c-0"],
     "c-1": raw["c-1"],
     "c-2": raw["c-2"],
@@ -213,6 +217,7 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
     let loMax = 0;
     let cScore = 0;
     let cCount = 0;
+    let cNaCount = 0;
     let centerScore = 0;
     let centerCount = 0;
 
@@ -272,6 +277,12 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
         loCount++;
       }
       if (key.startsWith("c-")) {
+        // "X" (unable to assess) was already validated against the program's
+        // allowed items; it counts toward neither the score nor the item count.
+        if (String(value) === REPORT_NA_VALUE) {
+          cNaCount++;
+          continue;
+        }
         const score = parseInt(String(value), 10);
         // Report scale is 1–4 (was 1–5 — G4, goal.md).
         if (!Number.isInteger(score) || score < 1 || score > 4) {
@@ -300,7 +311,7 @@ export async function submitEvaluation(_prevState: unknown, formData: FormData):
       };
     }
 
-    if (cCount !== REPORT_ITEM_COUNT)
+    if (cCount + cNaCount !== REPORT_ITEM_COUNT)
       return {
         success: false,
         error: message("กรุณาประเมินรายงานหรือโครงงานให้ครบทั้ง 5 ข้อ", "Please complete all five report or project questions."),

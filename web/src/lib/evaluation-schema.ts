@@ -111,6 +111,19 @@ export const reportStepSchema = z.object({
   "c-4": reportItemSchema,
 });
 
+// Program variants (lib/report-variants.ts) may let some items also accept
+// "X" (unable to assess). Everything else stays the plain 1–4 schema.
+const reportItemOrNaSchema = z
+  .string()
+  .min(1, "required")
+  .refine((v) => v === "X" || (Number.isInteger(Number(v)) && Number(v) >= 1 && Number(v) <= 4), "score_range");
+
+export function buildReportStepSchema(naItems: readonly number[] = []) {
+  if (naItems.length === 0) return reportStepSchema;
+  const item = (i: number) => (naItems.includes(i) ? reportItemOrNaSchema : reportItemSchema);
+  return z.object({ "c-0": item(0), "c-1": item(1), "c-2": item(2), "c-3": item(3), "c-4": item(4) });
+}
+
 // --- Competency questions (steps 1 & 2) ---
 // Each LO question is `lo-{questionId}` with a value that must be an integer
 // within the allowed score set. The allowed set is dynamic (from DB options
@@ -281,8 +294,9 @@ export function validateGeneralStep(
 
 export function validateReportStep(
   data: Record<string, string>,
+  naItems: readonly number[] = [],
 ): Record<string, string> {
-  const result = reportStepSchema.safeParse(data);
+  const result = buildReportStepSchema(naItems).safeParse(data);
   return result.success ? {} : flattenZodToKeys(result.error);
 }
 

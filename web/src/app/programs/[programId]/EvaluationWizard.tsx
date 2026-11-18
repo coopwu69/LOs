@@ -4,6 +4,7 @@ import { useCallback, useEffect, useActionState, useMemo, useRef, useState, useT
 import type { Option, Program, Question, Section, Template } from "@/lib/db";
 import type { Locale } from "@/lib/i18n";
 import { computeLiveScores, type LiveScores } from "@/lib/live-score";
+import { reportVariantFor } from "@/lib/report-variants";
 import { loadEvaluationDraft, saveEvaluationDraft, submitEvaluation } from "./actions";
 import {
   WIZARD_COPY as COPY,
@@ -135,7 +136,15 @@ function namedControl(form: HTMLFormElement, fieldName: string): HTMLElement | n
 }
 
 export function EvaluationWizard({ program, template, sections, questions, locale }: Props) {
-  const copy: WizardCopy = COPY[locale];
+  // Program-specific report step wording (e.g. IMAG); null for every other program.
+  const reportVariant = useMemo(() => reportVariantFor(program.code), [program.code]);
+  const reportNaItems = reportVariant?.naItems;
+  const copy: WizardCopy = useMemo(() => {
+    const base = COPY[locale];
+    const step = reportVariant?.copy[locale].step;
+    if (!step) return base;
+    return { ...base, steps: base.steps.map((s, i) => (i === STEP.REPORT ? step : s)) };
+  }, [locale, reportVariant]);
   const [state, formAction, pending] = useActionState(submitEvaluation, null as SubmitResult | null);
   const [currentStep, setCurrentStep] = useState(0);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- setter is used below; the value itself isn't read yet
@@ -274,11 +283,11 @@ export function EvaluationWizard({ program, template, sections, questions, local
           ),
           allowedScoresByQuestion: competencyConfig.allowedScoresByQuestion,
         });
-      else if (step === STEP.REPORT) rawErrors = validateReportStep(data);
+      else if (step === STEP.REPORT) rawErrors = validateReportStep(data, reportNaItems);
       else if (step === STEP.FEEDBACK) rawErrors = validateFeedbackStep(data);
       return localizeFieldErrors(rawErrors, locale);
     },
-    [competencyConfig, locale, primaryQuestions, secondaryQuestions],
+    [competencyConfig, locale, primaryQuestions, reportNaItems, secondaryQuestions],
   );
 
   // --- Recompute step completion whenever the form changes ---
@@ -479,7 +488,7 @@ export function EvaluationWizard({ program, template, sections, questions, local
             <CompetencyStep sections={secondarySections} questions={secondaryQuestions} locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
           </div>
           <div hidden={currentStep !== STEP.REPORT}>
-            <ReportStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} />
+            <ReportStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} variant={reportVariant} />
           </div>
           <div hidden={currentStep !== STEP.FEEDBACK}>
             <FeedbackStep locale={locale} errors={effectiveFieldErrors} formVersion={formVersion} answered={answered} total={questions.length} />
