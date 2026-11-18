@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:parity": "tsx --test scripts/form-parity.test.tsx"
+    "test:parity": "tsx --test scripts/form-parity.test.tsx",
+    "test:submit": "tsx --test scripts/submit-na.test.tsx"
   },
   "dependencies": {
     "@types/pg": "^8.23.1",
