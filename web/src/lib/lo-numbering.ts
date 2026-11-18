@@ -20,7 +20,23 @@ export function getLoQuestionNumbers(sections: Section[], questions: Question[])
   return numbers;
 }
 
-export function numberLoSections(sections: SectionRow[]): SectionRow[] {
+// Collapse questions that repeat the same LO code, keeping the tersest wording.
+// One rule shared by the live form, print and every Word export so they show
+// the same questions. The company form's server validation (actions.ts) also
+// dedupes by lo_code, so keep them in sync.
+export function dedupeByLoCode<T extends { id: string; lo_code: string | null; text: string; sequence: number }>(questions: T[]): T[] {
+  const unique = new Map<string, T>();
+  for (const question of questions) {
+    const key = question.lo_code?.trim().toUpperCase() || question.id;
+    const existing = unique.get(key);
+    if (!existing || question.text.length < existing.text.length) unique.set(key, question);
+  }
+  return [...unique.values()].sort((a, b) => a.sequence - b.sequence);
+}
+
+export function numberLoSections(rawSections: SectionRow[]): SectionRow[] {
+  const keptIds = new Set(dedupeByLoCode(rawSections.flatMap((s) => s.questions)).map((q) => q.id));
+  const sections = rawSections.map((s) => ({ ...s, questions: s.questions.filter((q) => keptIds.has(q.id)) }));
   const numbers = getLoQuestionNumbers(sections, sections.flatMap((s) => s.questions.map((q) => ({ ...q, section_id: s.id }))));
   return [...sections].sort((a, b) =>
     Number(!PRIMARY_DOMAINS.has(a.domain_type)) - Number(!PRIMARY_DOMAINS.has(b.domain_type)) || a.sequence - b.sequence,

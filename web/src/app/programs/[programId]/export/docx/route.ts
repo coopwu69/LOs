@@ -427,6 +427,16 @@ function buildDocx(doc: TemplateDoc): Document {
   });
 }
 
+// ต่อวันที่-เวลา (เวลาไทย) ท้ายชื่อไฟล์ เพื่อแยกไฟล์ใหม่ออกจากไฟล์ที่ดาวน์โหลดไว้ก่อนหน้า
+function filenameStamp(date = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Bangkok", year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hour12: false,
+  }).formatToParts(date);
+  const get = (type: string) => parts.find((x) => x.type === type)?.value ?? "";
+  return `${get("year")}${get("month")}${get("day")}-${get("hour")}${get("minute")}`;
+}
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ programId: string }> }
@@ -472,7 +482,7 @@ export async function GET(
   const uint8 = new Uint8Array(buffer);
 
   const safeCode = program.code.replace(/[^฀-๿a-zA-Z0-9]/g, "_");
-  const filename = `LOs_${safeCode}.docx`;
+  const filename = `LOs_${safeCode}_${filenameStamp()}.docx`;
 
   return new NextResponse(uint8, {
     status: 200,

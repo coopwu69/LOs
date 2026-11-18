@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getLoQuestionNumbers } from "@/lib/lo-numbering";
+import { dedupeByLoCode, getLoQuestionNumbers } from "@/lib/lo-numbering";
 import { notFound, permanentRedirect } from "next/navigation";
 import {
   getProgramPageData,
@@ -30,19 +30,6 @@ type PageParams = {
 };
 
 type QuestionWithOptions = Question & { options: Option[] };
-
-// Collapse questions that repeat the same LO code, keeping the tersest wording.
-// Mirrors the original /programs/[programId] page — the company form's server
-// validation (actions.ts) also dedupes by lo_code, so the client must match.
-function dedupeByLoCode(questions: QuestionWithOptions[]): QuestionWithOptions[] {
-  const uniqueQuestions = new Map<string, QuestionWithOptions>();
-  for (const question of questions) {
-    const key = question.lo_code?.trim().toUpperCase() || question.id;
-    const existing = uniqueQuestions.get(key);
-    if (!existing || question.text.length < existing.text.length) uniqueQuestions.set(key, question);
-  }
-  return [...uniqueQuestions.values()].sort((a, b) => a.sequence - b.sequence);
-}
 
 function Toolbar({ programKey, hasTemplate, locale, returnPath }: { programKey: string; hasTemplate: boolean; locale: Locale; returnPath: string }) {
   const copy = uiCopy[locale];

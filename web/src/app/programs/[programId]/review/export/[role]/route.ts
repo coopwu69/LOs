@@ -231,6 +231,16 @@ function buildDocx(doc: RoleFormDoc): Document {
   });
 }
 
+// ต่อวันที่-เวลา (เวลาไทย) ท้ายชื่อไฟล์ เพื่อแยกไฟล์ใหม่ออกจากไฟล์ที่ดาวน์โหลดไว้ก่อนหน้า
+function filenameStamp(date = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Bangkok", year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hour12: false,
+  }).formatToParts(date);
+  const get = (type: string) => parts.find((x) => x.type === type)?.value ?? "";
+  return `${get("year")}${get("month")}${get("day")}-${get("hour")}${get("minute")}`;
+}
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ programId: string; role: string }> }
@@ -259,7 +269,7 @@ export async function GET(
 
   const safeCode = program.code.replace(/[^\u0E00-\u0E7Fa-zA-Z0-9]/g, "_");
   const roleLabel = role.charAt(0).toUpperCase() + role.slice(1);
-  const filename = `${roleLabel}_${safeCode}.docx`;
+  const filename = `${roleLabel}_${safeCode}_${filenameStamp()}.docx`;
 
   return new NextResponse(uint8, {
     status: 200,

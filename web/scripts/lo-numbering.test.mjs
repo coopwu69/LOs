@@ -39,3 +39,12 @@ test("empty sections do not consume numbers; empty curriculum is supported", () 
   assert.deepEqual([...getLoQuestionNumbers(sections, [])], []);
   assert.deepEqual(numberLoSections([]), []);
 });
+test("duplicate LO codes collapse to the tersest wording, same as the live form", () => {
+  const dup = [
+    { id: "a", section_id: "skills", sequence: 1, lo_code: "LO1", text: "ข้อความยาวกว่ามาก" },
+    { id: "b", section_id: "skills", sequence: 2, lo_code: "lo1 ", text: "สั้น" },
+    { id: "c", section_id: "skills", sequence: 3, lo_code: "LO2", text: "อีกข้อ" },
+  ];
+  const numbered = numberLoSections([{ id: "skills", domain_type: "skills", sequence: 1, title_th: "", title_en: null, part: 1, questions: dup }]);
+  assert.deepEqual(numbered[0].questions.map((q) => [q.id, q.lo_code]), [["b", "LO1"], ["c", "LO2"]]);
+});
