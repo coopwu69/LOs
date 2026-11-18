@@ -168,7 +168,7 @@ export function FormShell({
                   {reportVariantCopy.rubric[index].map((text, level) => (
                     <li key={level}><span className="font-semibold text-primary">{level + 1}</span> {text}</li>
                   ))}
-                  {reportVariant?.naItems.includes(index) && <li><span className="font-semibold text-primary">X</span> {reportVariantCopy.naLabel.replace(/^X\s*/, "")}</li>}
+                  {reportVariant?.naItems.includes(index) && <li><span className="font-semibold text-primary">–</span> {reportVariantCopy.naLabel}</li>}
                 </ul>
               )}
             </fieldset>

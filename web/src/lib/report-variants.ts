@@ -72,7 +72,7 @@ const IMAG_VARIANT: ReportVariant = {
           "อธิบายกระบวนการ ขั้นตอน และผลลัพธ์ได้ชัดเจน ครบถ้วน",
         ],
       ],
-      naLabel: "X ไม่สามารถประเมินได้",
+      naLabel: "ไม่สามารถประเมินได้",
     },
     en: {
       step: ["Work and performance", "Work and performance for the organization", "Assess the quality of the work the student produced for the organization and how progress was communicated"],
@@ -115,7 +115,7 @@ const IMAG_VARIANT: ReportVariant = {
           "Explains the process, steps, and results clearly and completely",
         ],
       ],
-      naLabel: "X Unable to assess",
+      naLabel: "Unable to assess",
     },
   },
 };

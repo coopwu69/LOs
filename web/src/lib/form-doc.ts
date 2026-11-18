@@ -6,7 +6,7 @@ import { programDisplayName } from "./i18n";
 import { FORM_NAMES } from "./form-names";
 import { FORM_ROLES, type FormRole } from "./routes";
 import { WIZARD_COPY, PRIMARY_DOMAINS, ENGLISH_SCORE_LABELS } from "@/components/evaluation/copy";
-import { REPORT_NA_VALUE, reportVariantFor, type ReportVariant } from "@/lib/report-variants";
+import { reportVariantFor, type ReportVariant } from "@/lib/report-variants";
 import { ADVISOR_COPY } from "@/components/advisor/advisor-copy";
 import { STUDENT_COPY } from "@/components/student/student-copy";
 import type { TemplateDoc, SectionRow, QuestionRow, OptionRow, ProgramRow } from "./types";
@@ -156,7 +156,7 @@ function variantReportQuestions(variant: ReportVariant, locale: Locale, labels: 
     const scale: FormDocScaleLevel[] = labels
       .map((label, idx) => ({ score: idx + 1, label, description: v.rubric[i]?.[idx] }))
       .reverse();
-    if (variant.naItems.includes(i)) scale.push({ score: 0, scoreLabel: REPORT_NA_VALUE, label: v.naLabel.replace(/^X\s*/, "") });
+    if (variant.naItems.includes(i)) scale.push({ score: 0, scoreLabel: "–", label: v.naLabel });
     return { code: `${i + 1}`, text: item, type: "rating" as const, scale };
   });
 }
